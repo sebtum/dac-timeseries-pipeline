@@ -124,6 +124,16 @@ See the KPI table above. In addition:
 | duplicate_timestamp | throughout | 10 timestamps with two conflicting values | Not exact duplicates — requires an explicit tie-break policy. |
 | out_of_order | throughout | ~20 rows locally shuffled | Minor jitter, not a big delayed batch — still breaks anything assuming strict ordering. |
 
+One of the ten conflicting duplicates happens to land on `power` at
+**2026-04-20T10:43:20Z**: the original row reads `power=15029.1` (consistent with
+`voltage=100.33, current=149.80`), the conflicting duplicate reads `power=15393.1`. A naive
+"last row wins" resolution — e.g. a dict keyed by timestamp, overwritten as you scan the
+file — will silently pick up the jittered value and then report a spurious ~2.4%
+`power != voltage * current` mismatch that looks like a physical inconsistency but is
+actually just unresolved duplicate handling. This is a genuine, verified interaction
+between two defect categories, not a separate injected bug — it's a good concrete example
+of why "which duplicate do I keep" isn't a cosmetic question.
+
 ## Missing metadata (`data/raw/experiments.json`)
 
 | Experiment | Missing field |
