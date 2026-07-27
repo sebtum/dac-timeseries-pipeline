@@ -1,0 +1,11 @@
+# raw dataset is large and regenerable; only its checksum is versioned
+data/raw/*.csv
+
+# python
+.venv/
+__pycache__/
+*.pyc
+
+# influx/grafana local state if run via docker volumes here
+influxdb-data/
+grafana-data/
