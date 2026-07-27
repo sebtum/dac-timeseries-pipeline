@@ -33,7 +33,7 @@
     "solvent_flow_nominal_Lmin": 8.0,
     "operator": "M. Alvarez",
     "sorbent_batch": "SB-2026-015",
-    "notes": "Doubled air flow vs. baseline."
+    "notes": null
   },
   {
     "experiment_id": "EXP_004",
@@ -56,7 +56,7 @@
     "air_flow_nominal_m3h": 1200.0,
     "solvent_flow_nominal_Lmin": 8.0,
     "operator": "J. Nguyen",
-    "sorbent_batch": "SB-2026-016",
+    "sorbent_batch": null,
     "notes": "Hydrolyzer setpoint tracks available solar power."
   },
   {
@@ -67,7 +67,7 @@
     "current_setpoint_nominal_A": 150.0,
     "air_flow_nominal_m3h": 1200.0,
     "solvent_flow_nominal_Lmin": 9.5,
-    "operator": "R. Kovac",
+    "operator": null,
     "sorbent_batch": "SB-2026-015",
     "notes": "Slightly richer solvent flow vs. baseline."
   }

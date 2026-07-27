@@ -320,11 +320,330 @@ def sample_experiment(cfg, true_series, ambient_series, rng):
     return records
 
 
-def write_experiments_metadata(path):
+def parse_ts(ts_str):
+    return datetime.strptime(ts_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+
+def fmt_ts(dt):
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def log_defect(manifest, kind, exp, source, signal, start, end, description, lesson):
+    manifest.append(dict(
+        type=kind, experiment_id=exp, source=source, signal=signal,
+        start_ts=fmt_ts(start) if isinstance(start, datetime) else start,
+        end_ts=fmt_ts(end) if isinstance(end, datetime) else end,
+        description=description, lesson=lesson,
+    ))
+
+
+def remove_rows(records, predicate):
+    kept, removed = [], 0
+    for r in records:
+        if predicate(r):
+            removed += 1
+        else:
+            kept.append(r)
+    return kept, removed
+
+
+def in_window(r, source, signal, t0, t1):
+    return r[2] == source and r[3] == signal and t0 <= parse_ts(r[0]) < t1
+
+
+def set_quality_window(records, source, signal, t0, t1, quality, new_value=None):
+    count = 0
+    for r in records:
+        if in_window(r, source, signal, t0, t1):
+            r[5] = quality
+            if new_value is not None:
+                r[4] = new_value
+            count += 1
+    return count
+
+
+def set_single_value(records, source, signal, t, value):
+    best = None
+    for r in records:
+        if r[2] == source and r[3] == signal:
+            if best is None or abs((parse_ts(r[0]) - t).total_seconds()) < \
+                    abs((parse_ts(best[0]) - t).total_seconds()):
+                best = r
+    if best is not None:
+        best[4] = value
+    return best
+
+
+def freeze_window(records, source, signal, t0, t1, freeze_value=None):
+    matches = [r for r in records if in_window(r, source, signal, t0, t1)]
+    matches.sort(key=lambda r: parse_ts(r[0]))
+    if not matches:
+        return 0, freeze_value
+    value = freeze_value if freeze_value is not None else matches[0][4]
+    for r in matches:
+        r[4] = value
+    return len(matches), value
+
+
+def scale_window(records, source, signal, t0, t1, factor, decimals):
+    count = 0
+    for r in records:
+        if in_window(r, source, signal, t0, t1):
+            r[4] = f"{float(r[4]) * factor:.{decimals}f}"
+            count += 1
+    return count
+
+
+def duplicate_exact(records, rng, n):
+    if not records:
+        return records
+    picks = [records[rng.randrange(len(records))] for _ in range(n)]
+    return records + [list(p) for p in picks]
+
+
+def duplicate_conflicting(records, rng, n, jitter_frac):
+    numeric = [r for r in records if r[3] not in ("valve_state", "process_state")]
+    if not numeric:
+        return records
+    picks = rng.sample(numeric, min(n, len(numeric)))
+    extra = []
+    for r in picks:
+        jittered = float(r[4]) * (1.0 + rng.uniform(-jitter_frac, jitter_frac))
+        decimals = len(r[4].split(".")[1]) if "." in r[4] else 0
+        extra.append([r[0], r[1], r[2], r[3], f"{jittered:.{decimals}f}", "GOOD"])
+    return records + extra
+
+
+def move_block_to_end(records, signals, t0, t1):
+    moved, kept = [], []
+    for r in records:
+        if r[3] in signals and t0 <= parse_ts(r[0]) < t1:
+            moved.append(r)
+        else:
+            kept.append(r)
+    return kept + moved, len(moved)
+
+
+def interleave_shuffle(records, rng, n):
+    for _ in range(n):
+        i = rng.randrange(len(records) - 10)
+        j = i + rng.randint(4, 9)
+        records[i], records[j] = records[j], records[i]
+    return records
+
+
+def apply_unit_change(records, source, signal, t_from, factor, decimals):
+    count = 0
+    for r in records:
+        if r[2] == source and r[3] == signal and parse_ts(r[0]) >= t_from:
+            r[4] = f"{float(r[4]) * factor:.{decimals}f}"
+            count += 1
+    return count
+
+
+def apply_ambient_timezone(records):
+    for r in records:
+        if r[2] == "ambient":
+            local_dt = parse_ts(r[0]) + timedelta(hours=2)
+            r[0] = local_dt.strftime("%Y-%m-%dT%H:%M:%S") + "+02:00"
+    return records
+
+
+def inject_defects(cfg, records, rng, manifest):
+    exp = cfg["id"]
+    start = cfg["start"]
+    records = [list(r) for r in records]
+
+    if exp == "EXP_001":
+        for w0, w1 in [(600, 615), (1800, 1825), (4200, 4206), (5500, 5528)]:
+            t0, t1 = start + timedelta(seconds=w0), start + timedelta(seconds=w1)
+            for signal in ("current", "voltage", "power"):
+                records, removed = remove_rows(
+                    records, lambda r, s=signal, a=t0, b=t1: in_window(r, "hydrolyzer", s, a, b))
+                log_defect(manifest, "short_gap", exp, "hydrolyzer", signal, t0, t1,
+                           f"{w1 - w0}s dropout, {removed} samples removed",
+                           "Short enough that linear interpolation across the gap is defensible.")
+
+        t = start + timedelta(seconds=2500)
+        set_single_value(records, "hydrolyzer", "voltage", t, "412.00")
+        log_defect(manifest, "outlier", exp, "hydrolyzer", "voltage", t, t,
+                   "Single-sample voltage spike to 412 V",
+                   "A single-sample spike, not a real transient; a rolling median or z-score check "
+                   "should catch it without needing a physical-limits table.")
+
+        t0, t1 = start + timedelta(seconds=3600), start + timedelta(seconds=3900)
+        n = set_quality_window(records, "hydrolyzer", "conductivity", t0, t1, "BAD", new_value="50.0")
+        log_defect(manifest, "bad_quality", exp, "hydrolyzer", "conductivity", t0, t1,
+                   f"{n} samples pinned to an implausibly low reading and flagged BAD",
+                   "Flagged at the source; keep the value for audit but exclude it from any "
+                   "efficiency/energy calculation.")
+
+        t0, t1 = start + timedelta(seconds=5000), start + timedelta(seconds=5120)
+        n = scale_window(records, "hydrolyzer", "power", t0, t1, 1.4, 1)
+        log_defect(manifest, "physical_inconsistency", exp, "hydrolyzer", "power", t0, t1,
+                   f"power inflated ~40% above voltage*current for {n} samples, quality stays GOOD",
+                   "power != voltage * current is not a statistical outlier if power stays within its "
+                   "normal range - it is a physical consistency check the candidate has to compute "
+                   "deliberately, not something a range check will find.")
+
+    elif exp == "EXP_002":
+        t0, t1 = start + timedelta(seconds=3960), start + timedelta(seconds=4440)
+        records, removed = remove_rows(records, lambda r: r[2] == "hydrolyzer" and t0 <= parse_ts(r[0]) < t1)
+        log_defect(manifest, "long_gap", exp, "hydrolyzer", "*", t0, t1,
+                   f"8-minute full outage of the hydrolyzer data source ({removed} samples removed)",
+                   "Long enough that interpolation is not defensible; the window must be excluded "
+                   "from derived metrics, not filled in.")
+
+        t = start + timedelta(seconds=2000)
+        set_single_value(records, "hydrolyzer", "current", t, "0.00")
+        log_defect(manifest, "physical_inconsistency", exp, "hydrolyzer", "current", t, t,
+                   "current forced to 0 A while power stays near its normal ~29 kW",
+                   "current = 0 with nonzero power is not statistically unusual for either signal alone "
+                   "- only the combination is physically impossible.")
+
+        records = duplicate_exact(records, rng, 15)
+        log_defect(manifest, "duplicate_timestamp", exp, "*", "*",
+                   start, start + timedelta(seconds=cfg["duration_s"]),
+                   "15 rows duplicated exactly (same timestamp, signal and value)",
+                   "Simple exact-duplicate detection (drop identical rows) is safe here.")
+
+    elif exp == "EXP_003":
+        t0, t1 = start + timedelta(seconds=3600), start + timedelta(seconds=4800)
+        n, value = freeze_window(records, "absorber", "solvent_temperature", t0, t1)
+        log_defect(manifest, "stuck_sensor", exp, "absorber", "solvent_temperature", t0, t1,
+                   f"{n} samples frozen at {value} while the process kept evolving, quality stays GOOD",
+                   "Noise disappearing entirely is itself the signature; a rolling-variance check "
+                   "catches it even though every individual value looks plausible.")
+
+        t = start + timedelta(seconds=1500)
+        set_single_value(records, "absorber", "solvent_pH", t, "27.400")
+        log_defect(manifest, "outlier", exp, "absorber", "solvent_pH", t, t,
+                   "Single-sample solvent_pH spike to 27.4 (outside the physically possible 0-14 range)",
+                   "Physically impossible on its own - doesn't even need a statistical test, "
+                   "just a hard-limits check.")
+
+        t = start + timedelta(seconds=5000)
+        set_single_value(records, "plant", "fan_speed", t, "0.0")
+        log_defect(manifest, "physical_inconsistency", exp, "plant", "fan_speed", t, t,
+                   "fan_speed forced to 0 while air_flow stays at its normal ~2400 m3/h",
+                   "air_flow is untouched and looks completely normal - only cross-checking it "
+                   "against fan_speed reveals the inconsistency.")
+
+        t0, t1 = start + timedelta(seconds=2200), start + timedelta(seconds=2400)
+        n = set_quality_window(records, "hydrolyzer", "acid_pH", t0, t1, "BAD", new_value="4.800")
+        log_defect(manifest, "bad_quality", exp, "hydrolyzer", "acid_pH", t0, t1,
+                   f"{n} samples pinned to a value inconsistent with the current level, flagged BAD",
+                   "Flagged at the source; keep for audit, exclude from process analysis.")
+
+    elif exp == "EXP_004":
+        t = start + timedelta(seconds=1000)
+        set_single_value(records, "hydrolyzer", "pressure", t, "-3.100")
+        log_defect(manifest, "outlier", exp, "hydrolyzer", "pressure", t, t,
+                   "Single-sample pressure spike to -3.1 bar (negative gauge pressure isn't possible here)",
+                   "Physically impossible value; a hard-limits check catches it independent of statistics.")
+
+        t_from = start + timedelta(seconds=3600)
+        n = apply_unit_change(records, "absorber", "air_flow", t_from, 1.0 / 60.0, 2)
+        log_defect(manifest, "unit_change", exp, "absorber", "air_flow",
+                   t_from, start + timedelta(seconds=cfg["duration_s"]),
+                   f"{n} air_flow samples silently switch from m3/h to Nm3/min partway through the run, "
+                   f"quality stays GOOD",
+                   "pressure_drop is generated from the true, unchanged air flow and stays normal "
+                   "throughout, so cross-checking pressure_drop against the reported air_flow shows "
+                   "they've become inconsistent with each other after the switch.")
+
+        t = start + timedelta(seconds=4500)
+        set_single_value(records, "plant", "pump_speed", t, "0.0")
+        log_defect(manifest, "physical_inconsistency", exp, "plant", "pump_speed", t, t,
+                   "pump_speed forced to 0 while solvent_flow stays at its normal level",
+                   "solvent_flow alone looks unremarkable; only checking it against pump_speed "
+                   "reveals the inconsistency.")
+
+        t0, t1 = start + timedelta(seconds=2000), start + timedelta(seconds=2200)
+        n = set_quality_window(records, "hydrolyzer", "pressure", t0, t1, "UNCERTAIN")
+        log_defect(manifest, "uncertain_quality", exp, "hydrolyzer", "pressure", t0, t1,
+                   f"{n} samples flagged UNCERTAIN, value left unchanged",
+                   "UNCERTAIN is not the same as wrong; the candidate has to decide per-calculation "
+                   "whether to include or exclude these rather than blanket-dropping them like BAD.")
+
+    elif exp == "EXP_005":
+        t = start + timedelta(seconds=4000)
+        set_single_value(records, "hydrolyzer", "electrolyte_temperature", t, "-50.00")
+        log_defect(manifest, "outlier", exp, "hydrolyzer", "electrolyte_temperature", t, t,
+                   "Single-sample electrolyte_temperature spike to -50 C",
+                   "Physically implausible for an operating electrolyzer; a hard-limits or "
+                   "rolling-median check catches it.")
+
+        t_close = start + timedelta(seconds=2500)
+        t_open = t_close + timedelta(seconds=45)
+        records.append([fmt_ts(t_close), exp, "plant", "valve_state", "CLOSED", "GOOD"])
+        records.append([fmt_ts(t_open), exp, "plant", "valve_state", "OPEN", "GOOD"])
+        log_defect(manifest, "physical_inconsistency", exp, "plant", "valve_state", t_close, t_open,
+                   "valve_state reports CLOSED for 45s while solvent_flow keeps flowing normally",
+                   "solvent_flow itself is untouched and unremarkable; the inconsistency only shows "
+                   "up when cross-checked against valve_state.")
+
+        t0, t1 = start + timedelta(seconds=2800), start + timedelta(seconds=2980)
+        records, moved = move_block_to_end(
+            records, {"current", "voltage", "power", "flow", "pressure",
+                      "air_flow", "pump_speed", "fan_speed"}, t0, t1)
+        log_defect(manifest, "out_of_order", exp, "hydrolyzer/plant", "*", t0, t1,
+                   f"{moved} rows from this window arrive as a late batch appended at the end of the file",
+                   "Ingestion must not assume the file is time-sorted; sort (or upsert by timestamp) "
+                   "before computing anything windowed.")
+
+        t0, t1 = start, start + timedelta(seconds=1800)
+        n = set_quality_window(records, "ambient", "ambient_pressure", t0, t1, "UNCERTAIN")
+        log_defect(manifest, "uncertain_quality", exp, "ambient", "ambient_pressure", t0, t1,
+                   f"{n} samples flagged UNCERTAIN during a suspected weather-station recalibration",
+                   "Low-stakes signal; a reasonable candidate may choose to just note this rather "
+                   "than build special handling for it.")
+
+    elif exp == "EXP_006":
+        t0, t1 = start + timedelta(seconds=1080), start + timedelta(seconds=3000)
+        records, removed = remove_rows(records, lambda r: r[2] == "absorber" and t0 <= parse_ts(r[0]) < t1)
+        log_defect(manifest, "long_gap", exp, "absorber", "*", t0, t1,
+                   f"32-minute full outage of the absorber data source ({removed} samples removed)",
+                   "Long enough that interpolation is not defensible; also directly hurts this "
+                   "experiment's data_completeness score.")
+
+        t0, t1 = start + timedelta(seconds=3600), start + timedelta(seconds=6300)
+        n, value = freeze_window(records, "absorber", "co2_out_ppm", t0, t1, freeze_value="38.0")
+        log_defect(manifest, "stuck_sensor", exp, "absorber", "co2_out_ppm", t0, t1,
+                   f"{n} samples frozen at {value} ppm, quality stays GOOD",
+                   "With co2_in ~420 ppm this makes naive capture efficiency look like ~91% for this "
+                   "stretch - the single biggest trap in the dataset. A naive per-experiment average "
+                   "ranks this experiment as the best performer; a completeness/variance-aware "
+                   "analysis should disqualify or heavily discount it instead.")
+
+        records = duplicate_conflicting(records, rng, 10, 0.08)
+        log_defect(manifest, "duplicate_timestamp", exp, "*", "*",
+                   start, start + timedelta(seconds=cfg["duration_s"]),
+                   "10 timestamps carry two rows for the same signal with different values",
+                   "Exact-duplicate dropping does not resolve this; it requires an explicit tie-break "
+                   "policy (last-write-wins, average, or flag-both-suspect).")
+
+        records = interleave_shuffle(records, rng, 20)
+        log_defect(manifest, "out_of_order", exp, "*", "*",
+                   start, start + timedelta(seconds=cfg["duration_s"]),
+                   "~20 rows locally shuffled a few positions out of chronological order",
+                   "Simulates minor network/queueing jitter rather than a large delayed batch; "
+                   "still breaks any code that assumes strict file ordering.")
+
+    records = apply_ambient_timezone(records)
+    return records
+
+
+def write_experiments_metadata(path, manifest):
+    missing_fields = {
+        "EXP_003": ("notes",),
+        "EXP_005": ("sorbent_batch",),
+        "EXP_006": ("operator",),
+    }
     data = []
     for cfg in EXPERIMENTS:
         end = cfg["start"] + timedelta(seconds=cfg["duration_s"])
-        data.append(dict(
+        record = dict(
             experiment_id=cfg["id"],
             start_time=cfg["start"].strftime("%Y-%m-%dT%H:%M:%SZ"),
             end_time=end.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -335,13 +654,21 @@ def write_experiments_metadata(path):
             operator=cfg["operator"],
             sorbent_batch=cfg["sorbent_batch"],
             notes=cfg["notes"],
-        ))
+        )
+        for field in missing_fields.get(cfg["id"], ()):
+            record[field] = None
+            log_defect(manifest, "missing_metadata", cfg["id"], "experiments.json", field, None, None,
+                       f"{field} was not recorded for this run",
+                       "Forces an explicit decision about what a clean experiment comparison requires "
+                       "and whether missing context should block a conclusion.")
+        data.append(record)
     path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     csv_path = OUT_DIR / "dac_raw_timeseries.csv"
+    manifest = []
 
     total_rows = 0
     with csv_path.open("w", newline="", encoding="utf-8") as f:
@@ -351,18 +678,26 @@ def main():
             rng = random.Random(f"{SEED}-{cfg['id']}")
             true_series, ambient_series = simulate_true_series(cfg, rng)
             records = sample_experiment(cfg, true_series, ambient_series, rng)
+            records = inject_defects(cfg, records, rng, manifest)
             writer.writerows(records)
             total_rows += len(records)
             avg_current = sum(r["current"] for r in true_series) / len(true_series)
             avg_co2_out = sum(r["co2_out_ppm"] for r in true_series) / len(true_series)
             avg_eta = 1.0 - avg_co2_out / 420.0
             print(f"{cfg['id']}: {len(records):>7} rows | avg current {avg_current:6.1f} A "
-                  f"| avg capture efficiency {avg_eta * 100:5.1f}%")
+                  f"| true (pre-defect) capture efficiency {avg_eta * 100:5.1f}%")
 
-    write_experiments_metadata(OUT_DIR / "experiments.json")
+    write_experiments_metadata(OUT_DIR / "experiments.json", manifest)
+
+    debrief_dir = Path(__file__).resolve().parent.parent / "_debrief"
+    debrief_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = debrief_dir / "defect_manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     print(f"\nTotal rows written: {total_rows}")
+    print(f"Defects logged: {len(manifest)}")
     print(f"CSV: {csv_path}")
+    print(f"Manifest: {manifest_path}")
 
 
 if __name__ == "__main__":
