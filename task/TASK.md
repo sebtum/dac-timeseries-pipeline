@@ -42,12 +42,14 @@ of the task.
 
 ## Deliverables
 
-Work through as much of this as you can in the time available. Prioritization is part of
-what's being evaluated — it's fine (expected, even) not to finish everything.
+Work through all of the following.
 
 **A. Time-series data model.** Design how this data should live in InfluxDB: what's a
 measurement, what's a tag, what's a field, how experiment/component/sensor identity is
-represented. Raw values must be preserved unchanged somewhere in your model.
+represented. Raw values must be preserved unchanged somewhere in your model. Also address
+cost/scalability directly: months of high-resolution electrochemical data adds up — what's
+your retention/downsampling/tiering strategy, and what stays at full resolution vs. gets
+rolled up over time?
 
 **B. Ingestion.** Get the raw CSV into InfluxDB. Python is fine for this.
 
@@ -74,22 +76,47 @@ need different handling.
 **F. Experiment comparison.** Experiments started at different wall-clock times — align
 them (e.g. `experiment_time = timestamp - experiment_start`) so they're comparable. Use
 process phases (startup / steady-state / load-change / shutdown) if that helps your
-analysis. Come with at least a few concrete findings, not just plots.
+analysis. Come with at least a few concrete findings, not just plots — in particular, come
+with a specific, evidenced answer for how flow and pressure relate to hydrolyzer (cell)
+voltage; that's the relationship most worth having a sharp answer for.
 
-**G. Grafana dashboard design.** Sketch (or build, if you have time) a dashboard a scientist
-would actually use to compare experiments: experiment selector, KPI summary, relevant
-time-series, an overlay of multiple experiments on a common time axis, and something that
-makes data quality visible rather than hidden.
+**G. Grafana dashboard.** Build a running dashboard a scientist would actually use to compare
+experiments: experiment selector, KPI summary, relevant time-series, an overlay of multiple
+experiments on a common time axis, and something that makes data quality visible rather than
+hidden.
 
 ## Format
 
-Whatever gets you furthest fastest — scripts, a notebook, an actual running InfluxDB/Grafana
-setup, or written design notes for the parts you don't get to implement. If you run out of
-time on something, a clear note on what you'd do next is worth more than a rushed
-half-implementation.
+Scripts, a notebook, an actual running InfluxDB/Grafana setup — whatever gets each deliverable
+to a working state. `H` and `I` below are design/verbal by nature, not as a fallback for
+running out of time; everything in `A`–`G` should end up as something you can actually run or
+click through, not just described.
 
-## Time budget
+## Extended topics
 
-Open-book, 60 minutes. You will not finish all of this — that's by design. Stop when the
-clock runs out, whatever state you're in, and be ready to walk through what you built, why,
-and what you'd change.
+The deliverables above assume the raw CSV as a given starting point. These two go one layer
+further up the stack — treat them as open-ended design/discussion, not something to build.
+
+**H. Edge ingestion & resilience (design only).** The raw CSV is, in effect, what already
+landed in a local historian/buffer on an industrial PC at the plant. Design the layer
+upstream of it: how does that edge device get data from the plant's control system, how does
+it forward data onward, how does it survive a loss of connectivity without losing data, and
+how is that link secured? There's no real OPC-UA server or PLC to connect to here, so this
+stays a design exercise — but come with a specific architecture, not just component names,
+and be ready to defend the failure-mode handling in particular. Also design for "system
+health" as its own concern, separate from whether an individual value is clean: how would you
+know the pipeline itself is alive vs. silently stalled — heartbeats, staleness alarms, a
+watchdog? Name the failure mode where every point still looks individually fine but the
+pipeline has actually stopped moving data.
+
+**I. Cloud scaling narrative (verbal).** Talk through how your design would change if it had
+to run on AWS instead of on your laptop/local Docker setup — for each piece (ingestion,
+storage, processing, dashboarding), what becomes a managed service, what stays custom, and
+what changes about how failures are handled once it's cloud/multi-tenant rather than one box
+you control end to end. No need to actually stand any of this up.
+
+**J. Presentation walkthrough (verbal).** Once the rest is in whatever state you've reached,
+prepare a short walkthrough as if presenting to an interviewer: why this specific
+PLC-to-cloud flow (not just what it is), and a concrete walk-through of comparing a voltage
+spike from one experiment against another — show exactly how your system gets from raw
+telemetry to that comparison without the scientist manually aligning anything themselves.
