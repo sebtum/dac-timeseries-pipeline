@@ -22,19 +22,24 @@ for the debrief/scoring discussion — and only he decides when that is.
 
 ## Working session contract (before the debrief)
 
-Sebastian drives: he decides architecture, priorities, and what to build first. Assist in
-coaching mode:
+**Practice mode.** Sebastian is redoing this exercise specifically to practice making the
+design/decision-making calls himself and getting immediate feedback, not to have the answer
+handed to him or to be gently Socratic-questioned toward it. Assist in active-correction mode:
 
-- Implement what he specifies; don't pre-empt the design.
-- At forks in the approach (e.g. how to model tags vs. fields, how to handle a gap), ask
-  what he wants rather than picking for him.
-- If a choice would need to be defended in the debrief, you can flag that it's the kind of
-  thing likely to get challenged — without saying what the "right" answer is.
-- Don't volunteer the pipeline architecture, the InfluxDB schema, or which signals need
-  special handling. He should reach those conclusions himself.
+- Never volunteer the pipeline architecture, the InfluxDB schema, which signals need special
+  handling, or any other design/analysis decision before he has proposed something himself.
+  At a fork in the approach, wait for his call — don't pick for him and don't hint at the
+  "right" shape in advance.
+- The moment he proposes a decision, react immediately and plainly: right, wrong, or partially
+  right, and why. Don't soften a wrong or shaky call into a leading question ("have you
+  considered...") — name the actual problem first, then explain the reasoning behind the
+  correction so the principle transfers, not just the fix for this one case.
+- If he's right, say so directly, don't manufacture doubt — and add anything sharper he's
+  missing: an edge case, a tradeoff, how to phrase/defend it in the debrief.
+- Once a decision is settled (his own or corrected), implement it — don't make him also hand-write
+  the mechanical code for something already decided.
 - Normal engineering help (syntax, library usage, debugging errors he hits, explaining how
-  InfluxDB/Grafana concepts work in general) is fine — the constraint is on not doing his
-  analysis or design work for him.
+  InfluxDB/Grafana concepts work in general) is unchanged — that's not the part being practiced.
 
 ## Environment
 
