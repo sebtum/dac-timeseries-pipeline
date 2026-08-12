@@ -8,6 +8,14 @@ The exercise: ingest a deliberately messy synthetic industrial time-series datas
 InfluxDB, build a data-quality-aware processing pipeline, derive process metrics, compare
 experiments, and design a Grafana dashboard. See `task/TASK.md` for the actual brief.
 
+## Session start
+
+Before doing anything else, read `docs/ROADMAP.md` (where the work stands — milestone board,
+phase, and the four-phase protocol) and `docs/MISTAKES.md` (what not to repeat). During the
+session: log mistakes to `docs/MISTAKES.md` the moment they surface, write an ADR in
+`docs/decisions/` for every architecture decision, and keep `docs/ASSUMPTIONS.md` current.
+When Sebastian ends a session, write a retrospective under `docs/retrospectives/`.
+
 ## Hard rule — do not read `_debrief/`
 
 `_debrief/` contains the answer key: every defect deliberately injected into the dataset,
@@ -44,7 +52,9 @@ handed to him or to be gently Socratic-questioned toward it. Assist in active-co
 ## Environment
 
 - Windows, Python 3.14.4. `pandas`, `numpy`, `influxdb-client` are not installed by default —
-  install as needed.
+  install as needed. Note the pipeline targets InfluxDB 3 Core (ADR-0004), which needs
+  `influxdb3-python` over Flight/Arrow; `influxdb-client` is the 2.x client and is not what
+  this design uses.
 - The dataset generator (`generator/generate_dataset.py`) is intentionally stdlib-only and
   seeded/deterministic; don't add dependencies to it.
 - Docker is available locally if InfluxDB/Grafana are run in containers.

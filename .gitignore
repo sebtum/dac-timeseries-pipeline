@@ -9,3 +9,8 @@ __pycache__/
 # influx/grafana local state if run via docker volumes here
 influxdb-data/
 grafana-data/
+
+# editor swap/backup files
+*.swp
+*.swo
+*~
