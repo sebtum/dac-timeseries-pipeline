@@ -16,9 +16,9 @@ live in `decisions/`, written only after Sebastian has made the call.
 
 | M | Name | Deliverables | Phase | ADRs |
 |---|------|--------------|-------|------|
-| M0 | Environment & reconnaissance | (setup), CI | Discuss | — |
-| M1 | Time-series data model | A | Not started | — |
-| M2 | Ingestion | B | Not started | — |
+| M0 | Environment & reconnaissance | (setup), CI | Plan | — |
+| M1 | Time-series data model | A | Plan | [0006](decisions/ADR-0006-timeseries-data-model.md) |
+| M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
 | M4 | Derived metrics | E | Not started | — |
 | M5 | Comparison & findings | F | Not started | — |
@@ -34,8 +34,8 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 
 | # | Deliverable | Milestone | State |
 |---|-------------|-----------|-------|
-| A | Time-series data model | M1 | Not started |
-| B | Ingestion | M2 | Not started |
+| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/downsampling not started |
+| B | Ingestion | M2 | Duplicate handling & idempotency settled (ADR-0007); rest not started |
 | C | Data quality pipeline | M3 | Not started |
 | D | Cleaning and processing | M3 | Not started |
 | E | Derived metrics | M4 | Not started |
@@ -131,6 +131,10 @@ Claude's to pre-empt.
 - Start Docker; bring up InfluxDB + Grafana (compose file, pinned image tags, local-only
   credentials).
 - Write the profiling scripts implementing his checks.
+- **Duplicate census**, now a dependency rather than one check among many: exact vs conflicting
+  same-timestamp collisions per experiment and signal, whether conflicting pairs differ in
+  `quality`, and whether the two categorical signals collide at all. U-07, U-08 and U-11 are all
+  blocked on these numbers.
 
 **Verify**
 - Containers healthy and reachable.
@@ -141,10 +145,12 @@ Claude's to pre-empt.
 ## M1 — Time-series data model (A)
 
 **Decide**
-- Measurement / tag / field layout; how experiment, source and sensor identity are
-  represented.
-- Where raw values live unchanged.
-- Tag cardinality budget.
+- ~~Measurement / tag / field layout; how experiment, source and sensor identity are
+  represented.~~ *(settled: [ADR-0006](decisions/ADR-0006-timeseries-data-model.md))*
+- ~~Where raw values live unchanged.~~ *(settled: ADR-0006)*
+- ~~Tag cardinality budget.~~ *(settled: ADR-0006 — 150 series, measured not estimated)*
+- Where processed values, pipeline quality verdicts and exclusion reasons live — a second axis,
+  independent of the numeric/state split (U-09, U-10). Deferred to M3.
 - Retention, downsampling, tiering — what stays full-resolution, what rolls up, when.
 
 **Execute**
@@ -168,9 +174,15 @@ Claude's to pre-empt.
 
 ## M2 — Ingestion (B)
 
-**Decide** — batching; timestamp precision; type handling for the categorical signals;
-idempotency / re-run behaviour; error handling; how the timezone question raised in the data
-dictionary is resolved.
+**Decide** — batching; timestamp precision; error handling; how the timezone question raised in
+the data dictionary is resolved (U-01). Still open from
+[ADR-0007](decisions/ADR-0007-duplicate-resolution-idempotency.md): the win-policy for
+conflicting duplicates (U-07, constrained to be content-based) and the definition of "same" for
+float comparison (U-08).
+
+*Settled:* type handling for the categorical signals
+([ADR-0006](decisions/ADR-0006-timeseries-data-model.md)); duplicate resolution and
+idempotency / re-run behaviour (ADR-0007).
 
 **Execute** — the ingestion script, against the M1 schema.
 

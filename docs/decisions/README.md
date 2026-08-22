@@ -19,6 +19,8 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0003](ADR-0003-python-pipeline-language.md) | Python for ingestion and processing | — | B–F | Accepted ⚠ |
 | [0004](ADR-0004-influxdb3-core-sql.md) | InfluxDB 3 Core, queried with SQL | M0 | A, B | Accepted |
 | [0005](ADR-0005-postgres-experiment-metadata.md) | PostgreSQL for experiment metadata | M1 | A, F | Accepted |
+| [0006](ADR-0006-timeseries-data-model.md) | Tags, fields, and the numeric/state table split | M1 | A | Accepted |
+| [0007](ADR-0007-duplicate-resolution-idempotency.md) | Same-timestamp duplicate resolution and ingest idempotency | M2 | B, C | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
@@ -26,6 +28,11 @@ The decision stands; the defence is incomplete.
 Note that 0001 and 0004 split deliberately: the brief imposed *InfluxDB*, but *which version,
 queried in which language* was our choice, and the versions differ enough that conflating them
 caused a factual error — see ADR-0001's debrief answer.
+
+0006 and 0007 split for the same reason: 0006 decides what a point *is*, 0007 decides what
+happens when two points claim the same instant. Either could have been decided differently
+without forcing the other, and 0007 exists precisely because 0006's "store raw, unchanged" is
+necessary but not sufficient — InfluxDB will still discard a duplicate silently.
 
 **Pending, to be added by Sebastian:**
 - Docker / local runtime — currently an open M0 decision point, so not yet an ADR.
