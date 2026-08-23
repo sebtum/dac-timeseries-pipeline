@@ -16,7 +16,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 
 | M | Name | Deliverables | Phase | ADRs |
 |---|------|--------------|-------|------|
-| M0 | Environment & reconnaissance | (setup), CI | Plan | — |
+| M0 | Environment & reconnaissance | (setup), CI | Plan | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M1 | Time-series data model | A | Plan | [0006](decisions/ADR-0006-timeseries-data-model.md) |
 | M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
@@ -44,7 +44,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | H | Edge ingestion & resilience (design) | M7 | Not started |
 | I | Cloud scaling narrative (verbal) | M7 | Not started |
 | J | Presentation walkthrough (verbal) | M7 | Not started |
-| — | CI/CD *(added scope, not in the brief)* | cross-cutting, from M0 | Not started |
+| — | CI/CD *(added scope, not in the brief)* | cross-cutting, from M0 | Policy settled ([ADR-0009](decisions/ADR-0009-provisioning-as-code.md)); M0 increment next |
 
 ---
 
@@ -103,7 +103,11 @@ datasources and dashboards loaded from committed files rather than clicked into 
 That last part has value independent of CI: a dashboard that exists only inside a container
 volume can't be handed to anyone.
 
-**Open decision points** (M0 Discuss — see below): where CI runs, and what it runs against.
+**Settled** ([ADR-0009](decisions/ADR-0009-provisioning-as-code.md)): CI runs in GitHub Actions;
+the M0 increment lands **before** any profiling or ingest code, so that code is written under lint
+discipline from line one and any committed profile number is reproducible against a pinned
+dependency set. It is unblocked by U-02 because lint, format and dependency install never read the
+dataset — *what CI runs data tests against* becomes live at M2, not now.
 
 ---
 
@@ -112,14 +116,22 @@ volume can't be handed to anyone.
 Setup, plus the data discovery every later decision depends on.
 
 **Decide**
-- Which checks to run against the raw data, and what counts as enough reconnaissance to
-  start designing.
-- How Influx, Postgres and Grafana get run locally. *(Version and query language are settled:
-  [ADR-0004](decisions/ADR-0004-influxdb3-core-sql.md) — InfluxDB 3 Core with SQL. The image
-  tag must be pinned; `influxdb:latest` has pointed at 3 Core since 27 May 2026.)*
-- Where CI runs, and what it runs against — the raw CSV is gitignored, so a runner has no
-  dataset unless one is provided.
-- Which parts of the stack are provisioned as code, and from when.
+- ~~Which checks to run against the raw data.~~ *(settled: `MISTAKES.md` C-03 — his list plus the
+  two categories it missed.)* **Where** each check runs is settled separately:
+  [ADR-0010](decisions/ADR-0010-profile-post-ingest-in-database.md).
+- ~~How Influx, Postgres and Grafana get run locally.~~ *(settled:
+  [ADR-0008](decisions/ADR-0008-local-runtime-docker-compose.md) — Docker Compose, pinned tags,
+  services added at the milestone that needs them. Version and query language were already settled
+  by [ADR-0004](decisions/ADR-0004-influxdb3-core-sql.md).)*
+- ~~Where CI runs, and what it runs against.~~ *(settled:
+  [ADR-0009](decisions/ADR-0009-provisioning-as-code.md) — GitHub Actions, M0 increment first;
+  U-02 narrowed to M2.)*
+- ~~Which parts of the stack are provisioned as code, and from when.~~ *(settled: ADR-0009 — all
+  of it, added per milestone, with three exceptions: secrets, Grafana dashboards, migrations.)*
+
+**Still open** — U-15 (how the pre-ingest census is packaged) and U-16 (where post-ingest SQL
+profiling sits on this board). The board is **not restructured until U-16 is answered**; until
+then M0's Execute below describes only the pre-ingest half.
 
 **Correction mechanism.** Sebastian names the checks. Once his list is exhausted, Claude
 names the *categories* he didn't check — the brief itself names gaps, sensor noise, quality
@@ -128,19 +140,36 @@ sensors and differing sample rates. What those checks *find* is Sebastian's to i
 Claude's to pre-empt.
 
 **Execute**
-- Start Docker; bring up InfluxDB + Grafana (compose file, pinned image tags, local-only
-  credentials).
-- Write the profiling scripts implementing his checks.
-- **Duplicate census**, now a dependency rather than one check among many: exact vs conflicting
-  same-timestamp collisions per experiment and signal, whether conflicting pairs differ in
-  `quality`, and whether the two categorical signals collide at all. U-07, U-08 and U-11 are all
-  blocked on these numbers.
+- **CI increment first** (ADR-0009): pinned `requirements.txt`, ruff config, Actions workflow
+  running install + lint + format check. No data-dependent step; the comment in the workflow points
+  at U-02.
+- **The pre-ingest pass** — and *only* the pre-ingest pass. Per
+  [ADR-0010](decisions/ADR-0010-profile-post-ingest-in-database.md), it measures what the write to
+  InfluxDB destroys or what ingest needs as input, nothing else:
+  - **Duplicate census** — a dependency rather than one check among many. Exact vs conflicting
+    same-timestamp collisions per experiment and signal, under *every* candidate definition of
+    "same" rather than a chosen one; whether conflicting pairs differ in `quality`; whether the two
+    categorical signals collide at all; verbatim sample pairs. U-07, U-08 and U-11 are blocked on
+    these numbers, and last-write-wins deletes the evidence the moment ingest runs.
+  - Out-of-order arrivals (file order, erased by time-sorted storage).
+  - Timestamp string-format variants per source — the U-01 evidence, erased by parsing to instants.
+  - Row counts per experiment and signal, plus SHA-256 — the left side of ADR-0007's reconciliation
+    identity.
+  - Empty / non-parseable values and which signals are non-numeric, confirming the declared
+    categorical list ADR-0006:117 requires.
+- *Not here:* no Docker, no containers. Nothing needs a running service until M1 (ADR-0008), and
+  the rest of the profiling runs post-ingest (ADR-0010, placement pending U-16).
 
 **Verify**
-- Containers healthy and reachable.
-- Every requested check produces a number he can cite.
-- `data/raw/dac_raw_timeseries.sha256` still verifies.
-- Profile output saved to a file, so later milestones cite evidence rather than memory.
+- CI green on the branch; `pip install -r requirements.txt` succeeds from clean; `generator/` is
+  byte-identical (it is stdlib-only by contract).
+- Every pre-ingest measurement above produces a number he can cite, saved to a file so later
+  milestones cite evidence rather than memory.
+- U-07, U-08 and U-11 each have a concrete number or verbatim sample behind them — enough to make
+  the M2 decision without re-reading the CSV.
+- `data/raw/dac_raw_timeseries.sha256` still verifies: the pass is read-only.
+- **No verdict labels** anywhere in the output — counts, distributions and samples only. Emitting
+  `STUCK` would be C-02 repeated. Grep-checkable.
 
 ## M1 — Time-series data model (A)
 

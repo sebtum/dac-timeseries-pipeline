@@ -30,7 +30,50 @@ made without running the check — and any violation of the practice-mode contra
 `CLAUDE.md`, e.g. volunteering a design decision before Sebastian has proposed one, or
 softening a wrong call into a leading question instead of naming the problem.
 
-*(no entries yet)*
+### E-01 — Planned reconnaissance as a full in-memory pandas pass over the raw CSV   [M0, 2026-08-23]
+
+**Claimed / did:** proposed the M0 profiling pass as a Python script that loads all 520,005 rows
+into pandas and computes every check from `MISTAKES.md` C-03 in memory, against
+`data/raw/dac_raw_timeseries.csv`.
+
+**Actually true:** three things, each independently sufficient to reject it.
+1. Most of those checks are not destroyed by ingestion, so they can run as SQL aggregations
+   against InfluxDB — where the technique actually scales and where a real system would run them.
+   `task/TASK.md` frames the CSV as what already landed in a historian; in production there is no
+   CSV to load.
+2. A full in-memory load is the weakest possible answer to U-06, which is registered as the most
+   predictable debrief challenge, and it contradicts the standing rule at `ROADMAP.md:78-79`.
+3. The duplicate-census portion was **already designed** — ADR-0007:90 specifies a single
+   streaming pass sorted by series key then time, duplicates adjacent, memory O(1). Re-doing it in
+   pandas would have been a second, worse implementation of a settled decision.
+
+**Why I got it wrong:** I treated **position on the milestone board as a data dependency.** M0 sits
+before M1 and M2, so I assumed all M0 work must read the source file. Board order is bookkeeping;
+it says nothing about which measurements require which system state. I never asked the question
+that actually decides it.
+
+**Rule that prevents a repeat:** before planning any pre-ingest analysis, ask *what does the write
+destroy?* Only that set is forced upstream of ingestion; everything else belongs in the database.
+And before writing a component, check whether an existing ADR already specifies its shape.
+
+### E-02 — Proposed a per-check profiling package, and spent a clarifying question on it   [M0, 2026-08-23]
+
+**Claimed / did:** offered a `profiling/` package with one module per check family as the
+recommended structure, justified by "M3 reuses the detectors", and put it to Sebastian as a
+multiple-choice question alongside an output-format question.
+
+**Actually true:** building reusable detector infrastructure before M3's per-signal policy exists
+is designing ahead of the decision — the reuse was speculative, and the structure invited exactly
+the C-02 failure, since a module holding run-length logic is one commit away from holding a
+smoothing rule. `docs/decisions/README.md` also names file layout explicitly as trivia, below the
+threshold that deserves a decision at all.
+
+**Why I got it wrong:** I mistook "this might be reused later" for a present requirement, and then
+escalated a layout preference into a question that consumed decision bandwidth reserved for design
+calls.
+
+**Rule that prevents a repeat:** pick a default for layout, say plainly that it is trivia and
+redirectable, and move on. Reserve questions for decisions whose answer changes the work.
 
 ---
 

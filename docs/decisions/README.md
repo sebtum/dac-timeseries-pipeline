@@ -21,6 +21,9 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0005](ADR-0005-postgres-experiment-metadata.md) | PostgreSQL for experiment metadata | M1 | A, F | Accepted |
 | [0006](ADR-0006-timeseries-data-model.md) | Tags, fields, and the numeric/state table split | M1 | A | Accepted |
 | [0007](ADR-0007-duplicate-resolution-idempotency.md) | Same-timestamp duplicate resolution and ingest idempotency | M2 | B, C | Accepted |
+| [0008](ADR-0008-local-runtime-docker-compose.md) | Docker Compose, pinned tags, services added progressively | M0 | A, B, G | Accepted |
+| [0009](ADR-0009-provisioning-as-code.md) | Provisioning as code, per milestone, with three exceptions | M0 | — | Accepted |
+| [0010](ADR-0010-profile-post-ingest-in-database.md) | Profile post-ingest in the database; pre-ingest only what the write destroys | M0 | C, D | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
@@ -34,8 +37,11 @@ happens when two points claim the same instant. Either could have been decided d
 without forcing the other, and 0007 exists precisely because 0006's "store raw, unchanged" is
 necessary but not sufficient — InfluxDB will still discard a duplicate silently.
 
-**Pending, to be added by Sebastian:**
-- Docker / local runtime — currently an open M0 decision point, so not yet an ADR.
+0008 and 0009 split because the runtime and what configures it are independent: the same compose
+file could have been paired with hand-configured databases, and the same as-code policy could have
+been applied to native installs. 0010 is a third decision entirely — it changes *where analysis
+runs*, not what the stack is, and it was reached by overturning an assumption neither of the
+others touched.
 
 ## Status values
 
