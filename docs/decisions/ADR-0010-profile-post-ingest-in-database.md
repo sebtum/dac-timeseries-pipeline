@@ -128,9 +128,11 @@ ordering of Option 2 that works.
   nominal rates are documented and the arithmetic does not depend on the small deviations — but the
   design should be revisited once real rates exist.
 - **Reconnaissance no longer precedes ingestion on the milestone board.** Where the post-ingest
-  profiling sits is **U-16, open**, and the board is not restructured until it is answered.
+  profiling sits was **U-16**, resolved 2026-08-29: a new milestone, M2.5, between M2 and M3 —
+  see `ROADMAP.md` and `ASSUMPTIONS.md`.
 - **How the pre-ingest census is packaged** — as M2's ingest detector run in a mode that writes
-  nothing, or as a standalone script — is **U-15, open**.
+  nothing, or as a standalone script — was **U-15**, resolved 2026-08-29: the detector is
+  reused, scoped to detection only — see the addendum on ADR-0007 and `ASSUMPTIONS.md`.
 - **No verdict labels in any profile output**, pre- or post-ingest: counts, distributions and
   samples only. A profiler that emits `STUCK` has made an M3 cleaning decision inside M0 tooling,
   which is exactly C-02. The constraint is grep-checkable and should be checked.

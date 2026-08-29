@@ -157,6 +157,15 @@ A-01, A-02
 ADR-0006 (time-series data model). Open unknowns created here: U-07 (win-policy), U-08
 (definition of "same" for float comparison).
 
+## Addendum (2026-08-29) — U-15 resolution
+
+The sort-then-compare-adjacent detection pass specified above (line 90) is a single reusable
+module, not two implementations. The M0 pre-ingest census calls it in a mode that writes
+nothing and only reports counts; M2's ingestion script calls it for real and layers win-policy
+resolution (U-07) and the "same" definition (U-08) on top, once those are settled. Detection
+does not need either open question answered — only resolution does — so the shared module can
+be built and run at M0 without waiting on U-07/U-08.
+
 ## Debrief answer
 
 Ingesting raw doesn't by itself preserve raw, because InfluxDB deduplicates points sharing tags

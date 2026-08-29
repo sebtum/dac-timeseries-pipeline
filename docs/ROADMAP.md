@@ -19,6 +19,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M0 | Environment & reconnaissance | (setup), CI | Plan | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M1 | Time-series data model | A | Plan | [0006](decisions/ADR-0006-timeseries-data-model.md) |
 | M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
+| M2.5 | Post-ingest profiling | — | Not started | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
 | M4 | Derived metrics | E | Not started | — |
 | M5 | Comparison & findings | F | Not started | — |
@@ -45,6 +46,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | I | Cloud scaling narrative (verbal) | M7 | Not started |
 | J | Presentation walkthrough (verbal) | M7 | Not started |
 | — | CI/CD *(added scope, not in the brief)* | cross-cutting, from M0 | Policy settled ([ADR-0009](decisions/ADR-0009-provisioning-as-code.md)); M0 increment next |
+| — | Post-ingest profiling *(added scope, not in the brief)* | cross-cutting, M2.5 | Not started — placement settled (U-16); scope from [ADR-0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 
 ---
 
@@ -129,9 +131,9 @@ Setup, plus the data discovery every later decision depends on.
 - ~~Which parts of the stack are provisioned as code, and from when.~~ *(settled: ADR-0009 — all
   of it, added per milestone, with three exceptions: secrets, Grafana dashboards, migrations.)*
 
-**Still open** — U-15 (how the pre-ingest census is packaged) and U-16 (where post-ingest SQL
-profiling sits on this board). The board is **not restructured until U-16 is answered**; until
-then M0's Execute below describes only the pre-ingest half.
+**Settled** — U-15 (how the pre-ingest census is packaged) and U-16 (where post-ingest SQL
+profiling sits on this board); see `ASSUMPTIONS.md`. M0's Execute below covers only the
+pre-ingest half; the post-ingest half now has its own milestone, M2.5.
 
 **Correction mechanism.** Sebastian names the checks. Once his list is exhausted, Claude
 names the *categories* he didn't check — the brief itself names gaps, sensor noise, quality
@@ -158,7 +160,7 @@ Claude's to pre-empt.
   - Empty / non-parseable values and which signals are non-numeric, confirming the declared
     categorical list ADR-0006:117 requires.
 - *Not here:* no Docker, no containers. Nothing needs a running service until M1 (ADR-0008), and
-  the rest of the profiling runs post-ingest (ADR-0010, placement pending U-16).
+  the rest of the profiling runs post-ingest, at M2.5 (ADR-0010).
 
 **Verify**
 - CI green on the branch; `pip install -r requirements.txt` succeeds from clean; `generator/` is
@@ -221,6 +223,34 @@ idempotency / re-run behaviour (ADR-0007).
 - Re-running is safe.
 - Raw CSV checksum unchanged.
 - Ingest throughput noted.
+
+## M2.5 — Post-ingest profiling *(added scope, not in the brief)*
+
+Inserted between M2 and M3 to resolve U-16. Runs the profiling ADR-0010 already scoped as
+"everything ingestion doesn't destroy" — this milestone exists to give that work a place on
+the board, not to decide new checks.
+
+**Decide** — nothing; placement was the only open question (U-16), now settled.
+
+**Execute** — SQL aggregations against InfluxDB, plus targeted Python pulls for anything SQL
+can't express (per ADR-0010):
+- Value ranges against the documented ranges.
+- Actual sample intervals against nominal rates.
+- Gaps.
+- Run-lengths of identical consecutive values.
+- Noise characterisation (distribution of consecutive differences, kept separate from outlier
+  detection).
+- Physical relationships: `power` vs `voltage × current`, `co2_out_ppm` vs `co2_in_ppm`,
+  `current` vs `current_setpoint`, `pressure_drop` vs `air_flow`.
+- U-05 (Core's ~72h single-query span) is a live constraint here, not just at M5/M6, since
+  profiling spans March–June 2026 — resolve it here or explicitly state the workaround
+  (per-experiment queries, etc.).
+
+**Verify**
+- Every check above produces a number or distribution he can cite, saved to a file.
+- **No verdict labels** — counts, distributions and samples only, same constraint as M0
+  (C-02). Grep-checkable.
+- U-05 is either not a blocker for this span or the workaround is stated and demonstrated.
 
 ## M3 — Quality & cleaning pipeline (C, D)
 
