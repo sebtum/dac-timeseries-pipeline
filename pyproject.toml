@@ -1,0 +1,9 @@
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+# generator/ must stay byte-identical (ROADMAP.md M0 verify criterion; CLAUDE.md: stdlib-only,
+# seeded, don't touch) — excluded rather than reformatted.
+extend-exclude = ["generator"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

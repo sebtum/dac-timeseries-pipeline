@@ -75,6 +75,30 @@ calls.
 **Rule that prevents a repeat:** pick a default for layout, say plainly that it is trivia and
 redirectable, and move on. Reserve questions for decisions whose answer changes the work.
 
+### E-03 — Collision detection module does a full in-memory sort, contradicting its own O(1) framing   [M0, 2026-08-29]
+
+**Claimed / did:** wrote `pipeline/collisions.py` and `scripts/pre_ingest_census.py` as "the
+sort-then-compare-adjacent pass ADR-0007:90 specifies," implying it delivers the memory-bounded
+property that ADR-0007 and ADR-0003 (U-06) both lean on.
+
+**Actually true:** the streaming pass genuinely is O(1) — one row at a time, fixed-size counters
+— but the collision step appends every parsed row into a Python list and calls `sorted()` on the
+whole thing before comparing adjacent rows. That's an O(n) in-memory sort. ADR-0007's "O(1) in
+the streaming step" claim covers only the *comparison* pass after sorting; it says nothing about
+the sort itself being memory-bounded, and I built the sort as a plain in-memory one anyway. For
+the actual 50MB/520,005-row file this is harmless, but if this module is what M2 reuses for real
+ingestion — which the ADR-0007 addendum says it is — it doesn't yet deliver the bounded-memory
+property U-06 needs defended, and ADR-0003 already flags that defense as incomplete.
+
+**Why I got it wrong:** I pattern-matched "streaming pass, one row at a time" from the rest of
+the script and assumed it covered the sort step too, without checking each stage's actual memory
+profile separately. A pipeline can be streaming in four stages and batch in the fifth, and only
+checking the overall shape misses that.
+
+**Rule that prevents a repeat:** when a design record makes a Big-O claim, verify it stage by
+stage before reusing the claim to describe new code — "streaming" is not one property of a
+script, it's a property that has to hold independently at every step that touches all the data.
+
 ---
 
 ## Corrected design calls
