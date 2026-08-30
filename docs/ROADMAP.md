@@ -16,7 +16,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 
 | M | Name | Deliverables | Phase | ADRs |
 |---|------|--------------|-------|------|
-| M0 | Environment & reconnaissance | (setup), CI | Plan | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
+| M0 | Environment & reconnaissance | (setup), CI | Done | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M1 | Time-series data model | A | Plan | [0006](decisions/ADR-0006-timeseries-data-model.md) |
 | M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
 | M2.5 | Post-ingest profiling | — | Not started | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
@@ -45,7 +45,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | H | Edge ingestion & resilience (design) | M7 | Not started |
 | I | Cloud scaling narrative (verbal) | M7 | Not started |
 | J | Presentation walkthrough (verbal) | M7 | Not started |
-| — | CI/CD *(added scope, not in the brief)* | cross-cutting, from M0 | Policy settled ([ADR-0009](decisions/ADR-0009-provisioning-as-code.md)); M0 increment next |
+| — | CI/CD *(added scope, not in the brief)* | cross-cutting, from M0 | M0 increment done ([ADR-0009](decisions/ADR-0009-provisioning-as-code.md)) — lint + format check green on GitHub Actions; next increment lands at M1 |
 | — | Post-ingest profiling *(added scope, not in the brief)* | cross-cutting, M2.5 | Not started — placement settled (U-16); scope from [ADR-0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 
 ---
@@ -162,16 +162,30 @@ Claude's to pre-empt.
 - *Not here:* no Docker, no containers. Nothing needs a running service until M1 (ADR-0008), and
   the rest of the profiling runs post-ingest, at M2.5 (ADR-0010).
 
-**Verify**
-- CI green on the branch; `pip install -r requirements.txt` succeeds from clean; `generator/` is
-  byte-identical (it is stdlib-only by contract).
-- Every pre-ingest measurement above produces a number he can cite, saved to a file so later
-  milestones cite evidence rather than memory.
-- U-07, U-08 and U-11 each have a concrete number or verbatim sample behind them — enough to make
-  the M2 decision without re-reading the CSV.
-- `data/raw/dac_raw_timeseries.sha256` still verifies: the pass is read-only.
-- **No verdict labels** anywhere in the output — counts, distributions and samples only. Emitting
-  `STUCK` would be C-02 repeated. Grep-checkable.
+**Verify** — all pass.
+- CI green on the branch ([run 33302720981](https://github.com/sebtum/phlair/actions/runs/33302720981),
+  `lint` job, 13s); `pip install -r requirements.txt` succeeds from clean; `generator/` untouched
+  (`git diff --stat -- generator/` empty — excluded from ruff rather than reformatted, since
+  reformatting would violate this criterion).
+- Every pre-ingest measurement produces a number, saved to
+  [`reports/pre_ingest_census.md`](../reports/pre_ingest_census.md).
+- U-07, U-08, U-11 each have numbers behind them from the census: 25 collision groups total: 15
+  agree under all three candidate "same" definitions (raw string / float-exact / float-tolerant —
+  U-08 barely matters on this data, they never disagree with each other), 0 groups differ in
+  `quality` (U-07: a quality-preference win-rule has no signal to act on here), 0 groups on the
+  declared categorical signals (U-11: `readings_conflicts` doesn't need string columns unless a
+  future run's data differs). U-07/U-08/U-11 themselves stay `open` in `ASSUMPTIONS.md` — this
+  satisfies "evidence exists to decide at M2," not the M2 decision itself.
+- `data/raw/dac_raw_timeseries.sha256` still verifies: computed checksum equals committed, pass is
+  read-only (script only opens the CSV for reading).
+- **No verdict labels**: `grep -inE "stuck|suspicious|anomal|outlier|invalid|corrupt|error|wrong|fail|noise"
+  reports/pre_ingest_census.md` returns nothing.
+- Not in the original criteria, surfaced during Execute: the collision-detection module
+  (`pipeline/collisions.py`) had to be corrected mid-session from an in-memory sort to a genuine
+  bounded-memory external merge sort, since the former contradicted ADR-0007's O(1) framing and
+  the U-06 memory-scaling defense ADR-0003 already flags as incomplete. See MISTAKES.md E-03.
+  Verified deterministic across chunk sizes (50000 vs 20000 → byte-identical report modulo the
+  chunk-size line in the header).
 
 ## M1 — Time-series data model (A)
 
