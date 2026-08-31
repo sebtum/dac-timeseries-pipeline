@@ -10,7 +10,7 @@ Milestone: —   Deliverable: A, B   Date: 2026-08-11
 
 `task/TASK.md` deliverable A opens with "Design how this data should live in InfluxDB". The
 store was imposed by the brief, not selected — this ADR records that fact and the defence,
-because "it was in the brief" is not an answer an interviewer will accept.
+because "it was in the brief" is not an answer a reviewer will accept.
 
 Workload facts that any candidate store would have to handle:
 
@@ -94,7 +94,7 @@ simpler, and the retention lifecycle InfluxDB gives you would be machinery I was
 
 A-01
 
-## Debrief answer
+## Defense
 
 InfluxDB was given in the brief, so I didn't choose it — but it fits: append-only sensor data
 read back as range scans, with retention and downsampling as a platform concern rather than

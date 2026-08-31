@@ -100,7 +100,7 @@ while the dashboard is being designed.
 
 `docker-entrypoint-initdb.d/*.sql` runs only against an empty data volume and silently no-ops
 otherwise. Using it would mean schema changes after M1 appear to be applied and are not — a silent
-failure, which is the class of defect this whole exercise is about. `ROADMAP.md:92` already asks
+failure, which is the class of defect this whole project is about. `ROADMAP.md:92` already asks
 for "Postgres metadata schema migration runs clean", so a migration path is required rather than
 optional. Which mechanism is U-14.
 
@@ -142,7 +142,7 @@ committed after that milestone produces it; secrets are never committed but thei
   already require committed JSON and screenshots.
 - **A lint-only CI job proves very little today.** Its value is that M2's ingest test has somewhere
   to land and that the profiling code is written under lint discipline from line one — not that it
-  catches anything now. Overselling it in the debrief would be worse than omitting it.
+  catches anything now. Overselling it in review would be worse than omitting it.
 - **The pinned manifest is not ceremony.** Profile numbers committed as evidence are only evidence
   if the version that produced them is known; `requirements.txt` is a precondition for the
   reconnaissance output meaning anything later.
@@ -157,7 +157,7 @@ A-01 (untimed scope — the per-milestone discipline would not survive a 60-minu
 
 ADR-0008 (local runtime). Open unknowns created here: U-13, U-14. Narrows U-02.
 
-## Debrief answer
+## Defense
 
 The whole stack is provisioned as code — compose file, Influx database and retention creation,
 Postgres schema, Grafana datasources — and each piece is committed at the milestone that first

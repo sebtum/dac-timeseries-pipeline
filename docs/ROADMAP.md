@@ -3,8 +3,7 @@
 Single source of truth for where the work stands. Update the phase column as each milestone
 moves; don't rely on memory or chat history.
 
-**Scope:** untimed, build everything in `task/TASK.md` A–J. (`README.md` still mentions a
-60-minute clock — superseded by commit `3693904`.)
+**Scope:** untimed, build everything in `task/TASK.md` A–J.
 
 **Guardrail on this document:** it names *decision points, never their resolutions*. Every
 question below is derivable from `task/TASK.md` or `task/DATA_DICTIONARY.md` alone. Answers
@@ -17,7 +16,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M | Name | Deliverables | Phase | ADRs |
 |---|------|--------------|-------|------|
 | M0 | Environment & reconnaissance | (setup), CI | Done | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
-| M1 | Time-series data model | A | Plan | [0006](decisions/ADR-0006-timeseries-data-model.md) |
+| M1 | Time-series data model | A | Execute | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
 | M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
 | M2.5 | Post-ingest profiling | — | Not started | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
@@ -25,7 +24,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M5 | Comparison & findings | F | Not started | — |
 | M6 | Grafana dashboard | G | Not started | — |
 | M7 | Edge, cloud, presentation | H, I, J | Not started | — |
-| — | Debrief (terminal) | — | Locked until session declared over | — |
+| — | Retrospective (terminal) | — | Locked until session declared over | — |
 
 Phase values: `Not started` → `Discuss` → `Plan` → `Execute` → `Verify` → `Done`.
 
@@ -35,7 +34,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 
 | # | Deliverable | Milestone | State |
 |---|-------------|-----------|-------|
-| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/downsampling not started |
+| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); all artifacts still to build, and the rollup's execution locus is open (U-04) |
 | B | Ingestion | M2 | Duplicate handling & idempotency settled (ADR-0007); rest not started |
 | C | Data quality pipeline | M3 | Not started |
 | D | Cleaning and processing | M3 | Not started |
@@ -60,13 +59,28 @@ recommendation, no leading questions, no hinting at the shape of a good answer. 
 proposes. The moment he does, Claude reacts plainly: right, wrong, or partially right, and
 why — naming the actual problem first, then the principle behind it, so it transfers. If he's
 right, say so and add the sharper thing he's missing (edge case, tradeoff, how it gets
-attacked in the debrief). Wrong or shaky calls go into `MISTAKES.md § Corrected design calls`
+attacked under review). Wrong or shaky calls go into `MISTAKES.md § Corrected design calls`
 immediately.
 
-**2. Plan.** The settled decision becomes an ADR in `decisions/` (options, caveats, why,
-debrief answer). New assumptions and unknowns are registered in `ASSUMPTIONS.md`. The verify
-criteria for the milestone are written **now, before any code exists** — deciding what "done"
-means after seeing the output is how you fool yourself.
+**2. Plan.** Four outputs, all written before any code exists.
+
+- **The Discuss record** goes to `discuss/M#.md` — the decision points as tabled, the facts
+  supplied, how each call moved across the round-trips, the corrections, and what was still open
+  on exit. Not a transcript and not a summary of the ADRs: it is the *route* to the decision,
+  which is what gets attacked in review and is not recoverable from an ADR afterwards.
+- **Each settled decision becomes an ADR** in `decisions/` (options, caveats, why, consequences,
+  the defense). New assumptions and unknowns are registered in `ASSUMPTIONS.md`.
+- **The verify criteria for the milestone are written now** — deciding what "done" means after
+  seeing the output is how you fool yourself.
+- **The milestone is broken into tangible tasks with acceptance criteria**, each executable by an
+  agent that has not seen the conversation. A task that only makes sense to someone who was
+  present is not yet planned. Acceptance criteria are checkable statements rather than
+  intentions, and they trace back to the verify criteria above instead of inventing a second
+  standard.
+
+A milestone does not enter Execute until all four exist. An open decision does not block the
+milestone as a whole — it is recorded as open in `ASSUMPTIONS.md` and the tasks depending on it
+are marked blocked, so the independent work can still be handed off.
 
 **3. Execute.** Claude writes the code. The decisions are already made; mechanical
 implementation is not the thing being practiced. Sebastian reviews. Anything that turns out
@@ -91,7 +105,7 @@ code is fresh. A milestone is not `Done` until its CI increment is green.
 | M | CI increment added |
 |---|--------------------|
 | M0 | Pipeline skeleton: lint + format check, dependency install from a pinned manifest. |
-| M1 | Schema/config validation — database and retention definitions checked, not assumed; Postgres metadata schema migration runs clean; downsampling job tested against a known aggregate. |
+| M1 | Schema/config validation — retention checked **behaviourally** (write past the window, assert it is filtered), not by reading the configuration back; Postgres migration runs clean and re-runs as a no-op; loader cannot revert a manual correction; downsampling job tested against a known aggregate under a stated predicate. |
 | M2 | Ingest smoke test against a fixture slice using the v3 client; reconciliation assertion on row counts. |
 | M3 | Unit tests for each per-signal handling rule; the "nothing silently dropped" reconciliation runs as a test. |
 | M4 | Metric correctness tests, including the power cross-check against the logged `power` signal. |
@@ -163,7 +177,7 @@ Claude's to pre-empt.
   the rest of the profiling runs post-ingest, at M2.5 (ADR-0010).
 
 **Verify** — all pass.
-- CI green on the branch ([run 33302720981](https://github.com/sebtum/phlair/actions/runs/33302720981),
+- CI green on the branch ([run 33302720981](https://github.com/sebtum/dac-timeseries-pipeline/actions/runs/33302720981),
   `lint` job, 13s); `pip install -r requirements.txt` succeeds from clean; `generator/` untouched
   (`git diff --stat -- generator/` empty — excluded from ruff rather than reformatted, since
   reformatting would violate this criterion).
@@ -189,6 +203,22 @@ Claude's to pre-empt.
 
 ## M1 — Time-series data model (A)
 
+Discuss record: [`discuss/M1.md`](discuss/M1.md). Task breakdown: [`plans/M1.md`](plans/M1.md).
+
+**Plan-phase status:** all four Plan outputs exist — Discuss record, ADRs, the verify criteria
+below, and the task breakdown in [`plans/M1.md`](plans/M1.md) (T1–T12, four waves, acceptance
+criteria tracing to the criteria below). Milestone entered `Execute` on 2026-08-31.
+
+Three calls made while writing the breakdown, recorded there rather than in an ADR because none
+of them changes an architecture decision: **U-04 is neutralised, not resolved** — the rollup
+splits into a pure aggregation function and a thin driver, so the execution locus becomes a
+wrapper question deferred to M3 and no M1 task is blocked; **the M1 CI increment runs both
+services in GitHub Actions**, since ADR-0009's "comes up from a clean checkout" claim is otherwise
+as untested as the configuration ADR-0008 refused to stub; and **local raw retention is 1 year**
+against the 9-month plant policy, which is the local value ADR-0011 already required to be
+committed with its reason (all six experiments clear it — `EXP_004`, the earliest, would not reach
+the boundary until 2027-03-02, where 9 months locally would silently expire it around 2026-12-02).
+
 **Decide**
 - ~~Measurement / tag / field layout; how experiment, source and sensor identity are
   represented.~~ *(settled: [ADR-0006](decisions/ADR-0006-timeseries-data-model.md))*
@@ -196,26 +226,66 @@ Claude's to pre-empt.
 - ~~Tag cardinality budget.~~ *(settled: ADR-0006 — 150 series, measured not estimated)*
 - Where processed values, pipeline quality verdicts and exclusion reasons live — a second axis,
   independent of the numeric/state split (U-09, U-10). Deferred to M3.
-- Retention, downsampling, tiering — what stays full-resolution, what rolls up, when.
+- ~~Retention, downsampling, tiering — what stays full-resolution, what rolls up, when.~~
+  *(settled: [ADR-0011](decisions/ADR-0011-retention-tiering-rollup.md) — three databases, since
+  Core fixes retention per-database at creation: raw 9 months, 1-minute rollups 1 year, pinned
+  intervals unbounded, then Parquet in object storage. Numbers are defaults standing in for a
+  stakeholder conversation (A-03) and are parameters of the init script, not constants in it.)*
+- ~~How the Postgres schema arrives and how `experiments.json` is loaded.~~ *(settled:
+  [ADR-0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) — versioned SQL + small
+  Python runner; loader with per-field provenance so a re-run cannot revert a correction. Resolves
+  U-14, and answers ADR-0005's "which metadata fields become Influx tags" with **none**.)*
+- **Still open:** where the rollup executes (U-04). The plugin preference conflicts with the
+  decision to aggregate over M3's verdict; see the U-04 entry in `ASSUMPTIONS.md`. **No longer
+  blocks M1** — [`plans/M1.md`](plans/M1.md) splits the rollup into a pure aggregation function
+  (T8) and a thin driver (T9), leaving only *what calls the driver* open, at M3.
 
-**Execute**
-- Databases and retention periods; the schema written up as ADRs plus a compact schema
-  reference.
+**Execute** — broken into T1–T12 in [`plans/M1.md`](plans/M1.md); the summary below is the scope
+that breakdown covers.
+- **Verify U-13 first**, before the compose file: start the pinned image and observe the actual
+  first-boot admin-token behaviour rather than trusting ADR-0008's assertion.
+- Compose file, then the three databases and their retention periods via an idempotent init
+  script (no declarative config exists in Core — CLI or HTTP only).
 - **Build the downsampling mechanism.** InfluxDB 3 Core has no task engine, so this is code —
   a Processing Engine plugin or an external job (U-04). Not configuration
   ([ADR-0004](decisions/ADR-0004-influxdb3-core-sql.md)).
-- Postgres schema for experiment metadata, loaded from `experiments.json`
-  ([ADR-0005](decisions/ADR-0005-postgres-experiment-metadata.md)).
+- Postgres migration runner, versioned schema, and the `experiments.json` loader
+  ([ADR-0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md)). The runner needs
+  deterministic ordering, a Postgres advisory lock, and a per-migration checksum.
+- A compact schema reference (`docs/schema.md`): tables, tags, fields, databases, retention.
 
 **Verify**
 - Cardinality estimated from the *actual* dataset, not guessed.
 - "Raw preserved unchanged" is demonstrable by query, not asserted.
-- Downsampling actually runs and produces a rolled-up series that matches a hand-computed
-  aggregate.
+- Downsampling actually runs against a **stated predicate** and produces a rolled-up series that
+  matches a hand-computed aggregate. The predicate at M1 is a placeholder (`quality = 'GOOD'`);
+  M3 replaces it with the pipeline verdict and the rollup is rebuilt. Machinery is verified here,
+  policy at M3 — the criterion is not satisfiable any other way, since the verdict does not exist
+  until M3 ([ADR-0011](decisions/ADR-0011-retention-tiering-rollup.md)).
+- **The retention window is checked against the data's own timestamp span**, not merely declared.
+  The experiments run 2026-03-02 … 2026-06-15; any configured window that excludes one of them is
+  a failure, and it fails *silently* because Core filters expired points at query time
+  (MISTAKES.md C-06).
+- **Retention is proven behaviourally, not by configuration.** Create a throwaway database with a
+  1-hour retention period, write one point at `now - 2h` and one at `now - 5m`, query both back,
+  assert the first is absent and the second present, drop the database. Deliberately behavioural:
+  `influxdb3 show databases` and `GET /api/v3/configure/database` reported no retention period on
+  Core 3.7.0 ([influxdb#27082](https://github.com/influxdata/influxdb/issues/27082)), so asserting
+  on the configuration could silently assert nothing. This also satisfies ADR-0008/0009's rule
+  that unexercised configuration is untested configuration, without putting the demo dataset near
+  an expiry boundary.
 - The retention/downsampling story survives the "months of 1 Hz electrochemical data"
-  question with arithmetic behind it.
+  question with arithmetic behind it — 1,059,840 points/day ≈ 387 M points/plant-year, and the
+  60:1 rollup ratio.
+- **Rollup lag below raw retention** is recorded as an operational invariant: if the rollup job
+  stalls, buckets cross the expiry boundary carrying a stale or missing aggregate and there is no
+  recovery. Not monitored at M1, but stated here and carried into deliverable H.
 - Metadata queryable from Postgres; the null fields in `EXP_003`, `EXP_005` and `EXP_006`
   survive the load as nulls rather than being silently defaulted.
+- **The loader cannot revert a correction.** Set a value manually, re-run the loader, assert the
+  manual value survives — both for a field the JSON holds as null and for one where the JSON holds
+  a different non-null value ([ADR-0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md)).
+- Migrations run clean against an empty database, and a second run is a no-op.
 
 ## M2 — Ingestion (B)
 
@@ -360,8 +430,8 @@ reaches the dashboard through a template variable rather than a join
 
 ---
 
-## Terminal step — debrief
+## Terminal step — self-review
 
-Only once Sebastian declares the working session over: open `_debrief/`, score against the
-answer key, and write a final retrospective comparing his calls to the defects that were
-actually injected. Nothing before that point reads `_debrief/`.
+Only once Sebastian declares the working session over: open `_debrief/`, check his calls
+against the list of defects that were deliberately built into the dataset, and write a final
+retrospective. Nothing before that point reads `_debrief/`.

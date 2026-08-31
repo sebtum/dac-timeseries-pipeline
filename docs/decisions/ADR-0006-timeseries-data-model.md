@@ -139,7 +139,7 @@ A-01, A-02
 ADR-0004 (InfluxDB 3 Core, SQL), ADR-0005 (Postgres for experiment metadata),
 ADR-0007 (duplicate resolution and ingest idempotency).
 
-## Debrief answer
+## Defense
 
 The data is long format, so experiment, source and signal are tags and the reading is the field
 — that's 150 series across six experiments, and it grows linearly in experiments only, so

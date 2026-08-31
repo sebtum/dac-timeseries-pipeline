@@ -1,8 +1,9 @@
-# Systems & Data Infrastructure — Practice Exercise
+# Systems & Data Infrastructure — Project Brief
 
 ## Background
 
-Phlair operates Direct Air Capture (DAC) plants. Simplified, the process has three stages:
+This project is built around a Direct Air Capture (DAC) pilot plant. Simplified, the
+process has three stages:
 
 1. **Absorption** — air is contacted with a basic sorbent that picks up CO2.
 2. **Desorption** — the CO2-loaded sorbent is treated with acid, releasing the CO2.
@@ -11,7 +12,7 @@ Phlair operates Direct Air Capture (DAC) plants. Simplified, the process has thr
    renewable power.
 
 You are given raw sensor data from six pilot-scale experiments run under different
-operating conditions. Your job is to turn that raw data into something a scientist could
+operating conditions. The job is to turn that raw data into something a scientist could
 actually use to compare experiments and trust the results.
 
 ## What you have
@@ -30,7 +31,7 @@ and process it.
 This is raw industrial time-series data, not a cleaned dataset. Treat it the way you would
 treat a historian export from a real PLC/OPC-UA system: it was not curated for you. You
 should expect the kinds of problems that come with real acquisition systems — gaps, sensor
-noise, quality flags, timing quirks, and so on. Part of the exercise is discovering what's
+noise, quality flags, timing quirks, and so on. Part of the project is discovering what's
 actually in the data and deciding how to handle it. There's no single correct answer, but
 you should be able to justify each choice you make and say what you'd do differently with
 more time.
@@ -116,7 +117,7 @@ what changes about how failures are handled once it's cloud/multi-tenant rather 
 you control end to end. No need to actually stand any of this up.
 
 **J. Presentation walkthrough (verbal).** Once the rest is in whatever state you've reached,
-prepare a short walkthrough as if presenting to an interviewer: why this specific
+prepare a short walkthrough as if presenting to a technical stakeholder: why this specific
 PLC-to-cloud flow (not just what it is), and a concrete walk-through of comparing a voltage
 spike from one experiment against another — show exactly how your system gets from raw
 telemetry to that comparison without the scientist manually aligning anything themselves.

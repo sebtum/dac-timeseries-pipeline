@@ -13,7 +13,7 @@ pipeline. Trivia (variable naming, file layout) is not.
 
 | ADR | Decision | M | Deliverable | Status |
 |-----|----------|---|-------------|--------|
-| [0000](ADR-0000-record-decisions.md) | Keep ADRs for this exercise | — | — | Accepted |
+| [0000](ADR-0000-record-decisions.md) | Keep ADRs for this project | — | — | Accepted |
 | [0001](ADR-0001-influxdb-timeseries-store.md) | InfluxDB as the time-series store | — | A, B | Given (constraint) |
 | [0002](ADR-0002-grafana-visualisation.md) | Grafana as the visualisation layer | — | G | Given (constraint) |
 | [0003](ADR-0003-python-pipeline-language.md) | Python for ingestion and processing | — | B–F | Accepted ⚠ |
@@ -24,13 +24,20 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0008](ADR-0008-local-runtime-docker-compose.md) | Docker Compose, pinned tags, services added progressively | M0 | A, B, G | Accepted |
 | [0009](ADR-0009-provisioning-as-code.md) | Provisioning as code, per milestone, with three exceptions | M0 | — | Accepted |
 | [0010](ADR-0010-profile-post-ingest-in-database.md) | Profile post-ingest in the database; pre-ingest only what the write destroys | M0 | C, D | Accepted |
+| [0011](ADR-0011-retention-tiering-rollup.md) | Retention, tiering, and the rollup schema | M1 | A | Accepted ⚠ |
+| [0012](ADR-0012-postgres-migrations-metadata-loader.md) | Postgres migrations, and a metadata loader with per-field provenance | M1 | A, F | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
 
+⚠ ADR-0011 carries one too: *where* the rollup executes (U-04) is unresolved, because the stated
+preference for a Processing Engine plugin conflicts with the decision to aggregate over M3's
+pipeline verdict — a plugin cannot read a verdict that never lands in InfluxDB (U-09). The
+retention and rollup *design* stands; the execution locus does not.
+
 Note that 0001 and 0004 split deliberately: the brief imposed *InfluxDB*, but *which version,
 queried in which language* was our choice, and the versions differ enough that conflating them
-caused a factual error — see ADR-0001's debrief answer.
+caused a factual error — see ADR-0001's Defense section.
 
 0006 and 0007 split for the same reason: 0006 decides what a point *is*, 0007 decides what
 happens when two points claim the same instant. Either could have been decided differently
@@ -43,12 +50,19 @@ been applied to native installs. 0010 is a third decision entirely — it change
 runs*, not what the stack is, and it was reached by overturning an assumption neither of the
 others touched.
 
+0006 and 0011 split along the same seam as 0006/0007: 0006 decides what a point *is*, 0011 decides
+how long it lives and what replaces it afterwards. The tag/field layout would be unchanged under
+infinite retention, and the tiering would be unchanged had the categorical signals been encoded as
+integers — neither forces the other. 0012 is separable again: the metadata store was already chosen
+in 0005, and *how its schema arrives and how corrections survive a reload* could have been answered
+any number of ways without touching 0005's reasoning.
+
 ## Status values
 
 - `Proposed` — decided in Discuss, not yet defended in writing.
 - `Accepted` — chosen by us, with the reasoning written down.
 - `Given (constraint)` — imposed by the brief, not chosen. Still needs a defence: "it was in
-  the brief" is not an answer an interviewer accepts. Never let the record imply you chose
+  the brief" is not an answer a reviewer accepts. Never let the record imply you chose
   something that was handed to you.
 - `Superseded by ADR-nnnn` — reversed later. The old file stays.
 
@@ -87,11 +101,11 @@ What this makes easy. What it makes hard. What it forecloses.
 ## Assumptions relied on
 A-nn, A-nn (see ../ASSUMPTIONS.md)
 
-## Debrief answer
-2–4 sentences: how to defend this out loud when an interviewer pushes back.
+## Defense
+2–4 sentences: how to defend this out loud when a reviewer pushes back.
 ```
 
-The **Debrief answer** field is the point of the whole exercise. It is not optional, and it
+The **Defense** field is the point of writing these down at all. It is not optional, and it
 is not a summary of the Why section — it's the version you'd say under pressure.
 
 ## Rules

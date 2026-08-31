@@ -14,7 +14,7 @@ in memory.
 Two facts make that the wrong default:
 
 - **It is the weakest available answer to U-06**, the memory-scaling challenge already registered
-  as the most predictable debrief attack. A profiling design whose first act is "load the entire
+  as the most predictable review challenge. A profiling design whose first act is "load the entire
   dataset into RAM" concedes the point before the question is asked.
 - **On a real system there is no CSV to load.** `task/TASK.md` frames the file as "what already
   landed in a local historian/buffer"; deliverable H makes that explicit. The realistic workflow is
@@ -147,7 +147,7 @@ ADR-0006 (data model), ADR-0007 (duplicate resolution — supplies the streaming
 this reuses). `MISTAKES.md` C-02 (measurement is not remediation), C-03 (the check list itself),
 E-01 (the error this ADR corrects). Open unknowns created here: U-15, U-16. Bears on U-05, U-06.
 
-## Debrief answer
+## Defense
 
 I profile the data in the database, not by loading the CSV into pandas — cheap aggregations in SQL
 where the data already is, and targeted samples pulled into Python only where SQL can't express

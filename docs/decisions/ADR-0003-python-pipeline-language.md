@@ -54,7 +54,7 @@ or a plugin anyway; debugging config is worse than debugging code.
 Advantages: far faster and far lighter per row; a single static binary is easy to ship to an
 edge device; genuine concurrency for parallel ingest.
 Caveats: no analytical ecosystem comparable to pandas for the exploratory half (M0, M5);
-much slower to write, and the exercise is graded on decisions rather than throughput; not in
+much slower to write, and this project is graded on decisions rather than throughput; not in
 the installed environment.
 
 ### Option 4 — Influx CLI / line-protocol bulk write
@@ -113,7 +113,7 @@ speed — see Consequences and U-06.
 
 A-01
 
-## Debrief answer
+## Defense
 
 Python, and I picked it knowing it's the slowest option per row. It covers every phase —
 ingestion, the quality rules, the metrics, the comparison, the tests — in one language with no

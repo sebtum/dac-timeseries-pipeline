@@ -97,7 +97,7 @@ duplicated into InfluxDB tags as well as living in Postgres, and the rule for de
 
 A-01
 
-## Debrief answer
+## Defense
 
 The time-series data is immutable, but the metadata isn't — two of the six experiments have
 null fields that someone will fill in later, and one has no operator recorded. If that metadata

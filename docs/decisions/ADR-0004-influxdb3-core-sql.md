@@ -61,7 +61,7 @@ Advantages: keeps SQL; adds historical query capability and single-series indexi
 the span problem; compaction and query-time retention enforcement, so the retention story is
 demonstrable rather than hand-built.
 Caveats: the free tier is licensed for at-home/non-commercial use, which is a poor fit for a
-design presented as a plant architecture — an interviewer may reasonably ask what it costs in
+design presented as a plant architecture — a reviewer may reasonably ask what it costs in
 production; heavier to run; makes the design depend on a commercial tier.
 
 ## Decision
@@ -72,7 +72,7 @@ InfluxDB 3 Core, queried with SQL, image tag pinned explicitly.
 
 The compatibility argument decides it. This design already commits to PostgreSQL for
 experiment metadata (ADR-0005), so choosing 3 Core means the whole system is queried in SQL —
-one language across both stores, in the pipeline, in Grafana, and in the debrief. Option 2
+one language across both stores, in the pipeline, in Grafana, and in review. Option 2
 would buy built-in downsampling at the price of writing the analytical half of the project in
 Flux, a language the vendor has moved on from; that's paying in the currency of the future to
 save work today. Option 3 fixes Core's real limitations, but licensing it for at-home use and
@@ -101,7 +101,7 @@ U-05.
 
 A-01, A-02
 
-## Debrief answer
+## Defense
 
 The brief gave me InfluxDB but not a version, and the versions aren't interchangeable — 3
 dropped Flux and the task engine, 2.x has no SQL. I took 3 Core specifically for SQL, because

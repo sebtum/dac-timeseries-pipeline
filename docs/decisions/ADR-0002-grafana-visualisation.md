@@ -95,7 +95,7 @@ on it would have been building on something already abandoned.
 
 A-01
 
-## Debrief answer
+## Defense
 
 Grafana was in the brief, and it's also the only thing that meets all the constraints at once:
 it's shared rather than one person's laptop, it reads both InfluxDB and the Postgres metadata,

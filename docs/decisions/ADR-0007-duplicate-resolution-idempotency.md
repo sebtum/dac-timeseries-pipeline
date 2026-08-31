@@ -52,7 +52,7 @@ logger systematically replaying its buffer (exactly the deliverable H scenario) 
 Nudge colliding points by 1 ns so both persist.
 Advantages: both readings survive; no schema change; no detection needed beyond collision.
 Caveats: fabricates time. Every downstream query that trusts timestamps is reading a small lie,
-and the exercise is explicitly about not silently altering data.
+and this project is explicitly about not silently altering data.
 
 ### Option 3 — Detect at ingest, record conflicts in their own table
 Advantages: distorts neither the schema nor the timeline — no synthetic tag on the hot path, no
@@ -98,7 +98,7 @@ the series key taxes every query forever to preserve a handful of readings; writ
 table gets the same "evidence lives in the database, queryable alongside the data" property
 with no cost on the hot path. Given that framing, Option 1's only advantage evaporates.
 
-Option 2 is excluded on principle: an exercise whose central instruction is *don't silently fix
+Option 2 is excluded on principle: a project whose central instruction is *don't silently fix
 data* cannot answer a data problem by fabricating timestamps.
 
 Option 4 is not wrong so much as deferred work. The characterisation of what collapsed has to
@@ -166,7 +166,7 @@ resolution (U-07) and the "same" definition (U-08) on top, once those are settle
 does not need either open question answered — only resolution does — so the shared module can
 be built and run at M0 without waiting on U-07/U-08.
 
-## Debrief answer
+## Defense
 
 Ingesting raw doesn't by itself preserve raw, because InfluxDB deduplicates points sharing tags
 and timestamp last-write-wins, silently — so duplicate rows would collapse and I'd have lost

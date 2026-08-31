@@ -120,7 +120,7 @@ A-01 (untimed scope), A-02 (Core is adequate)
 ADR-0002 (Grafana), ADR-0004 (InfluxDB 3 Core), ADR-0005 (Postgres), ADR-0009 (provisioning as
 code). Open unknown created here: U-13.
 
-## Debrief answer
+## Defense
 
 Everything runs in Docker Compose with pinned image tags, and services go into the file at the
 milestone that first needs them rather than all up front. The reason it is compose and not a
