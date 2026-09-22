@@ -15,3 +15,81 @@ jobs:
       - run: pip install -r requirements.txt
       - run: ruff check .
       - run: ruff format --check .
+
+  integration:
+    runs-on: ubuntu-latest
+    # Postgres as a native Actions service container — GH waits for its healthcheck
+    # before any step below runs, and fails the job outright if it never goes healthy.
+    # Credentials match .env.example's defaults so bootstrap_influx_token.py's
+    # .env-from-.env.example seeding needs no CI-specific override.
+    services:
+      postgres:
+        image: postgres:16.6
+        env:
+          POSTGRES_DB: dac
+          POSTGRES_USER: dac
+          POSTGRES_PASSWORD: changeme_local_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dac -d dac"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install -r requirements.txt
+
+      # InfluxDB 3 Core is not brought up via the `services:` block: its entrypoint
+      # (`influxdb3 serve`) requires --node-id/--object-store/--data-dir with no
+      # defaults (docs/spikes/U-13-core-token-bootstrap.md), and Actions service
+      # containers can't pass a command past the image's own entrypoint. Started as a
+      # plain `docker run` instead, with the exact flags the spike verified —
+      # including --disable-authz health, so the wait loop below needs no token.
+      - name: Start InfluxDB 3 Core
+        run: |
+          docker run -d --name dac-influxdb \
+            -p 8181:8181 \
+            influxdb:3.11.2-core \
+            influxdb3 serve \
+              --node-id node1 \
+              --object-store file \
+              --data-dir /var/lib/influxdb3/data \
+              --disable-authz health
+
+      - name: Wait for InfluxDB to become reachable
+        run: |
+          timeout 60 bash -c \
+            'until curl -sf http://localhost:8181/health >/dev/null; do sleep 2; done'
+
+      - name: Bootstrap InfluxDB admin token
+        run: python scripts/bootstrap_influx_token.py
+
+      - name: Run Postgres migrations
+        run: python -m scripts.migrate
+
+      - name: Initialize InfluxDB databases
+        run: python scripts/init_influx.py
+
+      # A skip is a failure here: with both services live, every influx/postgres-marked
+      # test should run for real. `pytest`'s own exit code doesn't reflect skips, so
+      # the skip count is checked explicitly against the summary line.
+      - name: Run tests
+        run: |
+          set -o pipefail
+          python -m pytest -v 2>&1 | tee pytest.log
+          if grep -qE '[0-9]+ skipped' pytest.log; then
+            echo "::error::pytest reported skipped tests with both services up — a service must be unreachable"
+            exit 1
+          fi
+
+      - name: Dump InfluxDB logs on failure
+        if: failure()
+        run: docker logs dac-influxdb
+
+      - name: Stop InfluxDB
+        if: always()
+        run: docker rm -f dac-influxdb
