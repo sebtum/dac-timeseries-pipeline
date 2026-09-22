@@ -1,1 +1,4 @@
 ruff==0.16.5
+influxdb3-python==0.21.0
+psycopg[binary]==3.3.4
+pytest==9.1.1

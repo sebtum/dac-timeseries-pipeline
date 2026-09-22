@@ -16,7 +16,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M | Name | Deliverables | Phase | ADRs |
 |---|------|--------------|-------|------|
 | M0 | Environment & reconnaissance | (setup), CI | Done | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
-| M1 | Time-series data model | A | Execute | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
+| M1 | Time-series data model | A | Verify | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
 | M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
 | M2.5 | Post-ingest profiling | — | Not started | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
@@ -34,7 +34,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 
 | # | Deliverable | Milestone | State |
 |---|-------------|-----------|-------|
-| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); T1–T10 built (spike, runtime, schema doc, Influx init, behavioural proofs, Postgres migrations/loader, rollup aggregator/driver, CI increment) — none pushed/run in CI yet; T12 verify pass still to run. Rollup's execution locus stays open (U-04), by design. |
+| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); T1–T11 built and T12 verify pass run (2026-09-22) — V1–V10 all pass, evidence below. Not yet pushed to `origin/m1-data-model`, so CI has still not actually executed the integration job (T10's own "green on the branch" criterion is open); the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05 is also still outstanding. Rollup's execution locus stays open (U-04), by design. |
 | B | Ingestion | M2 | Duplicate handling & idempotency settled (ADR-0007); rest not started |
 | C | Data quality pipeline | M3 | Not started |
 | D | Cleaning and processing | M3 | Not started |
@@ -303,6 +303,28 @@ that breakdown covers.
   manual value survives — both for a field the JSON holds as null and for one where the JSON holds
   a different non-null value ([ADR-0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md)).
 - Migrations run clean against an empty database, and a second run is a no-op.
+
+**Verify-phase results (2026-09-22, T12) — V1–V10 all pass.**
+
+| # | Criterion | Result | Evidence |
+|---|---|---|---|
+| V1 | Cardinality from the actual dataset | Pass | `docs/schema.md` §2 — 150 series, cited to `reports/pre_ingest_census.md:19` (150 distinct `(experiment_id, source, signal)`), not estimated. |
+| V2 | Raw preserved unchanged, by query | Pass | `tests/integration/test_raw_preservation.py::test_numeric_value_round_trips_at_full_precision_including_negative` and `::test_categorical_state_round_trips_as_a_literal_string_not_an_integer`, both against a live Core. |
+| V3 | Downsampling matches a hand-computed aggregate under a stated predicate | Pass | Unit half: `tests/unit/test_rollup.py` (12 tests, hand-built buckets). End-to-end half: `tests/integration/test_rollup_run.py::test_rollup_matches_hand_computed_aggregate_and_distinguishes_a_gap`; `policy_version` stamped on every row per `::test_policy_version_is_stamped_on_every_written_row`. |
+| V4 | Retention checked against the data's own timestamp span | Pass | `tests/integration/test_influx_init.py::test_90d_retention_refuses_and_names_experiments_oldest_first` and `::test_365d_local_retention_clears_all_six_experiments`. |
+| V5 | Retention proven behaviourally (throwaway 1-hour database) | Pass | `tests/integration/test_retention.py::test_retention_hides_expired_points_but_keeps_fresh_ones`, teardown in a fixture. |
+| V6 | The "months of data" question, with arithmetic behind it | Pass | `docs/schema.md` §5 — 1,059,840 points/day, 387M/plant-year, 60:1 rollup ratio; recomputed by hand while verifying (777,600+172,800+103,680+5,760=1,059,840; ×365=386,841,600). |
+| V7 | Rollup lag below raw retention, recorded as an operational invariant | Pass | `docs/schema.md` §6; also carried into deliverable H per M7's scope. |
+| V8 | Metadata queryable; nulls survive as nulls | Pass | `tests/integration/test_metadata_loader.py::test_load_populates_all_six_experiments`, `::test_null_fields_survive_as_null_not_defaulted`; re-confirmed live via `scripts/load_experiments.py` against a freshly migrated database ("loaded 6 experiment(s)"). |
+| V9 | The loader cannot revert a correction (null **and** wrong-non-null) | Pass | `::test_rerun_cannot_revert_a_manual_null_correction`, `::test_rerun_cannot_revert_a_manual_wrong_non_null_correction`. |
+| V10 | Migrations run clean; a second run is a no-op | Pass | `tests/integration/test_migrations.py::test_real_migrations_apply_clean_and_rerun_is_noop`; re-confirmed live: `python -m scripts.migrate` → `applied: 0001, 0002`, second run → `up to date, nothing to apply`. |
+
+**T12's own acceptance criteria, beyond the V-table:**
+- Full from-scratch cycle run deliberately once: `docker compose down -v` → `up -d` → both containers healthy (~15s) → `scripts/bootstrap_influx_token.py` (fresh token, non-interactive) → `python -m scripts.migrate` → `scripts/init_influx.py` (three databases created) → `scripts/load_experiments.py` (6 experiments loaded) → `python -m pytest -v` → **43 passed, 0 skipped, 0 failed**.
+- `data/raw/dac_raw_timeseries.sha256` still verifies against a freshly computed SHA-256 of the CSV — M1 touched no raw data.
+- `ruff check .` and `ruff format --check .` both clean; `docker compose config` validates with no `latest` image tag.
+- One stale fact was caught and fixed while assembling this table, not a design decision: `docs/schema.md` §3's rollup local-retention row still read "1 year (365d)" from before the T2 walkthrough raised it to 5y (MISTAKES.md, flagged in this file's 2026-09-22 status note above) — corrected to `5y` with the same reasoning `.env.example` already carries.
+- **Not satisfied yet — carried forward rather than dropped:** CI green on the branch, with a run URL. Nothing from M1 has been pushed to `origin/m1-data-model`, so T10's integration job has never executed on GitHub Actions; everything above was verified locally against the same live services CI would use. Pushing (and, separately, the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05) are both still open before M1 can honestly flip to `Done` — see the 2026-09-22 status note above.
 
 ## M2 — Ingestion (B)
 

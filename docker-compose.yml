@@ -1,0 +1,63 @@
+services:
+  influxdb:
+    image: influxdb:3.11.2-core
+    container_name: dac-influxdb
+    # Image entrypoint is ["influxdb3", "serve"]; --node-id and --object-store are required
+    # flags with no defaults (docs/spikes/U-13-core-token-bootstrap.md). Auth stays ON (no
+    # --without-auth) per ADR-0009's "auth enabled locally too" policy — the admin token is
+    # bootstrapped by scripts/bootstrap_influx_token.py, not disabled away.
+    #
+    # --disable-authz health: the spike found auth is enforced on /health too (401
+    # unauthenticated) and there is no built-in unauthenticated healthcheck endpoint. Rather
+    # than have the healthcheck depend on a token that only exists after bootstrap has run
+    # (chicken-and-egg on a fresh `up`, and a stale-token problem after `--regenerate`),
+    # /health alone is exempted from auth. Every other endpoint (query, write, token admin)
+    # still requires the bearer token. This is a narrower carve-out than --without-auth.
+    command:
+      - influxdb3
+      - serve
+      - --node-id
+      - ${INFLUX_NODE_ID:-node1}
+      - --object-store
+      - file
+      - --data-dir
+      - /var/lib/influxdb3/data
+      - --disable-authz
+      - health
+    ports:
+      - "${INFLUX_PORT:-8181}:8181"
+    volumes:
+      - influxdb-data:/var/lib/influxdb3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8181/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  postgres:
+    image: postgres:16.6
+    container_name: dac-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dac}
+      POSTGRES_USER: ${POSTGRES_USER:-dac}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_local_only}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dac} -d ${POSTGRES_DB:-dac}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  # Named volume, not a bind mount — Windows bind-mount path semantics are avoided per
+  # ADR-0008. The name matches the `influxdb-data/` path already reserved in .gitignore
+  # (a defensive reservation in case a bind mount is ever substituted in); as a true named
+  # volume it is managed by Docker's own storage area, not materialised under the project
+  # root, so nothing here actually touches the working tree.
+  influxdb-data:
+  postgres-data:

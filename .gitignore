@@ -6,6 +6,10 @@ data/raw/*.csv
 __pycache__/
 *.pyc
 
+# secrets — bootstrapped locally by scripts/bootstrap_influx_token.py from .env.example,
+# never committed (ADR-0009 exception 1)
+.env
+
 # influx/grafana local state if run via docker volumes here
 influxdb-data/
 grafana-data/

@@ -7,3 +7,9 @@ extend-exclude = ["generator"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+markers = [
+    "influx: needs a reachable InfluxDB container (skipped, not failed, if unreachable)",
+    "postgres: needs a reachable PostgreSQL container (skipped, not failed, if unreachable)",
+]
