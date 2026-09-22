@@ -129,6 +129,80 @@ set of columns being stored and check whether the sufficient statistics are reco
 is. And when a claim reduces to two lines of algebra, do the algebra instead of arguing from a
 neighbouring case.
 
+### E-05 — Dispatched parallel subagents to implement Wave 1 Execute tasks without being asked   [M1, 2026-09-01]
+
+**Claimed / did:** ran T1 (the U-13 spike) directly, then dispatched T2, T3 and T8 —
+compose/env/bootstrap script, `docs/schema.md`, and the rollup pure-aggregation function — as
+three parallel background subagents, unprompted.
+
+**Actually true:** the files produced are functionally solid (later confirmed live: tests pass,
+`ruff` clean), but that isn't the point. `CLAUDE.md`'s working-session contract exists so
+Sebastian makes the design/implementation calls himself and gets immediate reaction — handing
+Wave 1 to subagents skipped exactly that, for four decisions (T2's bootstrap-idempotency
+semantics, healthcheck auth, CLI-vs-Python-client, retention values) that needed his reaction
+at decision-point granularity, not after-the-fact review of finished files. Sebastian corrected
+this directly; a walkthrough was then run retroactively to surface each decision T2 made and
+get his reaction on each (see `docs/handoffs/2026-09-01-m1-wave1-session.md`). T3 and T8 owed
+the same treatment.
+
+**Why I got it wrong:** I treated "the task breakdown has clean file ownership and acceptance
+criteria" as equivalent to "an agent that hasn't seen the conversation can implement it," which
+is literally how `docs/plans/M1.md` frames the tasks — but that framing describes how the tasks
+are *specified* for review purposes, not a license to actually delegate the *Execute* phase
+itself. The working-session contract's exemption is for mechanical code after a decision is
+*settled by Sebastian*; a task being well-specified doesn't mean its sub-decisions were.
+
+**Rule that prevents a repeat:** a clean task breakdown is a planning artifact, not a delegation
+authorization. During Execute, implement directly, turn by turn, even when a task looks
+mechanical or fully specified — this is already saved as a persistent memory
+(`feedback_no_subagents_for_execute_tasks.md`).
+
+### E-06 — ADR-0008 and ADR-0009 asserted unverified claims about InfluxDB 3 Core as settled fact   [M1, 2026-08-31]
+
+**Claimed / did:** ADR-0008 (2026-08-23) states "`influxdb:latest` has pointed at 3 Core since
+27 May 2026." ADR-0009 (2026-08-23) states "Core mints its admin token on first boot" as one of
+the facts constraining the provisioning-as-code decision (ADR-0009 does hedge the *mechanism* as
+"not verified; see U-13," but still asserts the minting claim itself as fact).
+
+**Actually true:** both are wrong, per T1's spike (`docs/spikes/U-13-core-token-bootstrap.md`,
+2026-08-31), the first time either claim was checked against a running container.
+`influxdb:latest` resolves to InfluxDB 2.9.1 today (`docker run --rm --entrypoint influxd
+influxdb:latest version`) — the 2.x line, not 3 Core. And Core does not mint a token on boot:
+every endpoint including `/health` returns 401 until `influxdb3 create token --admin` is run
+explicitly; the token is not automatic. Neither error changes the decisions those ADRs made
+(pin an explicit tag regardless of what `latest` does; auth stays on locally with a scripted
+non-interactive bootstrap) — only the evidence cited for them was wrong.
+
+**Why I got it wrong:** both claims were written as verified fact in an ADR without having
+actually run a container to check — "the tag started pointing at 3 Core on this date" and
+"mints a token on first boot" both read like specific, checkable claims, which made them sound
+verified rather than stated from general knowledge or documentation skimmed without testing.
+
+**Rule that prevents a repeat:** a specific, dated, checkable claim about how a live system
+behaves needs to actually be checked against that system before it goes in an ADR as fact —
+if it can't be checked yet, it gets the same "not verified, see U-nn" hedge ADR-0009 already
+used for the mechanism half of the same sentence, applied to the fact half too.
+
+### E-07 — Arithmetic error in `.env.example`'s retention comment, repeated without checking   [M1, 2026-09-01]
+
+**Claimed / did:** `.env.example`'s rollup-retention comment claimed the plant-policy rollup
+value (1 year) is "twelve times" the plant-policy raw value (9 months). The previous session
+repeated this figure in conversation with Sebastian without checking it.
+
+**Actually true:** 12 months ÷ 9 months ≈ 1.33×, not 12×. The comment was written by one of the
+T2 subagents (see E-05); the error survived a full session because it was never recomputed, only
+re-read and passed along.
+
+**Why I got it wrong:** treated a number already present in a committed-looking file as
+established rather than as a claim to verify — the same failure mode as E-04 (do the arithmetic
+instead of trusting a prior statement), but here the prior statement was a stray code comment
+rather than my own earlier reasoning, which made it feel less like something that needed
+checking.
+
+**Rule that prevents a repeat:** a ratio or arithmetic claim gets recomputed at the point it's
+used, regardless of whether it's newly stated or being repeated from an existing file — provenance
+of a number is not evidence of its correctness.
+
 ---
 
 ## Corrected design calls

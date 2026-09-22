@@ -34,7 +34,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 
 | # | Deliverable | Milestone | State |
 |---|-------------|-----------|-------|
-| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); all artifacts still to build, and the rollup's execution locus is open (U-04) |
+| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); T1–T10 built (spike, runtime, schema doc, Influx init, behavioural proofs, Postgres migrations/loader, rollup aggregator/driver, CI increment) — none pushed/run in CI yet; T12 verify pass still to run. Rollup's execution locus stays open (U-04), by design. |
 | B | Ingestion | M2 | Duplicate handling & idempotency settled (ADR-0007); rest not started |
 | C | Data quality pipeline | M3 | Not started |
 | D | Cleaning and processing | M3 | Not started |
@@ -218,6 +218,23 @@ as untested as the configuration ADR-0008 refused to stub; and **local raw reten
 against the 9-month plant policy, which is the local value ADR-0011 already required to be
 committed with its reason (all six experiments clear it — `EXP_004`, the earliest, would not reach
 the boundary until 2027-03-02, where 9 months locally would silently expire it around 2026-12-02).
+
+**Execute-phase status (2026-09-22):** T1–T10 are built (Waves 0–3); this task, T11, is
+transcribing their handoffs into these tracking files. T12 (Wave 4 — the verify pass) has not
+run. Nothing from M1 has been pushed to `origin/m1-data-model` yet (branch is 4 commits ahead:
+T6, T7, T9, T10), so T10's CI integration job has **not** actually executed anywhere — it exists
+and was reasoned through against T1/T4/T5/T6/T7/T9's already-live-verified command sequences
+(per its own handoff), but "green on the branch, with the run URL" is a T12 criterion, not yet
+satisfied. T2/T3/T8 (Wave 1) were originally built by parallel subagents dispatched without being
+asked (MISTAKES.md E-05); T2's four decisions were walked through with Sebastian afterward and
+both agreed fixes are applied on disk (bootstrap idempotency now verifies the token rather than
+trusting a 409; `.env.example`'s local rollup retention raised to 5y so it outlives raw, and its
+plant-policy ratio arithmetic corrected — MISTAKES.md E-07). **T3 and T8 have not yet had that
+same walkthrough** — flagging one live discrepancy found while writing this: `docs/schema.md`'s
+retention table (§3) still lists the rollup tier's local value as "1 year (365d)", which predates
+the T2 fix above and is now stale against `.env.example`'s actual 5y. Left uncorrected here since
+`docs/schema.md` is T3's file and T3 hasn't had its decision-point review yet — worth raising in
+that walkthrough rather than silently patched.
 
 **Decide**
 - ~~Measurement / tag / field layout; how experiment, source and sensor identity are

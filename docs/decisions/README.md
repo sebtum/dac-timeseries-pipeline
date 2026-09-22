@@ -21,8 +21,8 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0005](ADR-0005-postgres-experiment-metadata.md) | PostgreSQL for experiment metadata | M1 | A, F | Accepted |
 | [0006](ADR-0006-timeseries-data-model.md) | Tags, fields, and the numeric/state table split | M1 | A | Accepted |
 | [0007](ADR-0007-duplicate-resolution-idempotency.md) | Same-timestamp duplicate resolution and ingest idempotency | M2 | B, C | Accepted |
-| [0008](ADR-0008-local-runtime-docker-compose.md) | Docker Compose, pinned tags, services added progressively | M0 | A, B, G | Accepted |
-| [0009](ADR-0009-provisioning-as-code.md) | Provisioning as code, per milestone, with three exceptions | M0 | — | Accepted |
+| [0008](ADR-0008-local-runtime-docker-compose.md) | Docker Compose, pinned tags, services added progressively | M0 | A, B, G | Accepted ⚠ |
+| [0009](ADR-0009-provisioning-as-code.md) | Provisioning as code, per milestone, with three exceptions | M0 | — | Accepted ⚠ |
 | [0010](ADR-0010-profile-post-ingest-in-database.md) | Profile post-ingest in the database; pre-ingest only what the write destroys | M0 | C, D | Accepted |
 | [0011](ADR-0011-retention-tiering-rollup.md) | Retention, tiering, and the rollup schema | M1 | A | Accepted ⚠ |
 | [0012](ADR-0012-postgres-migrations-metadata-loader.md) | Postgres migrations, and a metadata loader with per-field provenance | M1 | A, F | Accepted |
@@ -30,10 +30,26 @@ pipeline. Trivia (variable naming, file layout) is not.
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
 
+⚠ ADR-0008 and ADR-0009 each stated one fact about InfluxDB 3 Core's live behaviour that turned
+out to be wrong, corrected by T1's spike (`docs/spikes/U-13-core-token-bootstrap.md`,
+2026-08-31; MISTAKES.md E-06). ADR-0008 claimed `influxdb:latest` "has pointed at 3 Core since 27
+May 2026" — it currently resolves to InfluxDB 2.9.1. ADR-0009 claimed "Core mints its admin token
+on first boot" — it does not; the token is created by an explicit non-interactive command
+(`influxdb3 create token --admin`), and a second call 409s rather than succeeding idempotently.
+Neither decision moves: ADR-0008's tag is pinned to an explicit version regardless of what
+`latest` does, and ADR-0009's policy (auth on locally, scripted non-interactive bootstrap into a
+gitignored `.env`) is exactly what the corrected mechanism still supports — only the evidence
+cited for each was wrong, not the choice it justified.
+
 ⚠ ADR-0011 carries one too: *where* the rollup executes (U-04) is unresolved, because the stated
 preference for a Processing Engine plugin conflicts with the decision to aggregate over M3's
 pipeline verdict — a plugin cannot read a verdict that never lands in InfluxDB (U-09). The
-retention and rollup *design* stands; the execution locus does not.
+retention and rollup *design* stands; the execution locus does not. **Still accurate after the
+T8/T9 split** (2026-09-22): T8 built the pure aggregation function and T9 the thin driver that
+calls it, exactly as `docs/plans/M1.md` scoped them — neither resolves U-04, since the driver
+takes the inclusion predicate as an injected parameter rather than reading a verdict from
+InfluxDB. The split only kept U-04 from blocking M1; it does not touch the plugin-vs-verdict
+conflict itself.
 
 Note that 0001 and 0004 split deliberately: the brief imposed *InfluxDB*, but *which version,
 queried in which language* was our choice, and the versions differ enough that conflating them
