@@ -16,7 +16,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M | Name | Deliverables | Phase | ADRs |
 |---|------|--------------|-------|------|
 | M0 | Environment & reconnaissance | (setup), CI | Done | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
-| M1 | Time-series data model | A | Verify | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
+| M1 | Time-series data model | A | Done | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
 | M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
 | M2.5 | Post-ingest profiling | — | Not started | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
@@ -34,7 +34,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 
 | # | Deliverable | Milestone | State |
 |---|-------------|-----------|-------|
-| A | Time-series data model | M1 | Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); T1–T11 built and T12 verify pass run (2026-09-22) — V1–V10 all pass, evidence below. Not yet pushed to `origin/m1-data-model`, so CI has still not actually executed the integration job (T10's own "green on the branch" criterion is open); the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05 is also still outstanding. Rollup's execution locus stays open (U-04), by design. |
+| A | Time-series data model | M1 | **Done** (2026-09-22). Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); T1–T12 all run — V1–V10 all pass, evidence in the M1 verify-phase results below. Pushed to `origin/m1-data-model`; CI green on the branch, both jobs — [run 35779389919](https://github.com/sebtum/dac-timeseries-pipeline/actions/runs/35779389919) (`lint` 14s, `integration` 1m1s, InfluxDB 3 Core + Postgres both up in Actions for the first time). Rollup's execution locus stays open (U-04), by design. **Deferred, not dropped:** the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05 — Sebastian's explicit call to push this pass through rather than fold it in here; still owed before those two files' design choices are considered reviewed. |
 | B | Ingestion | M2 | Duplicate handling & idempotency settled (ADR-0007); rest not started |
 | C | Data quality pipeline | M3 | Not started |
 | D | Cleaning and processing | M3 | Not started |
@@ -324,7 +324,10 @@ that breakdown covers.
 - `data/raw/dac_raw_timeseries.sha256` still verifies against a freshly computed SHA-256 of the CSV — M1 touched no raw data.
 - `ruff check .` and `ruff format --check .` both clean; `docker compose config` validates with no `latest` image tag.
 - One stale fact was caught and fixed while assembling this table, not a design decision: `docs/schema.md` §3's rollup local-retention row still read "1 year (365d)" from before the T2 walkthrough raised it to 5y (MISTAKES.md, flagged in this file's 2026-09-22 status note above) — corrected to `5y` with the same reasoning `.env.example` already carries.
-- **Not satisfied yet — carried forward rather than dropped:** CI green on the branch, with a run URL. Nothing from M1 has been pushed to `origin/m1-data-model`, so T10's integration job has never executed on GitHub Actions; everything above was verified locally against the same live services CI would use. Pushing (and, separately, the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05) are both still open before M1 can honestly flip to `Done` — see the 2026-09-22 status note above.
+- **CI green on the branch:** pushed to `origin/m1-data-model`; both jobs passed on the first run against this branch — [run 35779389919](https://github.com/sebtum/dac-timeseries-pipeline/actions/runs/35779389919) (`lint` 14s, `integration` 1m1s). This is the first time InfluxDB 3 Core has actually come up inside a GitHub Actions runner rather than being reasoned about from local behaviour.
+- **Deferred by Sebastian's explicit call, not resolved here:** the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05. M1 flips to `Done` below with this named as an open item rather than silently closed.
+
+**M1: Done (2026-09-22).**
 
 ## M2 — Ingestion (B)
 
