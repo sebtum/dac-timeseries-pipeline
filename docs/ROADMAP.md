@@ -17,7 +17,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 |---|------|--------------|-------|------|
 | M0 | Environment & reconnaissance | (setup), CI | Done | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M1 | Time-series data model | A | Done | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
-| M2 | Ingestion | B | Discuss | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md) |
+| M2 | Ingestion | B | Verify | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md), [0013](decisions/ADR-0013-ingestion.md) |
 | M2.5 | Post-ingest profiling | — | Not started | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
 | M4 | Derived metrics | E | Not started | — |
@@ -35,7 +35,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | # | Deliverable | Milestone | State |
 |---|-------------|-----------|-------|
 | A | Time-series data model | M1 | **Done** (2026-09-22). Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); T1–T12 all run — V1–V10 all pass, evidence in the M1 verify-phase results below. Pushed to `origin/m1-data-model`; CI green on the branch, both jobs — [run 35779389919](https://github.com/sebtum/dac-timeseries-pipeline/actions/runs/35779389919) (`lint` 14s, `integration` 1m1s, InfluxDB 3 Core + Postgres both up in Actions for the first time). Rollup's execution locus stays open (U-04), by design. **Deferred, not dropped:** the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05 — Sebastian's explicit call to push this pass through rather than fold it in here; still owed before those two files' design choices are considered reviewed. |
-| B | Ingestion | M2 | Duplicate handling & idempotency settled (ADR-0007); rest not started |
+| B | Ingestion | M2 | **Built, awaiting the judge** (2026-11-23). Real file: 520,005 rows = 519,980 saved + 15 exact copies + 10 conflict losers + 0 rejected, all 150 series balanced against a count read back from InfluxDB; second run identical; raw SHA-256 unchanged. Report: [`reports/M2.md`](../reports/M2.md). Decisions: [ADR-0013](decisions/ADR-0013-ingestion.md). |
 | C | Data quality pipeline | M3 | Not started |
 | D | Cleaning and processing | M3 | Not started |
 | E | Derived metrics | M4 | Not started |
@@ -50,6 +50,13 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 ---
 
 ## The four-phase protocol
+
+> **Changed 2026-11-23, from M2 on.** Claude now makes the calls and Sebastian verifies them in
+> milestone reports. Only major decisions need his approval (defined in `CLAUDE.md`). The loop
+> below now runs lighter: Discuss and Plan shrink to one decision log and the verify criteria,
+> both written before the code. Execute and Verify are unchanged. Each milestone ends with a
+> report in `reports/M#.md`, opened in the doc viewer. M0 and M1 were run under the full
+> protocol below.
 
 Every milestone runs the same loop.
 
@@ -349,6 +356,22 @@ idempotency / re-run behaviour (ADR-0007).
 - Re-running is safe.
 - Raw CSV checksum unchanged.
 - Ingest throughput noted.
+
+**Execute-phase status (2026-11-23).** Built on branch `m2-ingestion` under the new working
+model: the milestone record is `.workflow/dac.md` (scenarios S2.1-S2.33), the decisions are in
+[ADR-0013](decisions/ADR-0013-ingestion.md), and the report for review is
+[`reports/M2.md`](../reports/M2.md). Not yet committed or pushed: that waits for the judge.
+Results so far:
+
+- Real run (`python -m scripts.ingest`, dev `dac_raw`): exit 0, 520,005 rows = 519,980 + 15 + 10 + 0,
+  150 of 150 series balanced, 30 out-of-order rows, 0 outside the experiment windows, 72 s
+  (about 7,200 rows per second). A second run left every reading and conflict row identical.
+- Tests: 179 pass, 0 skipped (unit 123, integration 31, end-to-end 25), against a private stack.
+- Findings that were not in the plan: a write to a missing database creates it, so ingest checks
+  first (S2.24); partial accept behaves as documented on the v3 endpoint and is always off on the
+  client's default endpoint; the private verify stack must not overwrite a dev `.env`
+  (MISTAKES.md E-08).
+- Closed: U-01, U-02, U-07, U-08, U-11.
 
 ## M2.5 — Post-ingest profiling *(added scope, not in the brief)*
 

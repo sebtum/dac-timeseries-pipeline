@@ -31,6 +31,23 @@ series (ADR-0006, Why).
   that looks fine and means nothing. Two tables, one float-typed and one string-typed, avoid both
   problems: raw values are stored exactly as they appear in the CSV, and there is no type conflict.
 
+### The conflicts table (M2, ADR-0007 addendum, ADR-0013)
+
+A third table, `readings_conflicts`, holds one row per **discarded** reading when two or more
+readings claim the same instant for the same series. The kept reading is in `readings_numeric` /
+`readings_state`; both readings are here, so nothing is lost.
+
+| | `readings_conflicts` |
+|---|---|
+| **tags** | `experiment_id`, `source`, `signal`, `discard_rank` (1 = the best of the discarded readings; makes a group of three keep two records) |
+| **time** | the contested instant, so a query joins the conflict to the kept reading on `time` plus the three tags |
+| **fields (text)** | `value_kept_raw`, `value_discarded_raw` (exactly as the file wrote them), `quality_kept`, `quality_discarded`, `reason` (`value_differs` or `quality_differs`), `resolution` (`better_quality`, `present_value`, `lower_value`, `alphabetical`) |
+| **fields (int)** | `source_row_kept`, `source_row_discarded` (data-row numbers in the CSV, header excluded) |
+
+Real file: 10 rows, every one `value_differs` / `lower_value`. An exact copy (same value, same
+quality) is counted in the ingest summary, not stored here. An empty value is stored in the
+readings table as a point with a `quality` field and no `value` field.
+
 ## 2. Cardinality — 150 series, measured
 
 **150 series**, measured directly against the raw CSV by the pre-ingest census
@@ -141,7 +158,7 @@ must therefore be *monitored*, not merely scheduled (ADR-0011, Consequences).
   to avoid: `mean()` over a state column would return a number that looks fine and means nothing,
   because there is no numeric ordering between `STARTUP`, `STEADY_STATE`, `LOAD_CHANGE`, and
   `SHUTDOWN` for an aggregate to respect.
-- The table is tiny regardless (~73 rows across all six experiments: 7–19 `process_state` and 3–5
+- The table is tiny regardless (74 rows across all six experiments, counted in `dac_raw` after the M2 ingest; ADR-0011 said ~73: 7–19 `process_state` and 3–5
   `valve_state` rows each, per ADR-0011, Why) — size is not why it's exempt, but it does mean the
   exemption costs nothing in storage.
 - Because they never expire and never roll up, `readings_state` rows become the permanent index

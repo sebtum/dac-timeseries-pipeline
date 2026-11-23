@@ -203,6 +203,27 @@ checking.
 used, regardless of whether it's newly stated or being repeated from an existing file — provenance
 of a number is not evidence of its correctness.
 
+### E-08 — `verify_stack.py up` was not safe to run twice; it threw away the admin token   [M2, 2026-11-23]
+
+**Claimed / did:** wrote `scripts/verify_stack.py up` to rebuild `.env` from `.env.example` on
+every call, with an empty `INFLUX_TOKEN`, and described `up` as safe to repeat.
+
+**Actually true:** InfluxDB Core hands out the admin token once. The first `up` minted it into
+`.env`; the second `up` rewrote `.env` with an empty token, and the bootstrap step then failed
+because the server said a token already existed and would not give it back. The stack was running
+but unusable until `down` and a fresh `up`. The same pass had a second slip: `load_experiments.py`
+was started as a file, where it needs `python -m scripts.load_experiments` to find the `pipeline`
+package. Both were caught on the first manual run, before anything depended on the script.
+
+**Why I got it wrong:** I wrote `up` as a one-shot recipe and reasoned about "safe to repeat" from
+the compose command (which is idempotent) without asking about the one step that is not: a secret
+that can only be read at creation time. I did not run it twice before calling it done.
+
+**Rule that prevents a repeat:** any setup command described as repeatable gets run twice the
+first time it is written, and I list which of its steps create a value that cannot be read back
+(tokens, generated passwords) before deciding what a second run keeps. `tests/unit/test_verify_stack.py`
+now pins this: a second `up` for the same run keeps its token, a different run id does not.
+
 ---
 
 ## Corrected design calls

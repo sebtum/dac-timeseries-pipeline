@@ -166,6 +166,21 @@ resolution (U-07) and the "same" definition (U-08) on top, once those are settle
 does not need either open question answered — only resolution does — so the shared module can
 be built and run at M0 without waiting on U-07/U-08.
 
+## Addendum (2026-11-23) - M2 resolution of the open items
+
+ADR-0013 settled what this ADR left open. In short: the win-policy (U-07) is better quality flag,
+then a present value over an empty one, then the smaller number or alphabetically first text;
+"same" (U-08) means the same number once read, compared exactly, or the same text, and also the
+same quality flag; categorical conflicts (U-11) are stored as text in the same table.
+
+One change to the sketch of `readings_conflicts` above. The fields `value_kept` and
+`value_discarded` (float) became `value_kept_raw` and `value_discarded_raw` (text, exactly as
+the file wrote them). The ADR left this open ("a second table or string columns"), so this is an
+addendum, not a reversal. Two more things were added: a small tag `discard_rank`, so a group of
+three or more readings gets one record per discarded reading instead of overwriting its own
+record, and the `reason` values `value_differs` / `quality_differs`. Today all 25 collision
+groups in the data are pairs and none is on a categorical signal.
+
 ## Defense
 
 Ingesting raw doesn't by itself preserve raw, because InfluxDB deduplicates points sharing tags

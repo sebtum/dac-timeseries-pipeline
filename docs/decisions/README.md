@@ -26,6 +26,7 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0010](ADR-0010-profile-post-ingest-in-database.md) | Profile post-ingest in the database; pre-ingest only what the write destroys | M0 | C, D | Accepted |
 | [0011](ADR-0011-retention-tiering-rollup.md) | Retention, tiering, and the rollup schema | M1 | A | Accepted ⚠ |
 | [0012](ADR-0012-postgres-migrations-metadata-loader.md) | Postgres migrations, and a metadata loader with per-field provenance | M1 | A, F | Accepted |
+| [0013](ADR-0013-ingestion.md) | Ingestion: timezone, precision, batching, rejects, conflict winner, exit codes | M2 | B | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
