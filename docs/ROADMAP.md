@@ -360,7 +360,10 @@ idempotency / re-run behaviour (ADR-0007).
 **Execute-phase status (2026-11-23).** Built on branch `m2-ingestion` under the new working
 model: the milestone record is `.workflow/dac.md` (scenarios S2.1-S2.33), the decisions are in
 [ADR-0013](decisions/ADR-0013-ingestion.md), and the report for review is
-[`reports/M2.md`](../reports/M2.md). Not yet committed or pushed: that waits for the judge.
+[`reports/M2.md`](../reports/M2.md). Committed and pushed on `m2-ingestion` (2026-11-23); CI
+green: lint and integration, including the e2e ingest run
+([run 45193161554](https://github.com/sebtum/dac-timeseries-pipeline/actions/runs/45193161554)).
+Merge to `master` waits for approval (normal merge, no squash).
 Results so far:
 
 - Real run (`python -m scripts.ingest`, dev `dac_raw`): exit 0, 520,005 rows = 519,980 + 15 + 10 + 0,
