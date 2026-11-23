@@ -15,6 +15,13 @@ jobs:
       - run: pip install -r requirements.txt
       - run: ruff check .
       - run: ruff format --check .
+      # The shape of ingest_summary.json is a contract (M2). Its committed example must
+      # validate against the schema; the ingest's own output is validated in the tests.
+      - name: Validate the ingest summary contract example
+        run: >-
+          check-jsonschema
+          --schemafile contracts/ingest_summary.schema.json
+          contracts/examples/ingest_summary.example.json
 
   integration:
     runs-on: ubuntu-latest
@@ -74,6 +81,8 @@ jobs:
       - name: Initialize InfluxDB databases
         run: python scripts/init_influx.py
 
+      # `pytest` from the repo root also runs tests/e2e: the real ingest CLI against this
+      # InfluxDB, on the committed fixture (tests/fixtures/ingest), into throwaway databases.
       # A skip is a failure here: with both services live, every influx/postgres-marked
       # test should run for real. `pytest`'s own exit code doesn't reflect skips, so
       # the skip count is checked explicitly against the summary line.

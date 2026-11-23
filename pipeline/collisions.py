@@ -57,11 +57,13 @@ def sort_key(r: Reading) -> tuple[str, str, str, datetime]:
     return (*series_key(r), r.timestamp)
 
 
-def find_collisions(readings: Iterable[Reading]) -> Iterator[list[Reading]]:
-    """Yield groups of 2+ readings sharing (series key, timestamp).
+def group_by_instant(readings: Iterable[Reading]) -> Iterator[list[Reading]]:
+    """Yield every group of readings sharing (series key, timestamp), singletons included.
 
-    `readings` must already be sorted by `sort_key`. Holds only the current
-    group in memory: O(1) relative to the number of readings.
+    `readings` must already be sorted by `sort_key`. Holds only the current group in memory:
+    O(1) relative to the number of readings. Ingest resolves every group (a group of one is
+    just a saved point); the census only wants the groups of two or more, see
+    `find_collisions`.
     """
     group: list[Reading] = []
     current_key: tuple[str, str, str, datetime] | None = None
@@ -70,12 +72,23 @@ def find_collisions(readings: Iterable[Reading]) -> Iterator[list[Reading]]:
         if key == current_key:
             group.append(r)
         else:
-            if len(group) > 1:
+            if group:
                 yield group
             group = [r]
             current_key = key
-    if len(group) > 1:
+    if group:
         yield group
+
+
+def find_collisions(readings: Iterable[Reading]) -> Iterator[list[Reading]]:
+    """Yield groups of 2+ readings sharing (series key, timestamp).
+
+    `readings` must already be sorted by `sort_key`. Built on `group_by_instant`, so it is
+    O(1) relative to the number of readings too.
+    """
+    for group in group_by_instant(readings):
+        if len(group) > 1:
+            yield group
 
 
 def _spill_run(chunk: list[Reading], run_dir: Path, run_index: int) -> Path:

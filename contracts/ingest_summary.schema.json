@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contracts/ingest_summary.schema.json",
+  "title": "ingest_summary.json",
+  "description": "Shape of the summary that `python -m scripts.ingest` writes on every run, including refused ones. Pins names and types, not behaviour. Owned by /flow:plan; changes are recorded under Decisions in .workflow/dac.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "status", "exit_code", "refusal_reason", "input", "database", "totals",
+    "series", "rejects_by_reason", "conflicts_written", "out_of_order", "offsets_seen",
+    "window_check", "timing"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "status": {
+      "enum": ["ok", "completed_with_findings", "refused", "write_failed", "reconciliation_failed"]
+    },
+    "exit_code": { "enum": [0, 1, 2, 3, 4] },
+    "refusal_reason": {
+      "type": ["string", "null"],
+      "description": "Set only when status is refused, e.g. checksum_mismatch, database_missing, bad_header, file_missing."
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["csv_path", "experiments_path", "sha256_expected", "sha256_actual", "checksum_ok", "rows"],
+      "properties": {
+        "csv_path": { "type": "string" },
+        "experiments_path": { "type": "string" },
+        "sha256_expected": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "sha256_actual": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "checksum_ok": { "type": "boolean" },
+        "rows": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "database": { "type": "string" },
+    "totals": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/counts" }]
+    },
+    "series": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/counts" },
+          {
+            "type": "object",
+            "required": ["experiment_id", "source", "signal", "table"],
+            "properties": {
+              "experiment_id": { "type": "string" },
+              "source": { "type": "string" },
+              "signal": { "type": "string" },
+              "table": { "enum": ["readings_numeric", "readings_state", null] }
+            }
+          }
+        ]
+      }
+    },
+    "rejects_by_reason": {
+      "type": "object",
+      "propertyNames": {
+        "enum": [
+          "bad_timestamp", "missing_offset", "precision_too_fine", "bad_number",
+          "unknown_signal", "unknown_experiment", "bad_quality", "malformed_row"
+        ]
+      },
+      "additionalProperties": { "type": "integer", "minimum": 1 }
+    },
+    "conflicts_written": { "type": "integer", "minimum": 0 },
+    "out_of_order": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["total", "by_series"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "by_series": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["experiment_id", "source", "signal", "count"],
+            "properties": {
+              "experiment_id": { "type": "string" },
+              "source": { "type": "string" },
+              "signal": { "type": "string" },
+              "count": { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "offsets_seen": {
+      "type": "object",
+      "description": "Per source, the distinct UTC-offset texts as written in the file, e.g. Z or +02:00.",
+      "additionalProperties": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+    },
+    "window_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outside_window_total", "by_experiment_source"],
+      "properties": {
+        "outside_window_total": { "type": "integer", "minimum": 0 },
+        "by_experiment_source": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["experiment_id", "source", "first_offset_s", "last_offset_s", "outside_window"],
+            "properties": {
+              "experiment_id": { "type": "string" },
+              "source": { "type": "string" },
+              "first_offset_s": {
+                "type": "number",
+                "description": "First reading minus experiment start_time, in seconds."
+              },
+              "last_offset_s": {
+                "type": "number",
+                "description": "Last reading minus experiment end_time, in seconds (negative means before the end)."
+              },
+              "outside_window": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["started_at", "duration_s", "rows_per_second", "batch_size", "batches"],
+      "properties": {
+        "started_at": { "type": "string", "format": "date-time" },
+        "duration_s": { "type": "number", "minimum": 0 },
+        "rows_per_second": { "type": ["number", "null"], "minimum": 0 },
+        "batch_size": { "type": "integer", "minimum": 1 },
+        "batches": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "counts": {
+      "type": "object",
+      "required": ["csv_rows", "saved", "exact_copies", "conflict_losers", "rejected", "balanced"],
+      "properties": {
+        "csv_rows": { "type": "integer", "minimum": 0 },
+        "saved": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Counted back from InfluxDB, not counted on write."
+        },
+        "exact_copies": { "type": "integer", "minimum": 0 },
+        "conflict_losers": { "type": "integer", "minimum": 0 },
+        "rejected": { "type": "integer", "minimum": 0 },
+        "balanced": {
+          "type": "boolean",
+          "description": "csv_rows == saved + exact_copies + conflict_losers + rejected"
+        }
+      }
+    }
+  }
+}

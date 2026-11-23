@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "status": "completed_with_findings",
+  "exit_code": 1,
+  "refusal_reason": null,
+  "input": {
+    "csv_path": "tests/fixtures/ingest/slice.csv",
+    "experiments_path": "tests/fixtures/ingest/experiments.json",
+    "sha256_expected": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256_actual": "0000000000000000000000000000000000000000000000000000000000000000",
+    "checksum_ok": true,
+    "rows": 12
+  },
+  "database": "example_db",
+  "totals": {
+    "csv_rows": 12,
+    "saved": 9,
+    "exact_copies": 1,
+    "conflict_losers": 1,
+    "rejected": 1,
+    "balanced": true
+  },
+  "series": [
+    {
+      "experiment_id": "EXP_T1", "source": "hydrolyzer", "signal": "voltage",
+      "table": "readings_numeric",
+      "csv_rows": 6, "saved": 4, "exact_copies": 1, "conflict_losers": 1, "rejected": 0,
+      "balanced": true
+    },
+    {
+      "experiment_id": "EXP_T1", "source": "ambient", "signal": "ambient_temperature",
+      "table": "readings_numeric",
+      "csv_rows": 3, "saved": 3, "exact_copies": 0, "conflict_losers": 0, "rejected": 0,
+      "balanced": true
+    },
+    {
+      "experiment_id": "EXP_T1", "source": "plant", "signal": "valve_state",
+      "table": "readings_state",
+      "csv_rows": 2, "saved": 2, "exact_copies": 0, "conflict_losers": 0, "rejected": 0,
+      "balanced": true
+    },
+    {
+      "experiment_id": "EXP_T1", "source": "absorber", "signal": "voltage",
+      "table": null,
+      "csv_rows": 1, "saved": 0, "exact_copies": 0, "conflict_losers": 0, "rejected": 1,
+      "balanced": true
+    }
+  ],
+  "rejects_by_reason": { "unknown_signal": 1 },
+  "conflicts_written": 1,
+  "out_of_order": {
+    "total": 1,
+    "by_series": [
+      { "experiment_id": "EXP_T1", "source": "hydrolyzer", "signal": "voltage", "count": 1 }
+    ]
+  },
+  "offsets_seen": {
+    "absorber": ["Z"],
+    "ambient": ["+02:00"],
+    "hydrolyzer": ["Z"],
+    "plant": ["Z"]
+  },
+  "window_check": {
+    "outside_window_total": 0,
+    "by_experiment_source": [
+      { "experiment_id": "EXP_T1", "source": "ambient", "first_offset_s": 0, "last_offset_s": -60, "outside_window": 0 },
+      { "experiment_id": "EXP_T1", "source": "hydrolyzer", "first_offset_s": 0, "last_offset_s": -1, "outside_window": 0 },
+      { "experiment_id": "EXP_T1", "source": "plant", "first_offset_s": 0, "last_offset_s": -30, "outside_window": 0 }
+    ]
+  },
+  "timing": {
+    "started_at": "2026-11-23T10:00:00+00:00",
+    "duration_s": 0.8,
+    "rows_per_second": 15.0,
+    "batch_size": 10000,
+    "batches": 2
+  }
+}
