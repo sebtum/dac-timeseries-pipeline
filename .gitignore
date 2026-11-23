@@ -19,3 +19,6 @@ grafana-data/
 *.swo
 *~
 _debrief/
+
+# private verify-stack backup of a foreign .env (scripts/verify_stack.py)
+.env.pre-verify

@@ -1,0 +1,3 @@
+# Fixture bytes are hashed, so git must never convert their line endings (Windows vs the
+# Linux CI runner). The committed .sha256 files match the LF bytes below.
+tests/fixtures/** -text

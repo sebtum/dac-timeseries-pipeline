@@ -1,7 +1,9 @@
 services:
   influxdb:
     image: influxdb:3.11.2-core
-    container_name: dac-influxdb
+    # Overridable so a private verify stack (scripts/verify_stack.py) can run next to the dev
+    # stack under its own names; with no override the dev names are unchanged.
+    container_name: ${INFLUX_CONTAINER_NAME:-dac-influxdb}
     # Image entrypoint is ["influxdb3", "serve"]; --node-id and --object-store are required
     # flags with no defaults (docs/spikes/U-13-core-token-bootstrap.md). Auth stays ON (no
     # --without-auth) per ADR-0009's "auth enabled locally too" policy — the admin token is
@@ -37,7 +39,7 @@ services:
 
   postgres:
     image: postgres:16.6
-    container_name: dac-postgres
+    container_name: ${POSTGRES_CONTAINER_NAME:-dac-postgres}
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-dac}
       POSTGRES_USER: ${POSTGRES_USER:-dac}

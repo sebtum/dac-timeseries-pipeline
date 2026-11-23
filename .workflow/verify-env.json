@@ -1,0 +1,10 @@
+{
+  "requires": ["docker"],
+  "network": true,
+  "up": "python scripts/verify_stack.py up",
+  "health": "python scripts/verify_stack.py health",
+  "down": "python scripts/verify_stack.py down",
+  "copy": ["data/raw/dac_raw_timeseries.csv"],
+  "ports": 2,
+  "timeoutSeconds": 900
+}
