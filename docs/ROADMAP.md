@@ -18,7 +18,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M0 | Environment & reconnaissance | (setup), CI | Done | [0008](decisions/ADR-0008-local-runtime-docker-compose.md), [0009](decisions/ADR-0009-provisioning-as-code.md), [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
 | M1 | Time-series data model | A | Done | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
 | M2 | Ingestion | B | Verify | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md), [0013](decisions/ADR-0013-ingestion.md) |
-| M2.5 | Post-ingest profiling | — | Not started | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
+| M2.5 | Post-ingest profiling | — | Verify | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md), [0014](decisions/ADR-0014-post-ingest-profiling.md) |
 | M3 | Quality & cleaning pipeline | C, D | Not started | — |
 | M4 | Derived metrics | E | Not started | — |
 | M5 | Comparison & findings | F | Not started | — |
@@ -45,7 +45,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | I | Cloud scaling narrative (verbal) | M7 | Not started |
 | J | Presentation walkthrough (verbal) | M7 | Not started |
 | — | CI/CD *(added scope, not in the brief)* | cross-cutting, from M0 | M0 increment done ([ADR-0009](decisions/ADR-0009-provisioning-as-code.md)) — lint + format check green on GitHub Actions; next increment lands at M1 |
-| — | Post-ingest profiling *(added scope, not in the brief)* | cross-cutting, M2.5 | Not started — placement settled (U-16); scope from [ADR-0010](decisions/ADR-0010-profile-post-ingest-in-database.md) |
+| — | Post-ingest profiling *(added scope, not in the brief)* | cross-cutting, M2.5 | **Built, awaiting the judge** (2026-11-23). Real data: 150 series, 6 experiments, 24 relationships, 519,980 points, 188 read-only queries in about 16 s; every series and relationship recomputed independently in Python from plain pulls, 0 mismatches. Report: [`reports/M2.5.md`](../reports/M2.5.md). Decisions: [ADR-0014](decisions/ADR-0014-post-ingest-profiling.md). |
 
 ---
 
@@ -397,6 +397,23 @@ can't express (per ADR-0010):
 - U-05 (Core's ~72h single-query span) is a live constraint here, not just at M5/M6, since
   profiling spans March–June 2026 — resolve it here or explicitly state the workaround
   (per-experiment queries, etc.).
+
+**Execute-phase status (2026-11-23).** Built on branch `m2.5-profiling` (cut from `m2-ingestion`):
+the milestone record is `.workflow/dac.md` (scenarios S25.1-S25.22), the decisions are in
+[ADR-0014](decisions/ADR-0014-post-ingest-profiling.md), the committed output is
+`reports/post_ingest_profile.json` and `.md`, and the report for review is
+[`reports/M2.5.md`](../reports/M2.5.md). Merge to `master` waits for approval.
+Results so far:
+
+- Real run (`python -m scripts.post_ingest_profile`, dev `dac_raw`): exit 0, 150 series, 6
+  experiments, 24 relationships, 519,980 points, 188 queries, about 16 s. Three runs gave
+  identical JSON except the timing block.
+- All 150 series and 24 relationships were recomputed in Python from plain `SELECT` pulls: 0
+  mismatches to the 9th digit.
+- U-05: a single 105-day span query was answered (519,906 points). Narrowed, still open for M6.
+- Findings that were not in the plan: four engine quirks on Core 3.11.2 (conditional counts,
+  signed zero, percentile precision, last-bit instability of fitted lines), each found by the
+  calibration and worked around (ADR-0014). The verdict-word search finds nothing.
 
 **Verify**
 - Every check above produces a number or distribution he can cite, saved to a file.

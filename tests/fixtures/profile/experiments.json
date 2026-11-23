@@ -1,0 +1,12 @@
+[
+  {
+    "experiment_id": "EXP_001",
+    "start_time": "2026-05-04T08:00:00Z",
+    "end_time": "2026-05-04T08:02:00Z"
+  },
+  {
+    "experiment_id": "EXP_004",
+    "start_time": "2026-03-02T08:00:00Z",
+    "end_time": "2026-03-02T08:02:00Z"
+  }
+]

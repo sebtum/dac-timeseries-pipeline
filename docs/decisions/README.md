@@ -27,6 +27,7 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0011](ADR-0011-retention-tiering-rollup.md) | Retention, tiering, and the rollup schema | M1 | A | Accepted ⚠ |
 | [0012](ADR-0012-postgres-migrations-metadata-loader.md) | Postgres migrations, and a metadata loader with per-field provenance | M1 | A, F | Accepted |
 | [0013](ADR-0013-ingestion.md) | Ingestion: timezone, precision, batching, rejects, conflict winner, exit codes | M2 | B | Accepted |
+| [0014](ADR-0014-post-ingest-profiling.md) | Post-ingest profiling: what is measured, SQL versus Python, four engine quirks | M2.5 | C, D | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.

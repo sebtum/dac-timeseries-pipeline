@@ -22,3 +22,6 @@ _debrief/
 
 # private verify-stack backup of a foreign .env (scripts/verify_stack.py)
 .env.pre-verify
+
+# flow verify scratch output (real-run profile checks write here)
+.flow-tmp/

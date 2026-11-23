@@ -22,6 +22,13 @@ jobs:
           check-jsonschema
           --schemafile contracts/ingest_summary.schema.json
           contracts/examples/ingest_summary.example.json
+      # Same for the post-ingest profile (M2.5); the committed real profile is validated in
+      # tests/unit/test_profiling.py and the fixture run's output in tests/e2e/test_profile_cli.py.
+      - name: Validate the post-ingest profile contract example
+        run: >-
+          check-jsonschema
+          --schemafile contracts/post_ingest_profile.schema.json
+          contracts/examples/post_ingest_profile.example.json
 
   integration:
     runs-on: ubuntu-latest
@@ -81,8 +88,9 @@ jobs:
       - name: Initialize InfluxDB databases
         run: python scripts/init_influx.py
 
-      # `pytest` from the repo root also runs tests/e2e: the real ingest CLI against this
-      # InfluxDB, on the committed fixture (tests/fixtures/ingest), into throwaway databases.
+      # `pytest` from the repo root also runs tests/e2e: the real ingest and profile CLIs against
+      # this InfluxDB, on the committed fixtures (tests/fixtures/ingest, tests/fixtures/profile),
+      # into throwaway databases.
       # A skip is a failure here: with both services live, every influx/postgres-marked
       # test should run for real. `pytest`'s own exit code doesn't reflect skips, so
       # the skip count is checked explicitly against the summary line.

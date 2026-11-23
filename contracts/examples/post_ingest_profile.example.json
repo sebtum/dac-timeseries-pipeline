@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "source": { "database": "dac_raw", "experiments_file": "data/raw/experiments.json" },
+  "experiments": [
+    { "experiment_id": "EXP_001", "start": "2026-05-04T08:00:00Z", "end": "2026-05-04T10:00:00Z" }
+  ],
+  "span_probe": {
+    "start": "2026-05-04T08:00:00Z",
+    "end": "2026-05-04T10:00:00Z",
+    "succeeded": true,
+    "count": 7200,
+    "sum_of_per_experiment_counts": 7200,
+    "message_file": null
+  },
+  "series": [
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "unit": "V",
+      "nominal_interval_s": 1,
+      "documented_min": 60,
+      "documented_max": 130,
+      "points": 7126,
+      "points_without_value": 0,
+      "quality": { "GOOD": 7120, "UNCERTAIN": 4, "BAD": 2 },
+      "values": {
+        "min": 81.2,
+        "max": 96.4,
+        "mean": 88.1234567,
+        "stddev": 2.31,
+        "median": 88.0,
+        "p05": 84.5,
+        "p95": 92.0,
+        "below_documented_min": 0,
+        "above_documented_max": 0
+      },
+      "states": null,
+      "intervals_s": {
+        "count": 7125,
+        "min": 1,
+        "median": 1,
+        "p95": 1,
+        "max": 40,
+        "over_2x_nominal": 2,
+        "over_10x_nominal": 1,
+        "seconds_in_over_2x": 76,
+        "longest": [
+          { "start": "2026-05-04T08:40:00Z", "end": "2026-05-04T08:40:40Z", "seconds": 40 },
+          { "start": "2026-05-04T09:10:00Z", "end": "2026-05-04T09:10:36Z", "seconds": 36 }
+        ]
+      },
+      "runs": {
+        "count": 7050,
+        "median_samples": 1,
+        "max_samples": 12,
+        "max_seconds": 11,
+        "longest": [
+          { "start": "2026-05-04T09:00:00Z", "end": "2026-05-04T09:00:11Z", "samples": 12, "seconds": 11, "value": 88.4 }
+        ]
+      },
+      "differences": {
+        "count": 7125,
+        "mean": 0.0001,
+        "stddev": 0.21,
+        "median_abs": 0.1,
+        "p95_abs": 0.4,
+        "max_abs": 3.2
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "unit": null,
+      "nominal_interval_s": null,
+      "documented_min": null,
+      "documented_max": null,
+      "points": 7,
+      "points_without_value": 0,
+      "quality": { "GOOD": 7, "UNCERTAIN": 0, "BAD": 0 },
+      "values": null,
+      "states": { "LOAD_CHANGE": 2, "SHUTDOWN": 1, "STARTUP": 1, "STEADY_STATE": 3 },
+      "intervals_s": {
+        "count": 6,
+        "min": 300,
+        "median": 900,
+        "p95": 1800,
+        "max": 1800,
+        "over_2x_nominal": null,
+        "over_10x_nominal": null,
+        "seconds_in_over_2x": null,
+        "longest": [
+          { "start": "2026-05-04T08:15:00Z", "end": "2026-05-04T08:45:00Z", "seconds": 1800 }
+        ]
+      },
+      "runs": {
+        "count": 7,
+        "median_samples": 1,
+        "max_samples": 1,
+        "max_seconds": 0,
+        "longest": [
+          { "start": "2026-05-04T08:00:00Z", "end": "2026-05-04T08:00:00Z", "samples": 1, "seconds": 0, "value": "STARTUP" }
+        ]
+      },
+      "differences": null
+    }
+  ],
+  "relationships": [
+    {
+      "experiment_id": "EXP_001",
+      "kind": "power_vs_voltage_x_current",
+      "instants_matched": 7126,
+      "instants_unmatched": 74,
+      "corr": 0.9999,
+      "residual_mean": 0.5,
+      "residual_stddev": 12.0,
+      "residual_median": 0.1,
+      "residual_p05": -18.0,
+      "residual_p95": 19.0,
+      "residual_max_abs": 60.0,
+      "relative_residual_median": 0.0008,
+      "relative_residual_p95": 0.0015,
+      "power_zero_instants": 0,
+      "slope": 1.0001,
+      "intercept": -2.0,
+      "r2": 0.9998
+    },
+    {
+      "experiment_id": "EXP_001",
+      "kind": "co2_out_vs_co2_in",
+      "instants_matched": 3600,
+      "instants_unmatched": 0,
+      "corr": 0.12,
+      "ratio_median": 0.28,
+      "ratio_p05": 0.22,
+      "ratio_p95": 0.35,
+      "out_at_or_above_in": 0
+    },
+    {
+      "experiment_id": "EXP_001",
+      "kind": "current_vs_current_setpoint",
+      "instants_matched": 7126,
+      "instants_unmatched": 74,
+      "corr": 0.97,
+      "difference_mean": -0.3,
+      "difference_stddev": 1.1,
+      "difference_median": -0.2,
+      "difference_max_abs": 40.0,
+      "best_lag_s": 3,
+      "corr_at_best_lag": 0.995
+    },
+    {
+      "experiment_id": "EXP_001",
+      "kind": "pressure_drop_vs_air_flow",
+      "instants_matched": 3600,
+      "instants_unmatched": 0,
+      "corr": 0.9,
+      "slope_air_flow": 0.02,
+      "intercept_air_flow": -1.5,
+      "r2_air_flow": 0.81,
+      "slope_air_flow_sq": 0.00001,
+      "intercept_air_flow_sq": 0.3,
+      "r2_air_flow_sq": 0.83
+    }
+  ],
+  "timing": { "seconds": 12.5, "queries": 40 }
+}

@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "policy_version": "clean-v1",
+  "source": { "database": "dac_raw", "experiments_file": "data/raw/experiments.json" },
+  "experiments": [
+    { "experiment_id": "EXP_001", "start": "2026-05-04T08:00:00Z", "end": "2026-05-04T08:10:00Z" }
+  ],
+  "series": [
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "raw_points": 590,
+      "processed_points": 590,
+      "accepted": 588,
+      "excluded": 2,
+      "excluded_by_reason": {
+        "no_value": 0, "flag_bad": 1, "flag_uncertain": 0, "outside_physical_limits": 0,
+        "unknown_state": 0, "conflicting_duplicate": 0, "spike": 1, "flatline": 0
+      },
+      "flags": {
+        "no_value": 0, "flag_bad": 1, "flag_uncertain": 0, "outside_physical_limits": 0,
+        "unknown_state": 0, "conflicting_duplicate": 0, "spike": 2, "flatline": 0,
+        "outside_typical_range": 2
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 11.0,
+        "longest": [ { "start": "2026-05-04T08:06:39Z", "end": "2026-05-04T08:06:50Z", "seconds": 11.0 } ]
+      },
+      "flatline_intervals": { "count": 0, "seconds": 0.0 }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 80,
+      "excluded": 40,
+      "excluded_by_reason": {
+        "no_value": 0, "flag_bad": 0, "flag_uncertain": 0, "outside_physical_limits": 0,
+        "unknown_state": 0, "conflicting_duplicate": 0, "spike": 0, "flatline": 40
+      },
+      "flags": {
+        "no_value": 0, "flag_bad": 0, "flag_uncertain": 0, "outside_physical_limits": 0,
+        "unknown_state": 0, "conflicting_duplicate": 0, "spike": 0, "flatline": 40,
+        "outside_typical_range": 0
+      },
+      "gaps": { "count": 0, "seconds": 0.0, "longest": [] },
+      "flatline_intervals": { "count": 1, "seconds": 195.0 }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "raw_points": 4,
+      "processed_points": 4,
+      "accepted": 3,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0, "flag_bad": 0, "flag_uncertain": 0, "outside_physical_limits": 0,
+        "unknown_state": 1, "conflicting_duplicate": 0, "spike": 0, "flatline": 0
+      },
+      "flags": {
+        "no_value": 0, "flag_bad": 0, "flag_uncertain": 0, "outside_physical_limits": 0,
+        "unknown_state": 1, "conflicting_duplicate": 0, "spike": 0, "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    }
+  ],
+  "totals": {
+    "raw_points": 714,
+    "processed_points": 714,
+    "accepted": 671,
+    "excluded": 43,
+    "excluded_by_reason": {
+      "no_value": 0, "flag_bad": 1, "flag_uncertain": 0, "outside_physical_limits": 0,
+      "unknown_state": 1, "conflicting_duplicate": 0, "spike": 1, "flatline": 40
+    },
+    "flags": {
+      "no_value": 0, "flag_bad": 1, "flag_uncertain": 0, "outside_physical_limits": 0,
+      "unknown_state": 1, "conflicting_duplicate": 0, "spike": 2, "flatline": 40,
+      "outside_typical_range": 2
+    },
+    "gap_intervals": 1,
+    "gap_seconds": 11.0,
+    "flatline_intervals": 1
+  },
+  "reconciliation": { "balanced": true, "series_checked": 3, "unbalanced": [], "raw_unchanged": true },
+  "samples": [
+    {
+      "reason": "spike",
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "time": "2026-05-04T08:02:00Z",
+      "value_raw": 140.0,
+      "neighbours": [
+        { "time": "2026-05-04T08:01:59Z", "value_raw": 100.075, "verdict": "accepted" },
+        { "time": "2026-05-04T08:02:01Z", "value_raw": 100.075, "verdict": "accepted" }
+      ]
+    },
+    {
+      "reason": "unknown_state",
+      "experiment_id": "EXP_001",
+      "source": "plant",
+      "signal": "process_state",
+      "time": "2026-05-04T08:06:40Z",
+      "value_raw": "WARMUP",
+      "neighbours": [
+        { "time": "2026-05-04T08:02:00Z", "value_raw": "STEADY_STATE", "verdict": "accepted" },
+        { "time": "2026-05-04T08:09:00Z", "value_raw": "SHUTDOWN", "verdict": "accepted" }
+      ]
+    }
+  ],
+  "timing": { "seconds": 1.42, "queries": 12, "points_written": 717 }
+}
