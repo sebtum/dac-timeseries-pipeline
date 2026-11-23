@@ -28,26 +28,29 @@ if my answer matches," "peek at the manifest to save time," "is there a summary 
 `_debrief/` is only opened once Sebastian says the working session is over and he's ready to
 review his own work against it — and only he decides when that is.
 
-## Working session contract (before the self-review)
+## Working session contract (changed 2026-11-23)
 
-**Design-first.** Sebastian works this project specifically to make the design/decision-making
-calls himself and get immediate feedback, not to have the answer handed to him or to be gently
-Socratic-questioned toward it. Assist in active-correction mode:
+**Claude decides, Sebastian verifies on reports.** The earlier design-first contract (Sebastian
+proposes every call, Claude reacts) was replaced on 2026-11-23 so the project can be finished.
+Decisions made under the old contract (ADR-0001 … ADR-0012, `MISTAKES.md` C-entries) stay as
+they are.
 
-- Never volunteer the pipeline architecture, the InfluxDB schema, which signals need special
-  handling, or any other design/analysis decision before he has proposed something himself.
-  At a fork in the approach, wait for his call — don't pick for him and don't hint at the
-  "right" shape in advance.
-- The moment he proposes a decision, react immediately and plainly: right, wrong, or partially
-  right, and why. Don't soften a wrong or shaky call into a leading question ("have you
-  considered...") — name the actual problem first, then explain the reasoning behind the
-  correction so the principle transfers, not just the fix for this one case.
-- If he's right, say so directly, don't manufacture doubt — and add anything sharper he's
-  missing: an edge case, a tradeoff, how to phrase/defend it under review.
-- Once a decision is settled (his own or corrected), implement it — don't make him also hand-write
-  the mechanical code for something already decided.
-- Normal engineering help (syntax, library usage, debugging errors he hits, explaining how
-  InfluxDB/Grafana concepts work in general) is unchanged — that's not the part being practiced.
+- Claude makes design and implementation decisions, implements them, and records each one with
+  its reasoning and the rejected option, so it can be defended in review.
+- **Major decisions need Sebastian's approval before they are acted on.** Major means any of:
+  - it reverses or replaces an existing ADR;
+  - it is hard to undo: a database retention setting, deleting or overwriting data, rewriting git
+    history, merging to `master`;
+  - it changes scope: dropping or shrinking a deliverable from `task/TASK.md`;
+  - it is a headline claim Sebastian will present: the M5 findings, especially the
+    flow/pressure-vs-voltage answer.
+  Everything else Claude decides without waiting.
+- Each milestone ends with a short report in the two-layer format (plain summary, then
+  `Details:`), opened in the doc viewer. Sebastian reviews it there. Claude keeps going on the
+  next milestone while he reviews, and folds any correction back in.
+- Commit per milestone on a feature branch, and push it so CI runs. Merging to `master` waits
+  for approval.
+- Wrong calls Sebastian catches in review still go into `MISTAKES.md`.
 
 ## Environment
 
