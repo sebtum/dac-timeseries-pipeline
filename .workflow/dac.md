@@ -119,6 +119,13 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
   20. **Calibrate before scaling:** EXP_001, then EXP_004, then all six, each compared with a plain-Python recompute from a SELECT pull before anything is written.
   21. **Exit codes (clean):** 0 written and balanced; 2 refused, nothing written (database missing — never created —, raw tables missing, experiments file unreadable); 3 a query or write failed; 4 written but the read-back counts don't balance. Rollup: 0, 2, 3 with the same meaning.
   22. **Branch `m3-cleaning`, cut from `m2.5-profiling` after the M2.5 commit.** Commit and push at the end of M3; merge waits for approval.
+  23. **M2 and M2.5 accepted as done for starting M3** (Sebastian, 2026-11-23, approving the plain M3 explainer). Their newest Findings predate HEAD `4888e32` but list no defects. `/flow:verify M2` and `/flow:verify M2.5` re-run before the merge to `master`.
+- M3 re-plan after the calibration stop (2026-11-23, narrow question from execute; plan approved by Sebastian, `C:\Users\sebas\.claude\plans\distributed-scribbling-cake-of-7fc4517e-391c-4cb7-b461-8c072471b45f.md`). Calibration found four spike/flatline hits outside S3.29 (execute log, M3): chance flat steps in EXP_001 solvent_pH and EXP_005 ambient_pressure, the EXP_005 solar dawn ramp, and a real spike at EXP_006 fan_speed 11:10:17.
+
+  24. **A flagged flat step must sit in an unbroken run of at least 5 flat steps** (`FLAT_MIN_RUN = 5`), on top of decision 12's majority rule. Scattered small steps on a smooth signal are chance. Measured at execute: removes the pH and ambient-pressure hits; the five pinned flatline features keep identical counts (60 / 240 / 40 / 3600 / 1350); a run of 3 readings still flags none. Rejected: raising `FLAT_FRACTION` (would also weaken noise-collapse detection). Amends decision 12.
+  25. **For `available_solar_power`, a step is flat only when its change is exactly 0 and the two values are not both 0.0.** The step size of solar grows with its level (EXP_005 starts at 0 kW: steps of about 1 kW per minute at 08:00, 20 to 30 by 09:30), while the declared normal step, 12.255, is the median over six runs that mostly start at 100 to 400 kW; a fixed fraction of it is the wrong yardstick at low power. A frozen sensor repeats one value. Limit: a solar sensor frozen with a little added noise would not be caught. Replaces the night-zero special case (`_ZERO_IS_IDLE`). No run length fixes the dawn hit (execute measured 3, 5, 8). Rejected: exempt solar from flatline (misses a frozen sensor); accept the dawn hit (excludes good data).
+  26. **EXP_006 fan_speed 839.2 at 11:10:17 is a real spike and joins S3.29.** Its primary reason stays `conflicting_duplicate`; `spike` is in its flags, as decision 8 requires. `POLICY_VERSION` stays `m3-v1` (nothing written under it yet); the fingerprint is re-pinned to the amended table.
+  27. **M3 runs as 5 tasks, each by its own agent** (Sebastian's request, to keep each context short). Replaces decision 1's "one piece, no tasks" and, for M3, the no-subagents-for-Execute default. Pure rules (T1) and rollup (T2) in parallel; then fixture, Influx layer, CLI and e2e (T3); then real data (T4); then the write-up (T5). T1 keeps the names and signatures `scripts/clean.py` and `pipeline/cleaning_influx.py` import from `pipeline/cleaning.py`. A rule bug found by T3 or T4 is reported back, not patched outside the owner's files. T4 stops without changing thresholds if any spike or flatline appears outside S3.29. S3.26 is reworded so T2 proves it without the fixture.
 
 ### Assumptions and open questions
 - Partial accept on 3.11.2 behaves as documented — a real test in M2 decides (Claude).
@@ -132,6 +139,7 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M3: Core's merge behaviour for a write without a field, and empty-string fields — measured at execute (M3 decision 15).
 - M3: the thresholds (5 × robust sd, floor 10 × step, flatline 0.2 × step, windows) are a first calibration on six 2-hour runs; a longer or noisier data set may need them re-set, which is a policy-version change (Claude).
 - M3: EXP_004 air flow 09:00–10:00 is treated as a sensor fault (fan speed, pressure drop and outlet CO2 unchanged while the reading drops 60×). That is a cleaning call, not an M5 finding; M5 may revisit it (Claude decides; Sebastian reviews in the M3 report).
+- M3: `FLAT_MIN_RUN = 5` and the solar exact-repeat rule (decisions 24, 25) are a first calibration on the same six runs; a changed value is a policy-version change (Claude).
 - M3: EXP_004 pressure −3.1 bar: its acquisition flag decides whether the reason is `flag_uncertain` or `outside_physical_limits`; either way it is excluded (Claude, at execute).
 
 ### Next steps (not in this budget)
@@ -147,6 +155,10 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - Rollup rebuild after a policy change: if M3 decision 15a shows Core keeps an old field when a later write omits it, a bucket whose included count drops to 0 keeps its old `mean`/`std`/`median`. Fix options: write the rollup per policy version (schema change to ADR-0011, needs approval) or rebuild into a fresh table — small to medium, size known after execute.
 - Bursts of more than 5 bad readings look like a step to the Hampel rule and are not caught as `spike` (limits or flatline may still catch them) — documented limit — small.
 - M2.5 judge low findings: `InfluxGateway` has no query timeout (a hung span probe stalls the run) — small.
+- Rollup speed (M3): `python -m scripts.rollup` takes about 12 minutes for 16,256 buckets on the real data, about 2 minutes per experiment, and prints only when an experiment finishes (no timing, no progress). The streaming read of `readings_processed` is the likely cost; profile it, then add a per-experiment timing line — small to medium, found 2026-11-23.
+- Rollup end-to-end test shares one database (M3): `tests/e2e/test_clean_cli.py` writes the rollup into the same throwaway database as the cleaning, because Core allows 5 databases and 4 exist while it runs. A second throwaway would fail the 5-database limit. Fine until a test needs two at once — small, found 2026-11-23.
+- Old policy versions pile up (M3): bumping `POLICY_VERSION` writes new rows beside the old ones in `dac_raw`, and nothing removes the old version's rows (they expire with raw). A cleanup command, or a note in the operations story for deliverable H — small, found 2026-11-23 while writing ADR-0015.
+- No test validates the committed `reports/cleaning_summary.json` against `contracts/cleaning_summary.schema.json` (the profile has one in `tests/unit/test_profiling.py`); only the fixture run's output and the example are validated. Checked by hand at write-up — small, found 2026-11-23.
 
 ### Checks
 Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes the worktree
@@ -631,6 +643,9 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
   | Step is not a spike | voltage 100 → 110 and holds → no `spike` |
   | Ramp is not a spike | current 150 → 210 at 4 A/s → no `spike` |
   | Exact run | solvent temperature 30.22 × 40 → `flatline`; a run of 3 → not |
+  | Chance flat steps | pH, 7 of 13 steps small but never 5 in a row → no `flatline`; 4 in a row → none; 5 in a row in a mostly flat window → `flatline` |
+  | Solar slow ramp | dawn ramp, 25 readings rising 0.8 to 5 kW per step → no `flatline` |
+  | Solar frozen | solar 312.4 × 12 → `flatline` |
   | Noise collapse | air flow noise drops to 5 % of normal → `flatline`, boundary within 1 reading |
   | Setpoint exempt | current_setpoint 150 × 300 → accepted |
   | Solar night exempt | solar 0.0 × 20 → accepted |
@@ -794,9 +809,9 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
     Then the voltage bucket at 08:02:00 has count_all, min_all, max_all over all 60 raw values, count_included = accepted rows, mean over accepted rows only, and policy_version = POLICY_VERSION, equal to the numbers written in the test
 
   Scenario: S3.26 The rollup counts a point with no value instead of failing
-    Given current has a point with no value at +60 s
-    When the rollup runs
-    Then it exits 0 and the current bucket at 08:01:00 has count_no_value 1 and count_all over the other 59
+    Given readings_processed rows for one current bucket in a throwaway database, one of them without value_raw
+    When the rollup runs over that database
+    Then it exits 0 and that bucket has count_no_value 1 and count_all over the other rows
 
   Scenario: S3.27 The real data is fully covered and balanced
     Given the real CSV ingested
@@ -817,7 +832,8 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 
   Scenario: S3.29 No spike or flatline outside the known features
     Given the real data cleaned
-    Then spike appears in flags only in EXP_003 fan_speed, EXP_004 pump_speed and EXP_002 current, one reading each
+    Then spike appears in flags only in EXP_003 fan_speed, EXP_004 pump_speed, EXP_002 current and EXP_006 fan_speed, one reading each
+    And the EXP_006 fan_speed reading is at 11:10:17 with reason conflicting_duplicate
     And flatline appears only in EXP_003 solvent_temperature, EXP_006 co2_out_ppm, EXP_004 air_flow, EXP_001 conductivity and EXP_003 acid_pH
 
   Scenario: S3.30 The report carries hand-check samples
@@ -828,8 +844,27 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
     Given a private stack with the real CSV freshly ingested
     When the cleaning runs into a temporary report directory
     Then its cleaning_summary.json equals the committed reports/cleaning_summary.json except timing
+
+  Scenario: S3.32 Scattered or short stretches of small steps are not a flatline
+    Given a 0.2 Hz solvent_pH series with the normal step size where 7 of 13 consecutive steps are below 0.2 × step but never 5 in a row
+    When the rules run
+    Then no reading has flatline in flags
+    And with 4 small steps in a row inside a mostly flat window no reading has flatline
+    And with 5 small steps in a row inside a mostly flat window exactly those 6 readings have flatline
+
+  Scenario: S3.33 Solar counts only an exactly repeated value as a flatline
+    Given available_solar_power rising for 25 readings in steps of 0.8 to 5 kW
+    And elsewhere a value of 312.4 held for 12 readings, and 0.0 held for 20 readings
+    When the rules run
+    Then no reading of the ramp or of the zeros has flatline in flags
+    And exactly the 12 readings of 312.4 have flatline in flags
+
+  Scenario: S3.34 The policy document matches the policy table
+    Given docs/cleaning_policy.md and pipeline/cleaning_policy.py
+    Then the document has one row per signal pair, 25 in all
+    And each row's physical limits, step size and the rules that apply equal the declared table
   ```
-  Note on S3.29: the list is the plan's prediction from the profile, written before any rule ran (decision 19). If calibration finds a spike or flatline elsewhere, execute stops and raises it as a narrow question; the list is changed only through `/flow:plan M3`.
+  Note on S3.29: the list is the plan's prediction from the profile, written before any rule ran (decision 19), plus the EXP_006 fan_speed spike accepted at the re-plan (decision 26). If calibration finds a spike or flatline elsewhere, execute stops and raises it as a narrow question; the list is changed only through `/flow:plan M3`.
 - QA procedure:
   1. Private stack up (`.workflow/verify-env.json`). Create throwaway database `qa_m3` via `POST /api/v3/configure/database`. `python -m scripts.ingest --csv tests/fixtures/clean/readings.csv --experiments tests/fixtures/clean/experiments.json --sha256 tests/fixtures/clean/readings.sha256 --database qa_m3 --report-dir <tmp1>` → exit 0.
   2. Dump `readings_numeric`, `readings_state`, `readings_conflicts` of `qa_m3` (`SELECT * … ORDER BY` tags, time) to files A.
@@ -849,7 +884,13 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
   - `tests/fixtures/clean/` (new).
   - Committed real outputs: `reports/cleaning_summary.json`, `reports/cleaning_report.md`; `reports/M3.md` (two-layer milestone report).
   - Docs: `docs/cleaning_policy.md` (per-signal table line by line; the nine defect kinds; why pH, a plant state and an integrated energy value are handled differently; the alignment rule M4 will use: polled signals as-of within 2 × nominal, states carried forward), ADR-0015, `docs/schema.md` (three tables, rollup column), `docs/ASSUMPTIONS.md` (close U-04, U-09, U-10, U-12; narrow U-06; add A-05), `docs/decisions/README.md`, `docs/ROADMAP.md` (M3 phase, results).
-- Tests: `tests/unit/test_cleaning.py` (every rule on synthetic series, including the must-not-fire cases, priority, state intervals, gap intervals, summary reconciliation, sample selection; fake gateway for S3.21, S3.22), `tests/unit/test_cleaning_policy.py` (S3.24), `tests/unit/test_rollup.py` (no-value point, `count_no_value`), `tests/integration/test_rollup_run.py` (rewritten for the processed source; the hand-computed bucket stays), `tests/e2e/test_clean_cli.py` (fixture ingest + clean + rollup as subprocesses into throwaway databases, marked `influx`: S3.1–S3.20, S3.23, S3.25, S3.26, plus a SELECT-pull recompute of every verdict on the fixture). S3.27–S3.31 run on the real data (Checks rows, QA steps 7–8).
+- Tests: `tests/unit/test_cleaning.py` (every rule on synthetic series, including the must-not-fire cases, priority, state intervals, gap intervals, summary reconciliation, sample selection; fake gateway for S3.21, S3.22), `tests/unit/test_cleaning_policy.py` (S3.24), `tests/unit/test_rollup.py` (no-value point, `count_no_value`), `tests/integration/test_rollup_run.py` (rewritten for the processed source; the hand-computed bucket stays), `tests/e2e/test_clean_cli.py` (fixture ingest + clean + rollup as subprocesses into throwaway databases, marked `influx`: S3.1–S3.20, S3.23, S3.25, S3.26, plus a SELECT-pull recompute of every verdict on the fixture). S3.27–S3.31 run on the real data (Checks rows, QA steps 7–8). Added at the re-plan: S3.32, S3.33 in `tests/unit/test_cleaning.py`; S3.21, S3.22 in `tests/unit/test_clean_cli.py` (fake gateway); S3.26 in `tests/integration/test_rollup_run.py`; S3.34 in `tests/unit/test_policy_doc.py`.
+- Tasks (decision 27; checked with `lane.js tasks`):
+  - T1 [W1] Amend the flatline rule (decisions 24, 25), re-pin the fingerprint, unit-test every rule including the must-not-fire cases, priority, gap, flatline and state intervals, summary reconciliation and sample selection. Owns: `pipeline/cleaning.py`, `pipeline/cleaning_policy.py`, `tests/unit/test_cleaning.py`, `tests/unit/test_cleaning_policy.py`. Scenarios: S3.24, S3.32, S3.33.
+  - T2 [W1] Rollup over the verdict: source `readings_processed`, one policy version, included columns over `verdict = accepted`, `count_no_value`, the `scripts.rollup` CLI and exit codes. Owns: `pipeline/rollup.py`, `pipeline/rollup_run.py`, `scripts/rollup.py`, `tests/unit/test_rollup.py`, `tests/integration/test_rollup_run.py`. Scenarios: S3.26.
+  - T3 [W2] Clean fixture, InfluxDB layer and `scripts.clean` CLI finished, end-to-end tests of clean and rollup on the fixture, fake-gateway tests for exit 3 and 4. Owns: `pipeline/cleaning_influx.py`, `scripts/clean.py`, `tests/fixtures/clean/**`, `tests/e2e/test_clean_cli.py`, `tests/unit/test_clean_cli.py`. Scenarios: S3.1, S3.2, S3.3, S3.4, S3.5, S3.6, S3.7, S3.8, S3.9, S3.10, S3.11, S3.12, S3.13, S3.14, S3.15, S3.16, S3.17, S3.18, S3.19, S3.20, S3.21, S3.22, S3.23, S3.25. After: T1, T2.
+  - T4 [W3] Real data: calibrate EXP_001, EXP_004, then all six against a plain-Python recompute (decision 20); stop without changing thresholds on any hit outside S3.29; full run into `reports/`; reproduce on a fresh private stack; rebuild `dac_rollup`. Owns: `reports/cleaning_summary.json`, `reports/cleaning_report.md`, `.flow-tmp/**`. Scenarios: S3.27, S3.28, S3.29, S3.30, S3.31. After: T3.
+  - T5 [W4] Write-up: `docs/cleaning_policy.md`, ADR-0015, `docs/schema.md`, `docs/ASSUMPTIONS.md`, `docs/decisions/README.md`, `docs/ROADMAP.md`, `reports/M3.md`, CI contract step, doc-vs-table test. Owns: `docs/**`, `reports/M3.md`, `.github/workflows/ci.yml`, `tests/unit/test_policy_doc.py`. Scenarios: S3.34. After: T4.
 - After the judge: commit, push `m3-cleaning`, CI green, open `reports/M3.md` in the doc viewer. Merge waits for approval.
 
 #### M4: Derived metrics (E)
@@ -939,3 +980,29 @@ Checks run:
 - Raw CSV SHA-256 in repo and worktree = `9f791b42…553f` = committed
 - Contract files: untracked since plan; mtimes predate every implementation file, so unchanged by execute. Test changes since baseline: no tracked test modified or deleted; all M2.5 tests are new
 - `verify-env.js down 54bf10b5` → removed, no worktree changes reported
+
+### M3 — verify 2026-11-24 @ 4888e32 (+ uncommitted)
+Defects:        none
+Open questions:
+- The M2 and M2.5 done-rule note still applies (their newest Findings blocks predate this branch's base `4888e32`). Spec decision 23 defers re-verifying both to before the merge to `master`.
+- CI was not run (nothing pushed). The Spec's "After the judge" step covers it; the new `ci.yml` contract step passes locally through `contract.js`.
+Optional:
+- [low] Spec Next steps already lists that no test validates the committed `reports/cleaning_summary.json` against the contract. I checked it by hand (`check-jsonschema` on the committed and the fresh real summary: ok). Proposed test `test_committed_cleaning_summary_matches_the_contract`: load `reports/cleaning_summary.json`, validate with `jsonschema.Draft202012Validator(contracts/cleaning_summary.schema.json)`.
+- [low] Test changes since baseline, all justified by the Spec: `tests/integration/test_rollup_run.py` rewritten for the processed source (Spec: "rewritten for the processed source; the hand-computed bucket stays"; the bucket's numbers still match the M1 hand computation, with `count_good` 3 because quality is independent of the verdict); `test_no_readings_state_data_reaches_the_rollup` replaced by `test_only_the_asked_experiment_and_window_are_rolled_up` (state rows are no longer in the source table); `tests/unit/test_rollup.py` `sample()` helper gained a `verdict` argument, 279 lines added, none of the old assertions loosened or removed. No test skipped or deleted.
+- [info] Contract files unchanged since baseline (`git log` shows them only in `4888e32`, `git status` shows no change).
+- [info] The dev `dac_rollup` (16,256 buckets, `m3-v1`): 0 buckets with `count_included = 0` and a leftover `mean`; 0 rows without `count_no_value`.
+Scenarios:      S3.1–S3.3 → pass (e2e `test_s3_1`..`test_s3_3`, 3,665 fixture rows; real run: 150 series, processed = raw for all) · S3.4–S3.16 → pass (e2e tests tagged with each id, plus `test_every_verdict_matches_the_construction` over all 3,665 rows; my own boundary probes: spike on the first and last reading flagged, 40-reading flat run at start, middle and end flags exactly 40, limits 0.0 and 200.0 inclusive and ±0.0001 outside, 2 s spacing at 1 Hz not a gap while 2 s + 1 ns is) · S3.17–S3.19, S3.23 → pass (e2e; second run identical; committed and fresh real summaries validate with `check-jsonschema`) · S3.20 → pass (e2e: exit 2, empty report dir, `dac_missing` not listed) · S3.21, S3.22 → pass (unit `-k "exit_3 or exit_4 or policy"` 54 passed) · S3.24 → pass (unit policy tests) · S3.25, S3.26 → pass (e2e `test_s3_25_*`, integration `test_s3_26_*`) · S3.27 → pass (fresh private stack, real CSV ingested exit 0 = 519980 + 15 + 10 + 0; clean exit 0: 150 series, 519,980 raw, 514,443 accepted, 5,537 excluded, balanced true, raw_unchanged true) · S3.28 → pass (queried `readings_processed`: EXP_001 voltage 412.0, EXP_003 pH 27.4, EXP_005 electrolyte −50.0, EXP_004 pressure −3.1 all `outside_physical_limits`; EXP_002 current 0.0 at 09:33:20 `spike`; EXP_006 fan 839.2 `conflicting_duplicate`, flags include `spike`; EXP_004 air_flow: 0 readings at or above 1000 with flatline, 0 below 1000 without; flatline run counts 60/240/40/3600/1350; gap rows equal the profile's over-2×-nominal count for every series) · S3.29 → pass (independent recompute: spike flags only EXP_002 current, EXP_003 fan_speed, EXP_004 pump_speed, EXP_006 fan_speed, one each; flatline flags only EXP_001 conductivity, EXP_003 solvent_temperature and acid_pH, EXP_004 air_flow, EXP_006 co2_out_ppm) · S3.30 → pass (committed report has 18 samples, 3 for each of the 6 reasons that fired, each with 10 neighbours; the report equals `render_report(summary)` byte for byte) · S3.31 → pass (fresh-stack summary equals committed `reports/cleaning_summary.json` except `timing`) · S3.32–S3.33 → pass (unit tests in `test_cleaning.py`) · S3.34 → pass (unit `test_policy_doc.py`)
+Blocked:        none
+Checks run:
+- `verify-env.js up` → env 366b8415, ports 35420-35421, healthy
+- `ruff check .` → All checks passed; `ruff format --check .` → 93 files already formatted
+- `python -m pytest tests/unit -q` → 319 passed
+- `python -m pytest tests/integration -v -rs` → 36 passed, 0 skipped
+- `python -m pytest tests/e2e -v -rs` → 69 passed, 0 skipped
+- `python -m scripts.ingest` (real CSV, to `.flow-tmp/ingest`) → exit 0
+- `python -m scripts.clean --report-dir .flow-tmp/clean` → exit 0; `check-jsonschema` on its summary → ok
+- `python -m scripts.rollup` → exit 0, 16,256 buckets in 12 m 0 s; all 16,256 buckets equal the dev `dac_rollup` (counts, min, max, mean, median, std, policy_version); count_all + count_no_value = 519,906 numeric rows, count_included = 514,369 = 514,443 accepted − 74 state events
+- `contract.js --task .workflow/dac.md --root <WORKTREE>` → exit 0, 3 of 3 PASS
+- Independent recompute (scratch script, imports no pipeline code; limits from Spec decision 9, steps and nominals from the profile): all 519,980 stored rows' value_raw, value, quality, verdict, reason, flags equal; all gap and flatline interval rows equal; state intervals equal; 0 mismatches. A first run showed 48 "profile" mismatches caused by my own script keying the profile by signal without experiment; fixed and rerun, 0.
+- Raw CSV SHA-256 in repo and worktree = `9f791b42…553f` = committed
+- `verify-env.js down 366b8415` → removed, no worktree changes reported

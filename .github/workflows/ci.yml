@@ -29,6 +29,14 @@ jobs:
           check-jsonschema
           --schemafile contracts/post_ingest_profile.schema.json
           contracts/examples/post_ingest_profile.example.json
+      # Same for the cleaning summary (M3); the fixture run's output is validated in
+      # tests/e2e/test_clean_cli.py. The real-data clean and rollup are not run in CI (the
+      # rollup alone takes about 12 minutes).
+      - name: Validate the cleaning summary contract example
+        run: >-
+          check-jsonschema
+          --schemafile contracts/cleaning_summary.schema.json
+          contracts/examples/cleaning_summary.example.json
 
   integration:
     runs-on: ubuntu-latest
@@ -88,9 +96,11 @@ jobs:
       - name: Initialize InfluxDB databases
         run: python scripts/init_influx.py
 
-      # `pytest` from the repo root also runs tests/e2e: the real ingest and profile CLIs against
-      # this InfluxDB, on the committed fixtures (tests/fixtures/ingest, tests/fixtures/profile),
-      # into throwaway databases.
+      # `pytest` from the repo root also runs tests/e2e: the real ingest, profile and clean CLIs
+      # (and the rollup) against this InfluxDB, on the committed fixtures (tests/fixtures/ingest,
+      # tests/fixtures/profile, tests/fixtures/clean), into throwaway databases. The clean tests
+      # use one throwaway database and the rollup shares it, so the 5-database limit of Core
+      # holds next to dac_raw, dac_rollup and dac_pinned.
       # A skip is a failure here: with both services live, every influx/postgres-marked
       # test should run for real. `pytest`'s own exit code doesn't reflect skips, so
       # the skip count is checked explicitly against the summary line.

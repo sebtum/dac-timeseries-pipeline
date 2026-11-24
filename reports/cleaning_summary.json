@@ -1,0 +1,7228 @@
+{
+  "schema_version": 1,
+  "policy_version": "m3-v1",
+  "source": {
+    "database": "dac_raw",
+    "experiments_file": "data/raw/experiments.json"
+  },
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "start": "2026-05-04T08:00:00Z",
+      "end": "2026-05-04T10:00:00Z"
+    },
+    {
+      "experiment_id": "EXP_002",
+      "start": "2026-05-11T09:00:00Z",
+      "end": "2026-05-11T11:00:00Z"
+    },
+    {
+      "experiment_id": "EXP_003",
+      "start": "2026-05-18T07:30:00Z",
+      "end": "2026-05-18T09:30:00Z"
+    },
+    {
+      "experiment_id": "EXP_004",
+      "start": "2026-03-02T08:00:00Z",
+      "end": "2026-03-02T10:00:00Z"
+    },
+    {
+      "experiment_id": "EXP_005",
+      "start": "2026-06-15T06:00:00Z",
+      "end": "2026-06-15T08:00:00Z"
+    },
+    {
+      "experiment_id": "EXP_006",
+      "start": "2026-04-20T10:00:00Z",
+      "end": "2026-04-20T12:00:00Z"
+    }
+  ],
+  "series": [
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "air_flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "co2_in_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "co2_out_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "pressure_drop",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "solvent_flow",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "solvent_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "ambient",
+      "signal": "ambient_pressure",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "ambient",
+      "signal": "ambient_temperature",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "ambient",
+      "signal": "available_solar_power",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "ambient",
+      "signal": "relative_humidity",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "acid_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "base_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1380,
+      "excluded": 60,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 60,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 60,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 60,
+        "outside_typical_range": 60
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 1,
+        "seconds": 295.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "current",
+      "table": "readings_numeric",
+      "raw_points": 7126,
+      "processed_points": 7126,
+      "accepted": 7126,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 19
+      },
+      "gaps": {
+        "count": 4,
+        "seconds": 78.0,
+        "longest": [
+          {
+            "start": "2026-05-04T09:31:39Z",
+            "end": "2026-05-04T09:32:08Z",
+            "seconds": 29.0
+          },
+          {
+            "start": "2026-05-04T08:29:59Z",
+            "end": "2026-05-04T08:30:25Z",
+            "seconds": 26.0
+          },
+          {
+            "start": "2026-05-04T08:09:59Z",
+            "end": "2026-05-04T08:10:15Z",
+            "seconds": 16.0
+          },
+          {
+            "start": "2026-05-04T09:09:59Z",
+            "end": "2026-05-04T09:10:06Z",
+            "seconds": 7.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "current_setpoint",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "electrolyte_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 88
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "power",
+      "table": "readings_numeric",
+      "raw_points": 7126,
+      "processed_points": 7126,
+      "accepted": 7126,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 20
+      },
+      "gaps": {
+        "count": 4,
+        "seconds": 78.0,
+        "longest": [
+          {
+            "start": "2026-05-04T09:31:39Z",
+            "end": "2026-05-04T09:32:08Z",
+            "seconds": 29.0
+          },
+          {
+            "start": "2026-05-04T08:29:59Z",
+            "end": "2026-05-04T08:30:25Z",
+            "seconds": 26.0
+          },
+          {
+            "start": "2026-05-04T08:09:59Z",
+            "end": "2026-05-04T08:10:15Z",
+            "seconds": 16.0
+          },
+          {
+            "start": "2026-05-04T09:09:59Z",
+            "end": "2026-05-04T09:10:06Z",
+            "seconds": 7.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "raw_points": 7126,
+      "processed_points": 7126,
+      "accepted": 7125,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 1
+      },
+      "gaps": {
+        "count": 4,
+        "seconds": 78.0,
+        "longest": [
+          {
+            "start": "2026-05-04T09:31:39Z",
+            "end": "2026-05-04T09:32:08Z",
+            "seconds": 29.0
+          },
+          {
+            "start": "2026-05-04T08:29:59Z",
+            "end": "2026-05-04T08:30:25Z",
+            "seconds": 26.0
+          },
+          {
+            "start": "2026-05-04T08:09:59Z",
+            "end": "2026-05-04T08:10:15Z",
+            "seconds": 16.0
+          },
+          {
+            "start": "2026-05-04T09:09:59Z",
+            "end": "2026-05-04T09:10:06Z",
+            "seconds": 7.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "plant",
+      "signal": "fan_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "raw_points": 7,
+      "processed_points": 7,
+      "accepted": 7,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "plant",
+      "signal": "pump_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_001",
+      "source": "plant",
+      "signal": "valve_state",
+      "table": "readings_state",
+      "raw_points": 3,
+      "processed_points": 3,
+      "accepted": 3,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "absorber",
+      "signal": "air_flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "absorber",
+      "signal": "co2_in_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "absorber",
+      "signal": "co2_out_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "absorber",
+      "signal": "pressure_drop",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "absorber",
+      "signal": "solvent_flow",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "absorber",
+      "signal": "solvent_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "ambient",
+      "signal": "ambient_pressure",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "ambient",
+      "signal": "ambient_temperature",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "ambient",
+      "signal": "available_solar_power",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "ambient",
+      "signal": "relative_humidity",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "acid_pH",
+      "table": "readings_numeric",
+      "raw_points": 1344,
+      "processed_points": 1344,
+      "accepted": 1344,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 485.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:55Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 485.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "base_pH",
+      "table": "readings_numeric",
+      "raw_points": 1344,
+      "processed_points": 1344,
+      "accepted": 1344,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 485.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:55Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 485.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "table": "readings_numeric",
+      "raw_points": 1344,
+      "processed_points": 1344,
+      "accepted": 1344,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 1240
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 485.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:55Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 485.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "current",
+      "table": "readings_numeric",
+      "raw_points": 6720,
+      "processed_points": 6720,
+      "accepted": 6719,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 1,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 1,
+        "flatline": 0,
+        "outside_typical_range": 390
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 481.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:59Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 481.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "current_setpoint",
+      "table": "readings_numeric",
+      "raw_points": 6720,
+      "processed_points": 6720,
+      "accepted": 6720,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 300
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 481.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:59Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 481.0
+          }
+        ]
+      },
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "electrolyte_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1344,
+      "processed_points": 1344,
+      "accepted": 1344,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 1263
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 485.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:55Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 485.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "flow",
+      "table": "readings_numeric",
+      "raw_points": 6720,
+      "processed_points": 6720,
+      "accepted": 6720,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 281
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 481.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:59Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 481.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "power",
+      "table": "readings_numeric",
+      "raw_points": 6720,
+      "processed_points": 6720,
+      "accepted": 6720,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 311
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 481.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:59Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 481.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "table": "readings_numeric",
+      "raw_points": 6720,
+      "processed_points": 6720,
+      "accepted": 6720,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 103
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 481.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:59Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 481.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "raw_points": 6720,
+      "processed_points": 6720,
+      "accepted": 6720,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 481.0,
+        "longest": [
+          {
+            "start": "2026-05-11T10:05:59Z",
+            "end": "2026-05-11T10:14:00Z",
+            "seconds": 481.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "plant",
+      "signal": "fan_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "raw_points": 7,
+      "processed_points": 7,
+      "accepted": 7,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "plant",
+      "signal": "pump_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "source": "plant",
+      "signal": "valve_state",
+      "table": "readings_state",
+      "raw_points": 3,
+      "processed_points": 3,
+      "accepted": 3,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "air_flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "co2_in_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "co2_out_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "pressure_drop",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "solvent_flow",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "solvent_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1439,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 1
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1200,
+      "excluded": 240,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 240
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 240,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 1,
+        "seconds": 1195.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "ambient",
+      "signal": "ambient_pressure",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "ambient",
+      "signal": "ambient_temperature",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "ambient",
+      "signal": "available_solar_power",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "ambient",
+      "signal": "relative_humidity",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "acid_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1400,
+      "excluded": 40,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 40,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 40,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 40,
+        "outside_typical_range": 40
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 1,
+        "seconds": 195.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "base_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "current",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 16
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "current_setpoint",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "electrolyte_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 39
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "power",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 16
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "plant",
+      "signal": "fan_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7199,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 1,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 1,
+        "flatline": 0,
+        "outside_typical_range": 1
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "raw_points": 7,
+      "processed_points": 7,
+      "accepted": 7,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "plant",
+      "signal": "pump_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "source": "plant",
+      "signal": "valve_state",
+      "table": "readings_state",
+      "raw_points": 3,
+      "processed_points": 3,
+      "accepted": 3,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "air_flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 3600,
+      "excluded": 3600,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 3600
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 3600,
+        "outside_typical_range": 3600
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 1,
+        "seconds": 3599.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "co2_in_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "co2_out_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "pressure_drop",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "solvent_flow",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "solvent_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "ambient",
+      "signal": "ambient_pressure",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "ambient",
+      "signal": "ambient_temperature",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "ambient",
+      "signal": "available_solar_power",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "ambient",
+      "signal": "relative_humidity",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "acid_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "base_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "current",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 13
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "current_setpoint",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "electrolyte_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "power",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 13
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 6999,
+      "excluded": 201,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 200,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 200,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 1
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "plant",
+      "signal": "fan_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "raw_points": 7,
+      "processed_points": 7,
+      "accepted": 7,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "plant",
+      "signal": "pump_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7199,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 1,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 1,
+        "flatline": 0,
+        "outside_typical_range": 1
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_004",
+      "source": "plant",
+      "signal": "valve_state",
+      "table": "readings_state",
+      "raw_points": 3,
+      "processed_points": 3,
+      "accepted": 3,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "absorber",
+      "signal": "air_flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "absorber",
+      "signal": "co2_in_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "absorber",
+      "signal": "co2_out_ppm",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "absorber",
+      "signal": "pressure_drop",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "absorber",
+      "signal": "solvent_flow",
+      "table": "readings_numeric",
+      "raw_points": 3600,
+      "processed_points": 3600,
+      "accepted": 3600,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "absorber",
+      "signal": "solvent_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "ambient",
+      "signal": "ambient_pressure",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 90,
+      "excluded": 30,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 30,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 30,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "ambient",
+      "signal": "ambient_temperature",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "ambient",
+      "signal": "available_solar_power",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "ambient",
+      "signal": "relative_humidity",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "acid_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "base_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "current",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 17
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "current_setpoint",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "electrolyte_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1439,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 1,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 1
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "power",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 17
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "plant",
+      "signal": "fan_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "raw_points": 19,
+      "processed_points": 19,
+      "accepted": 19,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "plant",
+      "signal": "pump_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_005",
+      "source": "plant",
+      "signal": "valve_state",
+      "table": "readings_state",
+      "raw_points": 5,
+      "processed_points": 5,
+      "accepted": 5,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "air_flow",
+      "table": "readings_numeric",
+      "raw_points": 5280,
+      "processed_points": 5280,
+      "accepted": 5279,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 1921.0,
+        "longest": [
+          {
+            "start": "2026-04-20T10:17:59Z",
+            "end": "2026-04-20T10:50:00Z",
+            "seconds": 1921.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "co2_in_ppm",
+      "table": "readings_numeric",
+      "raw_points": 2640,
+      "processed_points": 2640,
+      "accepted": 2640,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 1922.0,
+        "longest": [
+          {
+            "start": "2026-04-20T10:17:58Z",
+            "end": "2026-04-20T10:50:00Z",
+            "seconds": 1922.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "co2_out_ppm",
+      "table": "readings_numeric",
+      "raw_points": 2640,
+      "processed_points": 2640,
+      "accepted": 1290,
+      "excluded": 1350,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 1350
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 1350,
+        "outside_typical_range": 1350
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 1922.0,
+        "longest": [
+          {
+            "start": "2026-04-20T10:17:58Z",
+            "end": "2026-04-20T10:50:00Z",
+            "seconds": 1922.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 1,
+        "seconds": 2698.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "pressure_drop",
+      "table": "readings_numeric",
+      "raw_points": 2640,
+      "processed_points": 2640,
+      "accepted": 2639,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 1922.0,
+        "longest": [
+          {
+            "start": "2026-04-20T10:17:58Z",
+            "end": "2026-04-20T10:50:00Z",
+            "seconds": 1922.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "solvent_flow",
+      "table": "readings_numeric",
+      "raw_points": 2640,
+      "processed_points": 2640,
+      "accepted": 2640,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 1922.0,
+        "longest": [
+          {
+            "start": "2026-04-20T10:17:58Z",
+            "end": "2026-04-20T10:50:00Z",
+            "seconds": 1922.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "solvent_pH",
+      "table": "readings_numeric",
+      "raw_points": 1056,
+      "processed_points": 1056,
+      "accepted": 1056,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 1925.0,
+        "longest": [
+          {
+            "start": "2026-04-20T10:17:55Z",
+            "end": "2026-04-20T10:50:00Z",
+            "seconds": 1925.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1056,
+      "processed_points": 1056,
+      "accepted": 1056,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 1,
+        "seconds": 1925.0,
+        "longest": [
+          {
+            "start": "2026-04-20T10:17:55Z",
+            "end": "2026-04-20T10:50:00Z",
+            "seconds": 1925.0
+          }
+        ]
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "ambient",
+      "signal": "ambient_pressure",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "ambient",
+      "signal": "ambient_temperature",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "ambient",
+      "signal": "available_solar_power",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "ambient",
+      "signal": "relative_humidity",
+      "table": "readings_numeric",
+      "raw_points": 120,
+      "processed_points": 120,
+      "accepted": 120,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "acid_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "base_pH",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1440,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 12
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "current",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 17
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "current_setpoint",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7199,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "electrolyte_temperature",
+      "table": "readings_numeric",
+      "raw_points": 1440,
+      "processed_points": 1440,
+      "accepted": 1439,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 994
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "flow",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7198,
+      "excluded": 2,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 2,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 2,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "power",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7199,
+      "excluded": 1,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 1,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 17
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "plant",
+      "signal": "fan_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7197,
+      "excluded": 3,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 3,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 3,
+        "spike": 1,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "plant",
+      "signal": "process_state",
+      "table": "readings_state",
+      "raw_points": 7,
+      "processed_points": 7,
+      "accepted": 7,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "plant",
+      "signal": "pump_speed",
+      "table": "readings_numeric",
+      "raw_points": 7200,
+      "processed_points": 7200,
+      "accepted": 7200,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": {
+        "count": 0,
+        "seconds": 0.0,
+        "longest": []
+      },
+      "flatline_intervals": {
+        "count": 0,
+        "seconds": 0.0
+      }
+    },
+    {
+      "experiment_id": "EXP_006",
+      "source": "plant",
+      "signal": "valve_state",
+      "table": "readings_state",
+      "raw_points": 3,
+      "processed_points": 3,
+      "accepted": 3,
+      "excluded": 0,
+      "excluded_by_reason": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0
+      },
+      "flags": {
+        "no_value": 0,
+        "flag_bad": 0,
+        "flag_uncertain": 0,
+        "outside_physical_limits": 0,
+        "unknown_state": 0,
+        "conflicting_duplicate": 0,
+        "spike": 0,
+        "flatline": 0,
+        "outside_typical_range": 0
+      },
+      "gaps": null,
+      "flatline_intervals": null
+    }
+  ],
+  "totals": {
+    "raw_points": 519980,
+    "processed_points": 519980,
+    "accepted": 514443,
+    "excluded": 5537,
+    "excluded_by_reason": {
+      "no_value": 0,
+      "flag_bad": 100,
+      "flag_uncertain": 230,
+      "outside_physical_limits": 4,
+      "unknown_state": 0,
+      "conflicting_duplicate": 10,
+      "spike": 3,
+      "flatline": 5190
+    },
+    "flags": {
+      "no_value": 0,
+      "flag_bad": 100,
+      "flag_uncertain": 230,
+      "outside_physical_limits": 4,
+      "unknown_state": 0,
+      "conflicting_duplicate": 10,
+      "spike": 4,
+      "flatline": 5290,
+      "outside_typical_range": 10242
+    },
+    "gap_intervals": 29,
+    "gap_seconds": 18519.0,
+    "flatline_intervals": 5
+  },
+  "reconciliation": {
+    "balanced": true,
+    "series_checked": 150,
+    "unbalanced": [],
+    "raw_unchanged": true
+  },
+  "samples": [
+    {
+      "reason": "flag_bad",
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "time": "2026-05-04T09:00:00Z",
+      "value_raw": 50.0,
+      "neighbours": [
+        {
+          "time": "2026-05-04T08:59:35Z",
+          "value_raw": 226.9,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:59:40Z",
+          "value_raw": 228.2,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:59:45Z",
+          "value_raw": 227.0,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:59:50Z",
+          "value_raw": 225.8,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:59:55Z",
+          "value_raw": 224.6,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T09:00:05Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:00:10Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:00:15Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:00:20Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:00:25Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        }
+      ]
+    },
+    {
+      "reason": "flag_bad",
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "conductivity",
+      "time": "2026-05-04T09:04:10Z",
+      "value_raw": 50.0,
+      "neighbours": [
+        {
+          "time": "2026-05-04T09:03:45Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:03:50Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:03:55Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:04:00Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:04:05Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:04:15Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:04:20Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:04:25Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:04:30Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-04T09:04:35Z",
+          "value_raw": 50.0,
+          "verdict": "excluded"
+        }
+      ]
+    },
+    {
+      "reason": "flag_bad",
+      "experiment_id": "EXP_003",
+      "source": "hydrolyzer",
+      "signal": "acid_pH",
+      "time": "2026-05-18T08:09:55Z",
+      "value_raw": 4.8,
+      "neighbours": [
+        {
+          "time": "2026-05-18T08:09:30Z",
+          "value_raw": 4.8,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:09:35Z",
+          "value_raw": 4.8,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:09:40Z",
+          "value_raw": 4.8,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:09:45Z",
+          "value_raw": 4.8,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:09:50Z",
+          "value_raw": 4.8,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:10:00Z",
+          "value_raw": 1.965,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:10:05Z",
+          "value_raw": 2.007,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:10:10Z",
+          "value_raw": 2.045,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:10:15Z",
+          "value_raw": 2.04,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:10:20Z",
+          "value_raw": 2.0,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "flag_uncertain",
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "time": "2026-03-02T08:33:20Z",
+      "value_raw": 2.597,
+      "neighbours": [
+        {
+          "time": "2026-03-02T08:33:15Z",
+          "value_raw": 2.596,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:33:16Z",
+          "value_raw": 2.643,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:33:17Z",
+          "value_raw": 2.567,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:33:18Z",
+          "value_raw": 2.616,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:33:19Z",
+          "value_raw": 2.618,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:33:21Z",
+          "value_raw": 2.623,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:33:22Z",
+          "value_raw": 2.616,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:33:23Z",
+          "value_raw": 2.604,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:33:24Z",
+          "value_raw": 2.582,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:33:25Z",
+          "value_raw": 2.566,
+          "verdict": "excluded"
+        }
+      ]
+    },
+    {
+      "reason": "flag_uncertain",
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "time": "2026-03-02T08:35:15Z",
+      "value_raw": 2.552,
+      "neighbours": [
+        {
+          "time": "2026-03-02T08:35:10Z",
+          "value_raw": 2.61,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:11Z",
+          "value_raw": 2.535,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:12Z",
+          "value_raw": 2.568,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:13Z",
+          "value_raw": 2.649,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:14Z",
+          "value_raw": 2.552,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:16Z",
+          "value_raw": 2.594,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:17Z",
+          "value_raw": 2.609,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:18Z",
+          "value_raw": 2.603,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:19Z",
+          "value_raw": 2.581,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T08:35:20Z",
+          "value_raw": 2.604,
+          "verdict": "excluded"
+        }
+      ]
+    },
+    {
+      "reason": "flag_uncertain",
+      "experiment_id": "EXP_005",
+      "source": "ambient",
+      "signal": "ambient_pressure",
+      "time": "2026-06-15T06:29:00Z",
+      "value_raw": 1014.16,
+      "neighbours": [
+        {
+          "time": "2026-06-15T06:24:00Z",
+          "value_raw": 1014.45,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-06-15T06:25:00Z",
+          "value_raw": 1014.4,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-06-15T06:26:00Z",
+          "value_raw": 1014.24,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-06-15T06:27:00Z",
+          "value_raw": 1014.28,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-06-15T06:28:00Z",
+          "value_raw": 1014.22,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-06-15T06:30:00Z",
+          "value_raw": 1014.07,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T06:31:00Z",
+          "value_raw": 1014.15,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T06:32:00Z",
+          "value_raw": 1014.12,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T06:33:00Z",
+          "value_raw": 1014.11,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T06:34:00Z",
+          "value_raw": 1014.0,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "outside_physical_limits",
+      "experiment_id": "EXP_001",
+      "source": "hydrolyzer",
+      "signal": "voltage",
+      "time": "2026-05-04T08:41:40Z",
+      "value_raw": 412.0,
+      "neighbours": [
+        {
+          "time": "2026-05-04T08:41:35Z",
+          "value_raw": 100.97,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:36Z",
+          "value_raw": 101.2,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:37Z",
+          "value_raw": 101.12,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:38Z",
+          "value_raw": 100.99,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:39Z",
+          "value_raw": 101.23,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:41Z",
+          "value_raw": 100.76,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:42Z",
+          "value_raw": 101.08,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:43Z",
+          "value_raw": 100.96,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:44Z",
+          "value_raw": 100.82,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-04T08:41:45Z",
+          "value_raw": 101.05,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "outside_physical_limits",
+      "experiment_id": "EXP_004",
+      "source": "hydrolyzer",
+      "signal": "pressure",
+      "time": "2026-03-02T08:16:40Z",
+      "value_raw": -3.1,
+      "neighbours": [
+        {
+          "time": "2026-03-02T08:16:35Z",
+          "value_raw": 2.577,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:36Z",
+          "value_raw": 2.637,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:37Z",
+          "value_raw": 2.59,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:38Z",
+          "value_raw": 2.578,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:39Z",
+          "value_raw": 2.598,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:41Z",
+          "value_raw": 2.61,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:42Z",
+          "value_raw": 2.606,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:43Z",
+          "value_raw": 2.618,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:44Z",
+          "value_raw": 2.641,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T08:16:45Z",
+          "value_raw": 2.6,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "outside_physical_limits",
+      "experiment_id": "EXP_005",
+      "source": "hydrolyzer",
+      "signal": "electrolyte_temperature",
+      "time": "2026-06-15T07:06:40Z",
+      "value_raw": -50.0,
+      "neighbours": [
+        {
+          "time": "2026-06-15T07:06:15Z",
+          "value_raw": 25.95,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:06:20Z",
+          "value_raw": 26.75,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:06:25Z",
+          "value_raw": 26.15,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:06:30Z",
+          "value_raw": 26.61,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:06:35Z",
+          "value_raw": 26.81,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:06:45Z",
+          "value_raw": 26.28,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:06:50Z",
+          "value_raw": 26.47,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:06:55Z",
+          "value_raw": 26.43,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:07:00Z",
+          "value_raw": 26.24,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-06-15T07:07:05Z",
+          "value_raw": 26.53,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "conflicting_duplicate",
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "air_flow",
+      "time": "2026-04-20T11:38:06Z",
+      "value_raw": 1209.4,
+      "neighbours": [
+        {
+          "time": "2026-04-20T11:38:01Z",
+          "value_raw": 1196.8,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:02Z",
+          "value_raw": 1202.4,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:03Z",
+          "value_raw": 1202.4,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:04Z",
+          "value_raw": 1204.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:05Z",
+          "value_raw": 1206.1,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:07Z",
+          "value_raw": 1205.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:08Z",
+          "value_raw": 1207.4,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:09Z",
+          "value_raw": 1189.0,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:10Z",
+          "value_raw": 1194.7,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:38:11Z",
+          "value_raw": 1189.4,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "conflicting_duplicate",
+      "experiment_id": "EXP_006",
+      "source": "hydrolyzer",
+      "signal": "flow",
+      "time": "2026-04-20T10:36:38Z",
+      "value_raw": 40.07,
+      "neighbours": [
+        {
+          "time": "2026-04-20T10:36:33Z",
+          "value_raw": 41.8,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:34Z",
+          "value_raw": 41.82,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:35Z",
+          "value_raw": 42.16,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:36Z",
+          "value_raw": 41.83,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:37Z",
+          "value_raw": 41.61,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:39Z",
+          "value_raw": 42.01,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:40Z",
+          "value_raw": 41.44,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:41Z",
+          "value_raw": 43.2,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:42Z",
+          "value_raw": 41.23,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T10:36:43Z",
+          "value_raw": 42.49,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "conflicting_duplicate",
+      "experiment_id": "EXP_006",
+      "source": "plant",
+      "signal": "fan_speed",
+      "time": "2026-04-20T11:10:17Z",
+      "value_raw": 839.2,
+      "neighbours": [
+        {
+          "time": "2026-04-20T11:10:12Z",
+          "value_raw": 899.0,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:13Z",
+          "value_raw": 903.6,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:14Z",
+          "value_raw": 899.0,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:15Z",
+          "value_raw": 894.8,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:16Z",
+          "value_raw": 902.9,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:18Z",
+          "value_raw": 909.4,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:19Z",
+          "value_raw": 903.5,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:20Z",
+          "value_raw": 897.8,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:21Z",
+          "value_raw": 901.4,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:10:22Z",
+          "value_raw": 898.6,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "spike",
+      "experiment_id": "EXP_002",
+      "source": "hydrolyzer",
+      "signal": "current",
+      "time": "2026-05-11T09:33:20Z",
+      "value_raw": 0.0,
+      "neighbours": [
+        {
+          "time": "2026-05-11T09:33:15Z",
+          "value_raw": 250.37,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:16Z",
+          "value_raw": 249.71,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:17Z",
+          "value_raw": 250.29,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:18Z",
+          "value_raw": 250.03,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:19Z",
+          "value_raw": 249.76,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:21Z",
+          "value_raw": 249.74,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:22Z",
+          "value_raw": 250.19,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:23Z",
+          "value_raw": 249.91,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:24Z",
+          "value_raw": 250.54,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-11T09:33:25Z",
+          "value_raw": 249.28,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "spike",
+      "experiment_id": "EXP_003",
+      "source": "plant",
+      "signal": "fan_speed",
+      "time": "2026-05-18T08:53:20Z",
+      "value_raw": 0.0,
+      "neighbours": [
+        {
+          "time": "2026-05-18T08:53:15Z",
+          "value_raw": 1491.5,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:16Z",
+          "value_raw": 1508.7,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:17Z",
+          "value_raw": 1514.8,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:18Z",
+          "value_raw": 1499.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:19Z",
+          "value_raw": 1501.2,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:21Z",
+          "value_raw": 1500.5,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:22Z",
+          "value_raw": 1502.4,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:23Z",
+          "value_raw": 1509.9,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:24Z",
+          "value_raw": 1504.7,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:53:25Z",
+          "value_raw": 1492.9,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "spike",
+      "experiment_id": "EXP_004",
+      "source": "plant",
+      "signal": "pump_speed",
+      "time": "2026-03-02T09:15:00Z",
+      "value_raw": 0.0,
+      "neighbours": [
+        {
+          "time": "2026-03-02T09:14:55Z",
+          "value_raw": 515.8,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:14:56Z",
+          "value_raw": 518.1,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:14:57Z",
+          "value_raw": 526.4,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:14:58Z",
+          "value_raw": 519.1,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:14:59Z",
+          "value_raw": 524.2,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:15:01Z",
+          "value_raw": 519.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:15:02Z",
+          "value_raw": 520.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:15:03Z",
+          "value_raw": 515.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:15:04Z",
+          "value_raw": 521.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-03-02T09:15:05Z",
+          "value_raw": 516.4,
+          "verdict": "accepted"
+        }
+      ]
+    },
+    {
+      "reason": "flatline",
+      "experiment_id": "EXP_003",
+      "source": "absorber",
+      "signal": "solvent_temperature",
+      "time": "2026-05-18T08:30:00Z",
+      "value_raw": 30.22,
+      "neighbours": [
+        {
+          "time": "2026-05-18T08:29:35Z",
+          "value_raw": 30.09,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:29:40Z",
+          "value_raw": 29.75,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:29:45Z",
+          "value_raw": 30.1,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:29:50Z",
+          "value_raw": 30.51,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:29:55Z",
+          "value_raw": 30.06,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-05-18T08:30:05Z",
+          "value_raw": 30.22,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:30:10Z",
+          "value_raw": 30.22,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:30:15Z",
+          "value_raw": 30.22,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:30:20Z",
+          "value_raw": 30.22,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-05-18T08:30:25Z",
+          "value_raw": 30.22,
+          "verdict": "excluded"
+        }
+      ]
+    },
+    {
+      "reason": "flatline",
+      "experiment_id": "EXP_004",
+      "source": "absorber",
+      "signal": "air_flow",
+      "time": "2026-03-02T09:39:15Z",
+      "value_raw": 20.02,
+      "neighbours": [
+        {
+          "time": "2026-03-02T09:39:10Z",
+          "value_raw": 19.98,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:11Z",
+          "value_raw": 19.94,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:12Z",
+          "value_raw": 20.08,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:13Z",
+          "value_raw": 19.77,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:14Z",
+          "value_raw": 19.91,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:16Z",
+          "value_raw": 20.09,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:17Z",
+          "value_raw": 20.02,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:18Z",
+          "value_raw": 20.16,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:19Z",
+          "value_raw": 20.03,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-03-02T09:39:20Z",
+          "value_raw": 20.18,
+          "verdict": "excluded"
+        }
+      ]
+    },
+    {
+      "reason": "flatline",
+      "experiment_id": "EXP_006",
+      "source": "absorber",
+      "signal": "co2_out_ppm",
+      "time": "2026-04-20T11:44:58Z",
+      "value_raw": 38.0,
+      "neighbours": [
+        {
+          "time": "2026-04-20T11:44:48Z",
+          "value_raw": 38.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-04-20T11:44:50Z",
+          "value_raw": 38.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-04-20T11:44:52Z",
+          "value_raw": 38.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-04-20T11:44:54Z",
+          "value_raw": 38.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-04-20T11:44:56Z",
+          "value_raw": 38.0,
+          "verdict": "excluded"
+        },
+        {
+          "time": "2026-04-20T11:45:00Z",
+          "value_raw": 102.9,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:45:02Z",
+          "value_raw": 104.0,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:45:04Z",
+          "value_raw": 103.2,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:45:06Z",
+          "value_raw": 102.3,
+          "verdict": "accepted"
+        },
+        {
+          "time": "2026-04-20T11:45:08Z",
+          "value_raw": 103.3,
+          "verdict": "accepted"
+        }
+      ]
+    }
+  ],
+  "timing": {
+    "seconds": 40.849,
+    "queries": 263,
+    "points_written": 520014
+  }
+}

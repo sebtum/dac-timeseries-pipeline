@@ -24,10 +24,11 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0008](ADR-0008-local-runtime-docker-compose.md) | Docker Compose, pinned tags, services added progressively | M0 | A, B, G | Accepted ⚠ |
 | [0009](ADR-0009-provisioning-as-code.md) | Provisioning as code, per milestone, with three exceptions | M0 | — | Accepted ⚠ |
 | [0010](ADR-0010-profile-post-ingest-in-database.md) | Profile post-ingest in the database; pre-ingest only what the write destroys | M0 | C, D | Accepted |
-| [0011](ADR-0011-retention-tiering-rollup.md) | Retention, tiering, and the rollup schema | M1 | A | Accepted ⚠ |
+| [0011](ADR-0011-retention-tiering-rollup.md) | Retention, tiering, and the rollup schema (addendum: M3 rollup over the verdict) | M1 | A | Accepted |
 | [0012](ADR-0012-postgres-migrations-metadata-loader.md) | Postgres migrations, and a metadata loader with per-field provenance | M1 | A, F | Accepted |
 | [0013](ADR-0013-ingestion.md) | Ingestion: timezone, precision, batching, rejects, conflict winner, exit codes | M2 | B | Accepted |
 | [0014](ADR-0014-post-ingest-profiling.md) | Post-ingest profiling: what is measured, SQL versus Python, four engine quirks | M2.5 | C, D | Accepted |
+| [0015](ADR-0015-cleaning-and-quality-pipeline.md) | Cleaning and quality pipeline: one verdict per reading beside the raw value, the rules, the rollup over the verdict | M3 | C, D | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
@@ -43,15 +44,11 @@ Neither decision moves: ADR-0008's tag is pinned to an explicit version regardle
 gitignored `.env`) is exactly what the corrected mechanism still supports — only the evidence
 cited for each was wrong, not the choice it justified.
 
-⚠ ADR-0011 carries one too: *where* the rollup executes (U-04) is unresolved, because the stated
-preference for a Processing Engine plugin conflicts with the decision to aggregate over M3's
-pipeline verdict — a plugin cannot read a verdict that never lands in InfluxDB (U-09). The
-retention and rollup *design* stands; the execution locus does not. **Still accurate after the
-T8/T9 split** (2026-09-22): T8 built the pure aggregation function and T9 the thin driver that
-calls it, exactly as `docs/plans/M1.md` scoped them — neither resolves U-04, since the driver
-takes the inclusion predicate as an injected parameter rather than reading a verdict from
-InfluxDB. The split only kept U-04 from blocking M1; it does not touch the plugin-vs-verdict
-conflict itself.
+ADR-0011 carried a warning too: *where* the rollup executes (U-04) was unresolved, because the
+stated preference for a Processing Engine plugin conflicted with the decision to aggregate over
+M3's verdict. **Resolved 2026-11-23** by M3 (ADR-0015, and an addendum to ADR-0011): the verdict
+lands in InfluxDB, and the rollup is an external Python job that reads it. The retention and rollup
+design stands; the only change is one added column, `count_no_value`.
 
 Note that 0001 and 0004 split deliberately: the brief imposed *InfluxDB*, but *which version,
 queried in which language* was our choice, and the versions differ enough that conflating them
@@ -73,7 +70,9 @@ how long it lives and what replaces it afterwards. The tag/field layout would be
 infinite retention, and the tiering would be unchanged had the categorical signals been encoded as
 integers — neither forces the other. 0012 is separable again: the metadata store was already chosen
 in 0005, and *how its schema arrives and how corrections survive a reload* could have been answered
-any number of ways without touching 0005's reasoning.
+any number of ways without touching 0005's reasoning. 0015 is separable from 0006 and 0013 for the
+same reason: those decide what is stored and how it got there, 0015 decides how each stored reading
+is judged, and a different set of rules would not change either.
 
 ## Status values
 
