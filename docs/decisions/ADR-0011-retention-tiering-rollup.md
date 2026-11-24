@@ -215,6 +215,24 @@ ADR-0004 (Core, SQL — created U-04, U-05), ADR-0005 (Postgres metadata, the pi
 ADR-0006 (what a point is), ADR-0010 (profiling post-ingest). Corrections behind this record:
 MISTAKES.md C-06, C-07, C-08.
 
+## Addendum (2026-11-23) - M3 settles the rollup's open items
+
+ADR-0015 settled what this ADR left open. It is an addendum, not a reversal: the tiers, the
+retention periods and the column split stand.
+
+- **Where the rollup runs (U-04) is decided: an external Python job** (`python -m scripts.rollup`),
+  run after cleaning. A Processing Engine plugin was rejected: it needs a plugin-enabled server to
+  test, and scheduling belongs to deliverable H. U-09 was answered by writing the verdict into
+  InfluxDB (`readings_processed`), so the conflict this ADR flagged no longer exists. U-04 is closed.
+- **The rollup consumes the verdict.** The inclusion predicate that was injected is now
+  `verdict = 'accepted'`, read from `readings_processed` for one policy version. The M1 placeholder
+  (`quality == 'GOOD'`) is gone from the driver.
+- **One column is added: `count_no_value`.** A point saved without a value (an empty reading) is
+  counted there and left out of every value column (`count_all`, `min_all`, `max_all`, `sum_all`,
+  `sumsq_all` and the included columns). `count_all + count_no_value` is the number of points in
+  the bucket. The real file has 0 such points, so no real bucket has a nonzero count today.
+- `policy_version` in a rollup row is now the cleaning version (`m3-v1`).
+
 ## Defense
 
 Raw stays nine months at full resolution, one-minute rollups keep a year, anything anyone marked

@@ -19,7 +19,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M1 | Time-series data model | A | Done | [0006](decisions/ADR-0006-timeseries-data-model.md), [0011](decisions/ADR-0011-retention-tiering-rollup.md), [0012](decisions/ADR-0012-postgres-migrations-metadata-loader.md) |
 | M2 | Ingestion | B | Verify | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md), [0013](decisions/ADR-0013-ingestion.md) |
 | M2.5 | Post-ingest profiling | — | Verify | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md), [0014](decisions/ADR-0014-post-ingest-profiling.md) |
-| M3 | Quality & cleaning pipeline | C, D | Not started | — |
+| M3 | Quality & cleaning pipeline | C, D | Verify | [0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md) |
 | M4 | Derived metrics | E | Not started | — |
 | M5 | Comparison & findings | F | Not started | — |
 | M6 | Grafana dashboard | G | Not started | — |
@@ -36,8 +36,8 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 |---|-------------|-----------|-------|
 | A | Time-series data model | M1 | **Done** (2026-09-22). Schema settled (ADR-0006); retention/tiering/rollup settled (ADR-0011); T1–T12 all run — V1–V10 all pass, evidence in the M1 verify-phase results below. Pushed to `origin/m1-data-model`; CI green on the branch, both jobs — [run 35779389919](https://github.com/sebtum/dac-timeseries-pipeline/actions/runs/35779389919) (`lint` 14s, `integration` 1m1s, InfluxDB 3 Core + Postgres both up in Actions for the first time). Rollup's execution locus stays open (U-04), by design. **Deferred, not dropped:** the T3/T8 decision-point walkthrough owed since MISTAKES.md E-05 — Sebastian's explicit call to push this pass through rather than fold it in here; still owed before those two files' design choices are considered reviewed. |
 | B | Ingestion | M2 | **Built, awaiting the judge** (2026-11-23). Real file: 520,005 rows = 519,980 saved + 15 exact copies + 10 conflict losers + 0 rejected, all 150 series balanced against a count read back from InfluxDB; second run identical; raw SHA-256 unchanged. Report: [`reports/M2.md`](../reports/M2.md). Decisions: [ADR-0013](decisions/ADR-0013-ingestion.md). |
-| C | Data quality pipeline | M3 | Not started |
-| D | Cleaning and processing | M3 | Not started |
+| C | Data quality pipeline | M3 | **Built, awaiting the judge** (2026-11-23). Real data: 150 series, 519,980 readings = 514,443 accepted + 5,537 excluded, every series balanced against a count read back from InfluxDB, raw tables unchanged. Each reading keeps its raw value, processed value, flag, verdict and reason. Report: [`reports/M3.md`](../reports/M3.md). Decisions: [ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md). Schema: [`schema.md`](schema.md). |
+| D | Cleaning and processing | M3 | **Built, awaiting the judge** (2026-11-23). Per-signal policy table, 25 rows, checked against the code by a test: [`cleaning_policy.md`](cleaning_policy.md). All nine defect kinds covered. Real data: 29 gaps, 5 stuck-sensor runs, 4 impossible values, 4 spikes, 100 BAD and 230 UNCERTAIN readings excluded; rollup rebuilt over the verdict (16,256 buckets). Report: [`reports/M3.md`](../reports/M3.md). Decisions: [ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md). |
 | E | Derived metrics | M4 | Not started |
 | F | Experiment comparison | M5 | Not started |
 | G | Grafana dashboard | M6 | Not started |
@@ -432,6 +432,30 @@ Results so far:
   are not treated alike.
 
 **Execute** — the pipeline; calibrated on a sample first, then run at full scale.
+
+**Execute-phase status (2026-11-23).** Built on branch `m3-cleaning` (cut from `m2.5-profiling`):
+the milestone record is `.workflow/dac.md` (scenarios S3.1-S3.34), the decisions are in
+[ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md) (with an addendum to ADR-0011), the
+policy table is [`cleaning_policy.md`](cleaning_policy.md), the committed outputs are
+`reports/cleaning_summary.json` and `reports/cleaning_report.md`, and the report for review is
+[`reports/M3.md`](../reports/M3.md). Merge to `master` waits for approval. Nothing is committed or
+pushed yet, and the judge has not run.
+Results so far:
+
+- Real run (`python -m scripts.clean`, dev `dac_raw`): exit 0, 150 series balanced, 519,980 readings
+  = 514,443 accepted + 5,537 excluded, 29 gaps (18,519 s), 5 flatline runs, raw tables unchanged,
+  about 41 s. Re-run on the dev stack and on a fresh private stack: summary identical except timing.
+- Rollup over the verdict (`python -m scripts.rollup`): 16,256 buckets in about 12 minutes.
+- Calibration: 0 mismatches against an independent plain-Python recompute on all six experiments.
+  The first calibration found four hits outside the pre-pinned list; the re-plan resolved them
+  (ADR-0015, decisions 24 to 26).
+- Tests: unit 319 pass (290 before the policy-document test, 29 in it); the new end-to-end file
+  `tests/e2e/test_clean_cli.py` 25 pass, 0 skipped, run in this session against the dev InfluxDB.
+  The rest of the end-to-end and integration suites were last run in the earlier waves (rollup
+  integration 10 pass) and were not re-run for the write-up.
+- Closed: U-04, U-09, U-10, U-12. Narrowed: U-06 (time-chunking for continuous data remains).
+  Added: A-05, A-06, A-07.
+- Not run: the judge, GitHub Actions. The real-data rollup is not in CI (about 12 minutes).
 
 **Verify**
 - Nothing silently dropped or silently fixed — provable by count reconciliation, raw vs

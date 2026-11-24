@@ -4,7 +4,7 @@ Compact reference for deliverable A. Every number here traces to a cited source 
 pre-ingest census, or the data dictionary. Nothing here is a new decision; see the cited ADRs for
 the reasoning behind each call.
 
-## 1. The two tables
+## 1. The tables
 
 Two InfluxDB tables, split by value type, same tag set on both
 (ADR-0006, Decision):
@@ -48,6 +48,38 @@ Real file: 10 rows, every one `value_differs` / `lower_value`. An exact copy (sa
 quality) is counted in the ingest summary, not stored here. An empty value is stored in the
 readings table as a point with a `quality` field and no `value` field.
 
+### The processed tables (M3, ADR-0015)
+
+Three more tables, written by `python -m scripts.clean`, in the **same database** as the raw tables
+(`dac_raw`), so they expire with raw. The raw tables are never written by cleaning. Every table has
+the tags `experiment_id`, `source`, `signal` and `policy_version` (the rule set, `m3-v1`; a new rule
+set writes new series beside the old ones). Time is the reading's own instant unless noted. The
+rules and reasons are in [`cleaning_policy.md`](cleaning_policy.md).
+
+| | `readings_processed` | `state_intervals` | `quality_intervals` |
+|---|---|---|---|
+| **what a row is** | one per numeric reading (dense: same count as `readings_numeric`) | one per state event, and how long it lasted | one per gap or stuck stretch |
+| **tags** | `experiment_id`, `source`, `signal`, `policy_version` | same four | same four plus `kind` (`gap` or `flatline`) |
+| **time** | the reading's instant | the event's instant | the interval's start |
+| **fields (float)** | `value_raw` (absent when the raw point has no value), `value` (absent when excluded) | `seconds` | `seconds` |
+| **fields (text)** | `quality` (acquisition flag), `verdict` (`accepted` or `excluded`), `reason` (empty when accepted), `flags` (comma-separated) | `value_raw`, `value` (absent when excluded), `quality`, `verdict`, `reason`, `flags` | none |
+| **fields (int)** | none | `end_ns` (exclusive end of the interval) | `end_ns`, `points` (flatline: readings flagged; gap: 0) |
+
+Rules that hold on all three:
+
+- **Raw value and processed value sit side by side.** `value` equals `value_raw` when the reading is
+  accepted and is absent when it is excluded. Nothing is clamped, filled or smoothed.
+- **`reason` is empty exactly when the reading is accepted.** An accepted row stores `""`, which
+  Core keeps as an empty string (measured, ADR-0015).
+- **Counts balance per series:** a series has as many processed rows (in `readings_processed` or
+  `state_intervals`) as raw readings. This is read back and checked on every run and written to
+  `cleaning_summary.json`.
+- **A gap or flatline row invents no reading.** State signals get no gap rows.
+
+Real run (policy `m3-v1`): 519,906 rows in `readings_processed`, 74 in `state_intervals` and 34 in
+`quality_intervals` (29 gaps, 5 flatline runs); 150 series, 519,980 readings = 514,443 accepted +
+5,537 excluded.
+
 ## 2. Cardinality — 150 series, measured
 
 **150 series**, measured directly against the raw CSV by the pre-ingest census
@@ -88,7 +120,8 @@ non-empty bucket (ADR-0011, Decision).
 | **Verdict-independent** | `count_all`, `min_all`, `max_all`, `sum_all`, `sumsq_all` | Never invalidated — computed over *every* sample regardless of quality verdict. `min_all`/`max_all` are the physical extremes actually observed and survive raw expiry as ground truth no cleaning-policy change can revise. |
 | **Verdict-dependent** | `count_included`, `mean`, `std`, `median` | Computed only over samples the inclusion predicate accepts. Recomputable inside the raw window; frozen once raw expires. |
 | **Composition** | `count_good`, `count_uncertain`, `count_bad` | Breakdown of the acquisition-time `quality` flag per bucket. |
-| **Provenance** | `policy_version` | Stamps which predicate generation sealed the bucket at the moment it froze (raw expiry) — needed because buckets across the table freeze under different policy generations over time, and that mixture is permanent (ADR-0011, Why). |
+| **No-value count (M3)** | `count_no_value` | Points in the bucket that were saved without a value (an empty reading). Left out of every value column, so `count_all + count_no_value` is the number of points in the bucket. Added by the M3 addendum to ADR-0011; 0 on the real data. |
+| **Provenance** | `policy_version` | Stamps which predicate generation sealed the bucket at the moment it froze (raw expiry) — needed because buckets across the table freeze under different policy generations over time, and that mixture is permanent (ADR-0011, Why). Since M3 it is the cleaning version (`m3-v1`). |
 
 **Std is population std (denominator n), not sample std (n−1).** With sample std, an n=1 bucket has
 undefined std and is unrecoverable — which happens for all four ambient signals at 1-minute
@@ -99,11 +132,18 @@ re-derive them, because pooling sums is associative addition with nothing to get
 pooling means/stds requires a weighted formula and an n-vs-n−1 convention that silently yields a
 plausible wrong number if confused (ADR-0011, Why).
 
-**Quality policy at M1:** the inclusion predicate is a stated placeholder, `quality == 'GOOD'`
-(`UNCERTAIN` excluded, treated as `BAD`). This is *not* the real policy — the real policy is M3's
-pipeline verdict, since acquisition-time `quality` is not exhaustive (a stuck sensor can read
-`GOOD` in-range). M1 builds and verifies the machinery against the placeholder; M3 supplies the
-policy and the rollup is rebuilt (ADR-0011, Decision).
+**Quality policy (changed at M3, ADR-0015):** the inclusion predicate is the cleaning verdict,
+`verdict = 'accepted'`, read from `readings_processed` for one policy version. The M1 placeholder
+(`quality == 'GOOD'`) is gone. The rollup is a separate command run after cleaning
+(`python -m scripts.rollup`), an external Python job (U-04 closed). Its aggregation is done in
+Python on a plain pull, not in SQL (ADR-0014, last-bit sums). `readings_state` and `state_intervals`
+are never rolled up. Real run: 16,256 buckets in about 12 minutes.
+
+**Stale-field limit.** A later write of the same key without a field keeps the field's old value
+(measured on Core 3.11.2). A rerun over rows of the same policy version writes identical values, so
+nothing is stale. If rows of one version were ever changed so a bucket's `count_included` fell to 0,
+its old `mean`, `std` and `median` would stay. Rule changes bump the version, so this cannot happen
+by construction; read `mean`, `std` and `median` only where `count_included > 0`.
 
 ## 5. Volume arithmetic
 
@@ -170,6 +210,8 @@ must therefore be *monitored*, not merely scheduled (ADR-0011, Consequences).
 - ADR-0006 — Time-series data model: tags, fields, numeric/state split
 - ADR-0011 — Retention, tiering, and the rollup schema
 - ADR-0012 — Postgres migrations, `experiments.json` loader with per-field provenance
+- ADR-0013 — Ingestion (the conflicts table)
+- ADR-0015 — Cleaning and quality pipeline (the three processed tables, the rollup over the verdict)
 - `reports/pre_ingest_census.md` — measured row/series counts, quality distribution
 - `task/DATA_DICTIONARY.md` — per-signal nominal sample rates
 - `docs/plans/M1.md` — local retention values (T2 scope, "Three calls made in this phase")

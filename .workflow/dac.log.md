@@ -92,3 +92,86 @@ Hand-edits to Spec: only two lines appended to Next steps.
 
 State left behind: private stack `dac-verify-m25` removed; `.env` is the dev one; dev containers
 `dac-influxdb` / `dac-postgres` were started for this milestone and stopped again (volumes kept; dev `dac_raw` holds the real data); `.flow-tmp/` holds scratch output (gitignored).
+
+### M3
+
+Status: **stopped at calibration, not finished, not committed.** Revision at start: `4888e32` on
+`m2.5-profiling`; work is on a new branch `m3-cleaning` (decision 22), nothing committed yet. Mode:
+standard, no `T<n>` task lines, so worked directly. Done-rule note: M2 and M2.5 have Findings only at
+`1c5b6ea` / `77b8516 (+ uncommitted)`, HEAD was `4888e32` (the M2.5 work, committed unchanged). Sebastian
+invoked execute M3 anyway, so I went ahead; the judges for M2 and M2.5 have not run at the commit.
+
+Done so far (all new, untested beyond the calibration below):
+`pipeline/cleaning_policy.py` (table, `POLICY_VERSION = "m3-v1"`, `policy_fingerprint()`),
+`pipeline/cleaning.py` (pure rules, intervals, summary, samples, report), `pipeline/cleaning_influx.py`
+(gateway, line protocol for the three tables), `scripts/clean.py` (CLI). `ruff check` / `ruff format` clean.
+Not started: rollup changes (`rollup.py`, `rollup_run.py`, `scripts/rollup.py`), the clean fixture, every
+test, ADR-0015, docs, the committed real outputs, `reports/M3.md`, CI contract step.
+
+Decision 15 measured (dev InfluxDB, throwaway database, dropped):
+(a) a later write of the same key without a field **keeps the old field value** (point at t1 written with
+`value=2.5`, rewritten without `value` still reads 2.5); (b) an empty string field is stored and read
+back as `""` (length 0). So accepted rows use `""`, not `none`. Consequence handled in the code: the
+read-back also counts rows that carry a value and compares with the accepted count.
+
+Calibration (decision 20), read-only on dev `dac_raw`, `.flow-tmp/calibrate.py`: EXP_001, then all six.
+Every feature the plan pinned in S3.28 shows up with exactly the predicted counts (412.0, pH 27.4,
+-50.0 outside limits; fan_speed, pump_speed, current spikes at the stated instants; 240 / 1350 / 3600 /
+60 / 40 flatline readings; 200 and 30 UNCERTAIN; pressure -3.1 excluded; 10 conflict instants; gaps
+per series as the profile's over-2x counts). **Four things are not in the pinned S3.29 list:**
+
+| # | Where | What fired | What it is |
+|---|---|---|---|
+| 1 | EXP_001 solvent_pH 09:28:10, 09:28:15 | flatline, 2 readings | chance: steps 0.003 and 0.009 against a threshold of 0.0097, plus scattered small steps in the window of 13 (7 flat of 13) |
+| 2 | EXP_005 ambient_pressure 07:40 to 07:44 | flatline, 5 readings | same cause: smooth signal, steps 0.01 / 0.00 against a threshold of 0.012 |
+| 3 | EXP_005 available_solar_power 06:00 to 06:24 | flatline, 25 readings | the dawn ramp (steps 0.8 to 5) is slower than 0.2 x 12.255 = 2.45, the day-time step size |
+| 4 | EXP_006 fan_speed 11:10:17 | `spike` in flags (primary reason stays `conflicting_duplicate`) | a real one: 839.2 among readings near 900; the kept value of a conflict pair |
+
+Evidence for a fix (`.flow-tmp/variants.py`, same data): requiring the flagged step to sit in an unbroken
+run of at least 5 flat steps removes #1 and #2 and keeps all five pinned flatline features with identical
+counts (60 / 240 / 40 / 3600 / 1350); with 3 it leaves 3 readings of #2; with 8 it leaves 11 of #3. #3 is
+not fixed by any run length: a smooth ramp is flat by this definition.
+
+Stopped here because S3.29's note says an extra spike or flatline comes back to `/flow:plan M3`. Raw CSV
+not touched, no write to any InfluxDB table (only the throwaway probe database, dropped).
+
+State left behind: dev containers `dac-influxdb` / `dac-postgres` started for the calibration, stopped
+again; `.env` unchanged; `.flow-tmp/` holds scratch scripts (gitignored).
+
+#### M3 re-run after the re-plan (decisions 24-27), tasks in waves
+
+Revision at start `4888e32` on `m3-cleaning`. Calibration stop above is resolved by the re-plan.
+
+**W1 (T1, T2) done.** `lane.js check --wave W1` ok; `pytest tests/unit` 257 passed; ruff clean; `contract.js --static` 3 PASS.
+- T1: `FLAT_MIN_RUN = 5` and solar exact-repeat rule in `cleaning_policy.py` / `cleaning.py`; `_ZERO_IS_IDLE` removed; fingerprint re-pinned (`2b004502...49358bb`, `m3-v1`); `tests/unit/test_cleaning.py`, `test_cleaning_policy.py` (78 tests). Notes: a short exact run (about 12 readings) in 1 Hz noise is not flagged (majority window h = 30); `.flow-tmp/variants.py` uses the removed `zero_is_idle` (T4 must not reuse it); real-data counts not re-run yet.
+- T2: `Sample.value` may be None, `count_no_value`, `run_rollup` reads `readings_processed` (signature changed: `experiment_id` required), `scripts/rollup.py` new; unit 28, integration 10 pass against live Core. Choice: no rows of the current policy version -> exit 2. Dev `dac-influxdb` left running.
+
+**W2 (T3) done.** `lane.js check --wave W2` ok; `pytest tests/unit` 290 passed; `pytest tests/e2e/test_clean_cli.py` 25 passed, 0 skipped (live dev Core, throwaway databases dropped); ruff clean; `contract.js --static` 3 PASS; raw SHA-256 OK.
+- T3: fixture `tests/fixtures/clean/` (3667 rows, 3665 saved + 1 exact copy + 1 conflict loser); `cleaning_influx.py` fix (`has_column` before `COUNT(value)`, since a table with only excluded rows has no `value` column); `tests/unit/test_clean_cli.py` (33), `tests/e2e/test_clean_cli.py` (25, includes a SELECT-pull recompute of all 3665 verdicts). Fixture run: 12 series, 3368 accepted, 297 excluded, 1 gap, 2 flatline runs, re-run identical; rollup 08:02 bucket: 60 / 59 / min 99.925 / max 140.0 / mean 99.99872881.
+- Notes: e2e rollup goes into the same throwaway database as the clean (`--rollup-database` = `--database`), since Core allows 5 databases and 4 exist; 140 V rows also carry `outside_typical_range` (typical voltage 60-130), so S3.14 flags read `flag_bad,spike,outside_typical_range`; flatline boundary at +360 s is tight (31 of 61 steps flat).
+
+**W3 (T4) done.** `lane.js check --wave W3` ok; I re-checked: summary validates against the contract; 150 series, raw 519,980 = accepted 514,443 + excluded 5,537, balanced, raw_unchanged; raw SHA-256 OK; `.env` is the dev one.
+- T4: calibration on EXP_001, EXP_004 and all six: 0 mismatches between `pipeline.cleaning` and an independent recompute (verdicts, gaps, flatline intervals). Spikes only in the four S3.29 places; flatline only in the five S3.29 series (60 / 40 / 240 / 3600 / 1350); the earlier chance hits are gone. excluded_by_reason: flag_bad 100, flag_uncertain 230, outside_physical_limits 4, conflicting_duplicate 10, spike 3, flatline 5190 (flags: spike 4, flatline 5290, outside_typical_range 10,242); 29 gaps = profile's over-2x counts; 5 flatline runs. Tables in dev `dac_raw`: readings_processed 519,906 + state_intervals 74; quality_intervals 34. Re-run on dev and fresh private stack (`m3t4`): summary identical except timing. Rollup: 16,256 buckets in about 12 min (about 2 min per experiment, silent until each finishes).
+- State: private stack removed; dev `dac-influxdb` up; `.env` dev; `.flow-tmp/t4/` scratch.
+
+**W4 (T5) done.** Write-up: `docs/cleaning_policy.md` (25 rows), `docs/decisions/ADR-0015-cleaning-and-quality-pipeline.md`, ADR-0011 addendum, `docs/schema.md`, `docs/ASSUMPTIONS.md` (closed U-04, U-09, U-10, U-12; narrowed U-06; added A-05, A-06, A-07), `docs/ROADMAP.md`, `docs/decisions/README.md`, `.github/workflows/ci.yml` (contract step), `reports/M3.md`, `tests/unit/test_policy_doc.py` (29 tests, mutation-checked). Four lines appended to Spec Next steps. `lane.js check --wave W4` flags only `.workflow/dac.md` (the allowed Next-steps append; the other diff in that file is the plan's).
+- Lead edit: added a note to ADR-0015 that the `Rejected` cell for decisions 5, 8, 9, 11, 13, 14, 16, 17, 19-22 was written at the write-up (the plan recorded none).
+
+### M3 final (revision `4888e32` + uncommitted, branch `m3-cleaning`)
+
+Status: implemented and verified by me, **not committed, not pushed, judge not run**. Mode standard, tasks T1-T5 by agents (decision 27).
+
+| Command | Result |
+|---|---|
+| `ruff check .` / `ruff format --check .` | clean (94 files) |
+| `python -m pytest tests/unit -q` | 319 passed |
+| `python -m pytest tests/integration tests/e2e -q -rs` (dev stack, Postgres started for the run, stopped after) | 105 passed, 0 skipped. (First run without Postgres: 91 passed, 14 skipped, rerun after starting it.) |
+| `node contract.js --static` | 3 PASS |
+| `python -m scripts.clean --report-dir reports` on real data (T4) | exit 0, 150 series, 519,980 = 514,443 + 5,537, balanced, raw_unchanged; re-run and fresh private stack equal except timing |
+| `python -m scripts.rollup` on real data (T4) | exit 0, 16,256 buckets, about 12 min |
+| independent recompute vs `pipeline.cleaning` (T4, EXP_001, EXP_004, all six) | 0 mismatches |
+| SHA-256 of raw CSV | OK |
+| GitHub Actions, judge | not run |
+
+Remaining gaps: judge (`/flow:verify M3`), judges for M2 and M2.5 at the commit, commit and push, CI run. Rollup speed (12 min) and the other Next-steps lines are in Spec.
+State left behind: dev `dac-influxdb` running (holds processed tables and `readings_rollup`); `dac-postgres` stopped; `.env` dev; `.flow-tmp/` scratch.
