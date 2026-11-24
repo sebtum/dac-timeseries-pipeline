@@ -1006,3 +1006,11 @@ Checks run:
 - Independent recompute (scratch script, imports no pipeline code; limits from Spec decision 9, steps and nominals from the profile): all 519,980 stored rows' value_raw, value, quality, verdict, reason, flags equal; all gap and flatline interval rows equal; state intervals equal; 0 mismatches. A first run showed 48 "profile" mismatches caused by my own script keying the profile by signal without experiment; fixed and rerun, 0.
 - Raw CSV SHA-256 in repo and worktree = `9f791b42…553f` = committed
 - `verify-env.js down 366b8415` → removed, no worktree changes reported
+
+### M3 — verify correction 2026-11-24 @ 1dcd428
+Defects:        [fixed in the follow-up commit] CI `integration` job failed at collection: `tests/unit/test_clean_cli.py` and `tests/e2e/test_clean_cli.py` share a basename, so `python -m pytest` from the repo root stops with "import file mismatch" (GitHub Actions run 45400042405; reproduced locally with `python -m pytest --collect-only`: 391 collected, 1 error).
+Why the first verify block missed it: it ran `tests/unit`, `tests/integration` and `tests/e2e` as three separate commands. The CI job (and the Spec's Checks table, by listing them separately) never ran the whole suite in one session. The first block's "Defects: none" was wrong for the full-suite command.
+Fix: renamed the unit file to `tests/unit/test_clean_exit_codes.py` (content unchanged); updated the one doc reference in `reports/M3.md`. The Spec still names the old path in its Tests and T3 lines (historical).
+Optional:
+- [low] Add a Checks row `python -m pytest -v` (whole suite, stack up) so a basename clash is caught by verify, not only by CI.
+Checks run after the fix: `python -m pytest --collect-only -q` → 424 collected, 0 errors; no duplicate test basenames under `tests/`; `ruff check .` and `ruff format --check .` pass; `python -m pytest tests/unit -q` → 319 passed. CI result: see the next block if recorded.
