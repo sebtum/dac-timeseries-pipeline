@@ -21,7 +21,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M2.5 | Post-ingest profiling | — | Verify | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md), [0014](decisions/ADR-0014-post-ingest-profiling.md) |
 | M3 | Quality & cleaning pipeline | C, D | Verify | [0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md) |
 | M4 | Derived metrics | E | Verify (built 2026-11-24, judge not run) | [0016](decisions/ADR-0016-derived-metrics.md) |
-| M5 | Comparison & findings | F | Not started | — |
+| M5 | Comparison & findings | F | Verify (built 2026-11-24, judge not run) | [0017](decisions/ADR-0017-comparison-and-findings.md) |
 | M6 | Grafana dashboard | G | Not started | — |
 | M7 | Edge, cloud, presentation | H, I, J | Not started | — |
 | — | Retrospective (terminal) | — | Locked until session declared over | — |
@@ -39,7 +39,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | C | Data quality pipeline | M3 | **Built, awaiting the judge** (2026-11-23). Real data: 150 series, 519,980 readings = 514,443 accepted + 5,537 excluded, every series balanced against a count read back from InfluxDB, raw tables unchanged. Each reading keeps its raw value, processed value, flag, verdict and reason. Report: [`reports/M3.md`](../reports/M3.md). Decisions: [ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md). Schema: [`schema.md`](schema.md). |
 | D | Cleaning and processing | M3 | **Built, awaiting the judge** (2026-11-23). Per-signal policy table, 25 rows, checked against the code by a test: [`cleaning_policy.md`](cleaning_policy.md). All nine defect kinds covered. Real data: 29 gaps, 5 stuck-sensor runs, 4 impossible values, 4 spikes, 100 BAD and 230 UNCERTAIN readings excluded; rollup rebuilt over the verdict (16,256 buckets). Report: [`reports/M3.md`](../reports/M3.md). Decisions: [ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md). |
 | E | Derived metrics | M4 | **Built, awaiting the judge** (2026-11-24). Real data: 13 metrics and 4 derived series for each of the 6 experiments, each metric with a coverage and a label (complete, partial or none); the formulas were recomputed independently in plain Python with 0 differences; energy from voltage times current agrees with the logged power to within 0.67 % in every experiment. These are numbers, not findings. Report: [`reports/M4.md`](../reports/M4.md). Decisions: [ADR-0016](decisions/ADR-0016-derived-metrics.md). Formulas: [`metrics.md`](metrics.md). Schema: [`schema.md`](schema.md). |
-| F | Experiment comparison | M5 | Not started |
+| F | Experiment comparison | M5 | **Built, awaiting the judge** (2026-11-24). Real data: all 6 experiments put on one experiment clock, 28 voltage fits (hydrolyzer and absorber, steady and whole run, each experiment and pooled), 8 evidence rows, 15 pair comparisons, the pressure-drop check and the EXP_004 air-flow check; an independent plain-Python recompute found 0 differences. The headline answer on flow and pressure against cell voltage is **not resolved in this run**: all 8 evidence rows are `not_resolved`, which is not evidence of no effect. Only one pair (EXP_001 against EXP_002, differing in current setpoint) is a supported comparison; the other 14 are confounded. Report: [`reports/M5.md`](../reports/M5.md). Draft findings: [`reports/findings.md`](../reports/findings.md); **the findings are a draft until Sebastian approves them.** Decisions: [ADR-0017](decisions/ADR-0017-comparison-and-findings.md). Method: [`comparison.md`](comparison.md). |
 | G | Grafana dashboard | M6 | Not started |
 | H | Edge ingestion & resilience (design) | M7 | Not started |
 | I | Cloud scaling narrative (verbal) | M7 | Not started |
@@ -513,6 +513,43 @@ single query's span at ~72h by default (U-05). Whatever the comparison approach,
 work within that or explicitly change it.
 
 **Execute** — the comparison queries and analysis.
+
+**Execute-phase status (2026-11-24).** Built on branch `m5-comparison` (cut from `master`): the
+milestone record is `.workflow/dac.md` (scenarios S5.1-S5.26), the decisions are in
+[ADR-0017](decisions/ADR-0017-comparison-and-findings.md), the method is in
+[`comparison.md`](comparison.md), the committed outputs are `reports/comparison_summary.json` and
+`reports/comparison_report.md`, the draft findings are in
+[`reports/findings.md`](../reports/findings.md), and the report for review is
+[`reports/M5.md`](../reports/M5.md). Merge to `master` waits for Sebastian's approval of the
+findings. Nothing is committed or pushed yet, the judge has not run, and GitHub Actions has not run.
+Results so far:
+
+- Real run (`python -m scripts.compare`, dev `dac_raw`): exit 0, 6 experiments, 28 voltage fits
+  (all testable, 0 singular resamples of 1000 in each), 8 evidence rows, 15 comparisons, 219
+  queries, about 53 s. It writes files only; no database row changed.
+- Calibration: 0 differences at 9 digits against an independent plain-Python recompute (no
+  pipeline imports) on EXP_001 (347 values) and on all six (3,497 values). Four `r2_drop` values
+  near 1e-8 differ in the 9th digit (a difference of two R squared near 0.99), not counted.
+- Reproducibility: a rerun on the dev stack and a run on a fresh private stack give the same
+  summary except timing, and the report is byte-equal.
+- Answer: all 8 evidence rows are `not_resolved`. Hydrolyzer steady: the flow and pressure
+  intervals include zero in 6 of 6 experiments and pooled. Whole-run fits are not separable (flow
+  VIF 14 to 29). EXP_005's residuals are strongly autocorrelated (block lag-1 correlation 0.87), so
+  its intervals are probably too narrow.
+- Also: EXP_004's raw air flow falls 98.3 % after 09:00Z while fan speed, pressure drop, outlet CO2
+  and capture efficiency stay put (supports A-07 without closing it). Pressure drop does not follow
+  air flow within an experiment (R squared at most 0.002); across experiments it follows two
+  air-flow levels only. Comparability: 1 supported pair, 14 confounded. Partial coverage: EXP_002
+  voltage, power and energy per kilogram; EXP_004, EXP_005 and EXP_006 capture and energy per
+  kilogram.
+- Tests: unit pass, including the findings test (`tests/unit/test_findings_doc.py`, every number
+  checked against the summary) and the method-document test (`tests/unit/test_comparison_doc.py`).
+  The end-to-end, integration and exit-code suites passed in the earlier waves (see the execute
+  log).
+- Added: A-09, the A-07 status from the air-flow check, the U-05 note (219 queries, no span error;
+  still open for the Grafana time picker). Contract step added to CI.
+- Not run: the judge, GitHub Actions. Not committed or pushed. The real-data comparison is not in
+  CI.
 
 **Verify**
 - At least three findings, each stated as claim + the query and numbers behind it.

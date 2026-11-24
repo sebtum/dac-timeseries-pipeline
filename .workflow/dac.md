@@ -14,17 +14,25 @@
 - M2.5: `docs/ROADMAP.md` § M2.5; ADR-0010 (what to measure, where); ADR-0004 and U-05 (query span); `task/DATA_DICTIONARY.md` (nominal rates, typical ranges); MISTAKES.md C-01, C-02
 - M3: `docs/ROADMAP.md` § M3; `task/TASK.md` C, D; ADR-0006 (U-09, U-10), ADR-0011 (rollup over the verdict, UNCERTAIN as BAD, U-04), ADR-0013 (conflicts table, empty values), ADR-0014 and `reports/post_ingest_profile.json` (the measured facts the rules are calibrated on); U-06, U-12; MISTAKES.md C-01, C-02, C-03; approved plan `C:\Users\sebas\.claude\plans\glittery-splashing-nebula-of-6edcf82e-3517-4393-95bf-5335ed2e2c92.md`
 - M4: `docs/ROADMAP.md` § M4; `task/TASK.md` E; `task/DATA_DICTIONARY.md` (units, nominal rates, the power note); ADR-0005 (Postgres for metadata, Grafana reaches it by variable), ADR-0011 (tiers), ADR-0015 and `docs/cleaning_policy.md` (the verdict M4 consumes, the alignment rule it promised: polled signals as-of within 2 × nominal); `reports/cleaning_summary.json` and `reports/post_ingest_profile.json` (measured gaps, exclusions, shared instants); MISTAKES.md C-01, E-04, E-06; approved plan `C:\Users\sebas\.claude\plans\nested-twirling-book-of-20e84ac6-0afe-4726-bfcc-f29c4a1074b7.md`
+- M5: `docs/ROADMAP.md` § M5; `task/TASK.md` F; `task/DATA_DICTIONARY.md` (process phases, the flow/solvent_flow note); ADR-0005 (metadata in Postgres), ADR-0012 (corrections live in Postgres), ADR-0015 and `docs/cleaning_policy.md` (accepted readings, state intervals with no expiry), ADR-0016 and `docs/metrics.md` (`metrics_series`, `experiment_metrics`, the integration and coverage rules M5 reuses); `reports/post_ingest_profile.json` (current lags setpoint by 23–24 s; pressure drop vs air flow R² < 0.17), `reports/metrics_summary.json`; A-07, U-05; MISTAKES.md E-09; approved plan `C:\Users\sebas\.claude\plans\frolicking-gliding-mango-of-945a74fa-e04e-4ece-aa19-1bfea04e10ae.md`
 
 ### Goal
-Build everything in `task/TASK.md` A–J, one roadmap milestone at a time. Current milestone, M4:
-compute power, energy, capture efficiency, capture rate, energy per kg CO2 and data-quality shares
-per experiment from accepted readings only, label each number with its coverage, store time series
-in InfluxDB and experiment numbers in Postgres, and cross-check power and energy independently.
+Build everything in `task/TASK.md` A–J, one roadmap milestone at a time. Current milestone, M5:
+put the six experiments on a shared clock (seconds since start), split each into its process
+phases, answer with evidence how hydrolyzer flow and pressure relate to cell voltage at fixed
+current and temperature, say which experiment pairs can fairly be compared and which cannot, and
+draft at least three findings for Sebastian's approval. Read-only; outputs are files.
+M4 (built, merged): compute power, energy, capture efficiency, capture rate, energy per kg CO2 and
+data-quality shares per experiment from accepted readings only, label each number with its
+coverage, store time series in InfluxDB and experiment numbers in Postgres, and cross-check power
+and energy independently.
 M3 (built, merged): decide for every stored reading whether it can be trusted, write raw value, processed value, flag,
 decision and reason side by side, record gaps and stuck stretches as intervals, rebuild the rollup
 over that decision, and prove by counts that nothing was dropped or quietly changed.
 M2.5 (built): measure the stored data and write the numbers to a file, without judging any reading.
 M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing anything, and prove it with counts.
+- Scope (M5): comparison command `scripts.compare`, pure analysis functions with a versioned policy table, read layer over InfluxDB and Postgres, summary contract, hand-built three-experiment fixture with a planted voltage relationship, real run with committed outputs, independent recompute, draft findings with a findings-vs-summary regression test, `docs/comparison.md`, ADR-0017, M5 report.
+- Non-goals (M5): writing any InfluxDB or Postgres row (aligned series or results for Grafana are M6's call); new cleaning rules or metric formulas; filling any input; causal claims (one run per condition); the dashboard (M6); fixing the M4 read-back count (Next steps).
 - Scope (M4): metrics command `scripts.metrics`, pure metric functions with a versioned policy table, InfluxDB table `metrics_series` in `dac_raw`, Postgres migration 0003 (`experiment_metrics`, `signal_quality`), summary contract, hand-built fixture with hand-computed answers, real run with committed outputs, `docs/metrics.md`, ADR-0016, M4 report.
 - Non-goals (M4): `experiment_time` alignment, process-phase segmentation, cross-experiment comparison and findings (M5); dashboard (M6); rolling up the derived series; changing any raw or processed table or the cleaning rules; filling any input; time-chunked processing for continuous data; scheduling (H).
 - Scope (M3): cleaning command, three processed tables in `dac_raw`, summary contract, rollup command over the verdict, policy document, hand-built fixture, real run with committed outputs, ADR-0015, M3 report.
@@ -48,6 +56,7 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M2.5 baseline: `77b851678fc9b1cc901df21ad0cb1277c7e4f30e` (branch `m2-ingestion`), clean
 - M3 baseline (planning, 2026-11-23): `77b851678fc9b1cc901df21ad0cb1277c7e4f30e` on branch `m2.5-profiling`, with all of M2.5 uncommitted: ` M .github/workflows/ci.yml`, ` M .gitignore`, ` M .workflow/dac.log.md`, ` M .workflow/dac.md`, ` M docs/ASSUMPTIONS.md`, ` M docs/ROADMAP.md`, ` M docs/decisions/README.md`, ` M pipeline/signals.py`, `?? contracts/examples/post_ingest_profile.example.json`, `?? contracts/post_ingest_profile.schema.json`, `?? docs/decisions/ADR-0014-post-ingest-profiling.md`, `?? pipeline/profiling.py`, `?? pipeline/profiling_sql.py`, `?? reports/M2.5.md`, `?? reports/post_ingest_profile.json`, `?? reports/post_ingest_profile.md`, `?? scripts/post_ingest_profile.py`, `?? tests/e2e/test_profile_cli.py`, `?? tests/fixtures/profile/`, `?? tests/unit/test_profiling.py`. M3 execute starts from the M2.5 commit, on a new branch `m3-cleaning`.
 - M4 baseline (planning, 2026-11-24): `a7bade12486f58fabf3ee5fede4fd67d6b22cee7` on `master` (the M3 merge), clean. M4 execute starts on a new branch `m4-metrics` cut from it; the first commit carries this record and the M4 contract files.
+- M5 baseline (planning, 2026-11-24): `262fb1fd0124e4da1d158933139f23aca781911c` on `master` (the M4 merge). Pre-existing: `?? docs/project-overview.html` (not M5's; leave it uncommitted). M5 execute starts on a new branch `m5-comparison` cut from it; the first commit carries this record and the M5 contract files.
 
 ### Constraints
 - Milestone ids follow `docs/ROADMAP.md`. Only `/flow:plan <id>` details a milestone.
@@ -64,6 +73,9 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M4 never writes `readings_numeric`, `readings_state`, `readings_conflicts`, `readings_processed`, `state_intervals`, `quality_intervals` or `dac_rollup`, and never creates a database. In InfluxDB it writes only `metrics_series` (target raw database); in Postgres only `experiment_metrics` and `signal_quality`. It never changes the `experiment` table.
 - M4 reads only rows with `verdict = 'accepted'` for one cleaning `policy_version` as metric inputs; it reads counts of all rows for the quality shares. Same Core 3.11.2 SQL quirks to avoid as M3 (ADR-0014); integrals and sums are done in Python with `math.fsum`.
 - M4 outputs are not findings. Comparisons between experiments and the flow/pressure-vs-voltage answer are M5 and need Sebastian's approval (CLAUDE.md).
+- M5 writes nothing to InfluxDB or Postgres and creates no database or schema. It reads `readings_processed` (accepted rows, plus `value_raw` for the air-flow check), `state_intervals` and `metrics_series` of one cleaning `policy_version` (and, for `metrics_series`, one `metrics_version`), and Postgres `experiment` and `experiment_metrics`. Every InfluxDB query is bounded to one experiment window (U-05).
+- M5 analysis is stdlib Python (`math.fsum`, `random.Random`, no numpy), like M3 and M4; it may import `pipeline.metrics` for `as_of`, `covered_intervals`, `overlap`, `integrate_over`, `status_for` and `POLICY`, and must not change that module.
+- M5 findings are a draft until Sebastian approves them (CLAUDE.md, headline claims). `reports/findings.md` says so in its status line; the merge to `master` waits for that approval.
 
 ### Decisions
 - M0, M1 accepted as done under the old method (Sebastian, 2026-11-23).
@@ -158,6 +170,33 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
   18. **Expected real-data labels pinned before the real run** (S4.24). A different label stops T4 and comes back as a narrow question; constants are not tuned silently.
   19. **Calibrate before scaling:** EXP_001 first, compared with an independent plain-Python recompute from SELECT pulls (no pipeline imports), then EXP_004 (air-flow hour), then all six.
   20. **Branch `m4-metrics`, cut from `master`.** Commit and push at the end of M4; merge waits for approval.
+  21. **Recorded at the M5 plan (judge note):** the inlet CO2 rate uses the captured series' instants (where co2_in, co2_out, air flow and ambient are all usable), with ppm = co2_in. "Likewise with co2_in alone" in decision 9 meant the formula, not the instants. Keeps `capture_below_inlet` like for like. ADR-0016 item 24 records it. No code or contract change.
+- M5, made while planning (2026-11-24); plan approved by Sebastian (`C:\Users\sebas\.claude\plans\frolicking-gliding-mango-of-945a74fa-e04e-4ece-aa19-1bfea04e10ae.md`). Full reasoning goes into ADR-0017 at execute.
+
+  1. **Mode standard, judge verify, 6 tasks run by agents** (Sebastian asked for parallel agents in separate contexts). W1: pure analysis (T1) ∥ reads (T2) ∥ fixture (T3); W2: command and e2e (T4); W3: real data (T5); W4: write-up and draft findings (T6). A bug found by a later task is reported back to the owner, not patched outside the finder's files. Rejected: one piece (Sebastian's request); full mode (read-only, no new risk class).
+  2. **M4 accepted as done for starting M5** (Sebastian, with this plan). Its newest Findings block (`@ a7bade1 (+ uncommitted)`, no defects) reviewed the working tree that became commit `9ad21eb`, merged as `262fb1f` with his approval.
+  3. **"Flow and pressure" = the hydrolyzer's electrolyte `flow` (L/min) and `pressure` (bar)** (Sebastian, with this plan): same subsystem as the cell voltage; the data dictionary warns not to conflate `flow` with other flows. The absorber's `air_flow` and `pressure_drop` get the same analysis as a second model, so the other reading of the brief is answered too. Rejected: absorber only.
+  4. **Read-only.** M5 writes no InfluxDB or Postgres row and creates nothing; its outputs are files. Rejected: storing aligned series now (M6 decides how the overlay works; storing them before that is designing ahead).
+  5. **Shared clock: `experiment_time_s = (t_ns − start_ns) / 1e9`**, start = the experiment's `start_time`. Ids and windows `[start, end)` come from the experiments file, as in M2–M4; metadata comes from Postgres `experiment` (corrections live there, ADR-0012). If Postgres `start_time` or `end_time` differs from the file for an experiment, the run refuses (exit 2, `window_mismatch`). Rejected: aligning on the first STEADY_STATE event (phases are reported separately, in experiment time, so phase offsets stay visible).
+  6. **Phases from accepted `process_state` rows of `state_intervals`:** phase = `[event time, end_ns)`. Analysis window = `[start + settle_s, end)` when `start + settle_s < end`, otherwise none. `settle_s = 60` (more than twice the measured 23–24 s current-to-setpoint lag). Steady windows = the windows of STEADY_STATE phases. Rejected: whole phases (transients leak in).
+  7. **Instant join.** Hydrolyzer model: exact same instant of voltage, current, flow, pressure (all 1 Hz). Absorber model: exact instants of pressure_drop (0.5 Hz) where voltage, current and air_flow also exist. `electrolyte_temperature` (0.2 Hz) as-of: latest accepted reading at or before the instant, used when at most `temp_max_age_s = 10` s old (2 × nominal; reuses `pipeline.metrics.as_of`). Only instants inside the analysis windows. Rejected: resampling to a grid (invents values).
+  8. **Voltage model (OLS):** `voltage ~ 1 + current + electrolyte_temperature + X1 + X2`, hydrolyzer `X1, X2 = flow, pressure`, absorber `air_flow, pressure_drop`. Predictors centred at the fit's own means; normal equations solved by Gaussian elimination with partial pivoting; sums with `math.fsum`. A fit is **testable** when it has at least `min_instants = 300` rows and no pivot is at or below `1e-9 ×` the largest diagonal entry of the normal matrix. Per term: `coefficient` (V per unit of the term), its interval (decision 10), `r2_drop` (R² of the full model minus R² without that term), `vif` (1 / (1 − R² of the term on the other predictors)), `plain_corr` (Pearson of voltage with the term over the fit rows). For X1 and X2 also the lag fields (decision 11). Joint: `r2_drop` without both X1 and X2; `separable` = both VIFs below `vif_limit = 10`. When not separable, findings may cite only the joint effect. Rejected: plain correlation as the answer (voltage follows current first; it is reported, not concluded from).
+  9. **Fits:** each model × window (`steady`, `whole_run` = `[start, end)`) × scope (each experiment; `pooled` over the testable experiments of that model and window, with one intercept per experiment instead of the common one).
+  10. **Block bootstrap.** Blocks: within each analysis window, block `k` = rows with `floor((t − window_start) / bootstrap_block_s) = k` (`bootstrap_block_s = 120`). A resample draws B blocks with replacement (B = number of non-empty blocks) by `rng.randrange(B)`, B draws per resample, `bootstrap_resamples = 1000` resamples, `rng = random.Random(seed_key)` with `seed_key = f"{bootstrap_seed}|{model}|{window}|{scope}"` and `bootstrap_seed = 20261124`. Each block's sufficient statistics (sums of the centred cross-products) are computed once and summed per resample (same centring constants as the full fit). Pooled: stratified, for each experiment in id order draw its own B_e blocks, one rng. A singular resample is counted (`resamples_singular`) and skipped. Interval = percentiles at `(1 − interval_level) / 2` and `(1 + interval_level) / 2` (`interval_level = 0.95`) of the coefficient over the used resamples, linear interpolation between order statistics (type 7). Rejected: textbook standard errors (1 s readings are autocorrelated; intervals would be far too narrow).
+  11. **Lag search** for X1 and X2: residual of the model without that term (the other three predictors) at instant t against the term at the exact instant `t − k s`, k = 0 … `lag_max_s = 60`; a k with fewer than `min_instants` pairs is skipped. Best = highest |Pearson|, ties to the smaller k. Reported: `best_lag_s`, `corr_at_best_lag`, `corr_at_zero`.
+  12. **Evidence rule** per (model, window, term), over the per-experiment fits. An interval *excludes zero* when `low > 0` or `high < 0` (an endpoint of exactly 0 does not). `supported`: at least 2 testable fits, all exclude zero, all the same sign. `single_run`: exactly 1 testable fit and it excludes zero. `inconsistent`: two testable fits exclude zero with opposite signs. `not_resolved`: any other case with at least 1 testable fit. `not_testable`: none. The pooled fit is reported beside the status, not used by it. Rejected: judging effect sizes by eye.
+  13. **Steady-state KPIs** per experiment over the steady windows: `voltage_mean_v` (V, mean of accepted voltage instants), `mean_power_kw` (kW, trapezoid integral of `power_computed` over its covered intervals ∩ steady windows ÷ covered seconds ÷ 1000), `capture_rate_mean_kg_h` (kg/h, same with `capture_rate`), `capture_efficiency_mean` (fraction, plain mean of `capture_efficiency` values at instants in the steady windows, as M4 decision 10), `sec_kwh_per_kg` (kWh/kg, energy of `power_computed` over power-covered ∩ capture-covered ∩ steady, ÷ CO2 captured over the same, as M4 decision 11). Covered intervals use `pipeline.metrics.covered_intervals` with the M4 spacing limits (`POLICY` of `pipeline.metrics`: 2 s for voltage and power, 4 s for capture and efficiency). Coverage = covered steady seconds ÷ steady seconds; status by `pipeline.metrics.status_for`. Intervals: the same block layout as decision 10 over the steady windows, each block contributing its partial sums (integral and covered seconds, or sum and count, or energy and captured), a resample KPI = ratio of the summed parts; seed key `f"{bootstrap_seed}|kpi|{kpi}|{experiment_id}"`. The 1,000 resample values are kept in memory for decision 14. Whole-run metrics are the 13 Postgres `experiment_metrics` rows, copied unchanged.
+  14. **Comparability** for all 15 pairs (a < b by id). Seven factors, measured from accepted readings in the steady windows where possible: `current_setpoint` (median), `current_setpoint_profile` (`varying` when p95 − p05 of the setpoint exceeds `condition_tol_rel` × its median, else `constant`), `air_flow` (median), `solvent_flow` (median), `ambient_temperature` (median), `relative_humidity` (median), `sorbent_batch` (metadata). Relative factors differ when `|a − b| > condition_tol_rel × max(|a|, |b|)` (`condition_tol_rel = 0.05`); ambient temperature when `|a − b| > ambient_tol_c = 5`; humidity when `|a − b| > humidity_tol_pct = 15`; profile and batch when not equal. A missing value (null batch, no readings) makes `differs` null, which counts as differing. Status: `same_conditions` (0 differing), `supported` (exactly 1), `confounded` (2 or more), with the differing factors named. `operator` is listed under `recorded_differences` only (setpoints are automated; not a factor). Per KPI: `difference = b − a`, interval from the element-wise differences of the two resample arrays (type 7), `excludes_zero`, and `coverage_status` = `both_complete` (both KPI statuses complete), `partial_coverage` (both have a value, one or both partial), `not_available` (either value null; difference and interval null). Rejected: comparing pairs without the factor check.
+  15. **One run per condition.** Findings say "in this run" and name the confounders; no causal wording. New assumption A-09 (T6).
+  16. **Pressure drop vs air flow** (the M2.5 next step): per experiment, over the steady windows at pressure_drop instants with air_flow at the same instant, fits `pressure_drop ~ air_flow` and `~ air_flow²` (slope, intercept, R²) and the lag search of decision 11 on air_flow; across experiments, the steady medians of air_flow and pressure_drop and a line through them (slope, R²). Numbers only.
+  17. **Air-flow check (A-07)** for `airflow_check_experiment = "EXP_004"`, boundary `airflow_check_boundary = "2026-03-02T09:00:00Z"`: median and count before and after the boundary within the experiment window for `air_flow` (from `value_raw`, all rows, since cleaning excluded the second hour), and `fan_speed`, `pressure_drop`, `co2_in_ppm`, `co2_out_ppm` (accepted) and `capture_efficiency` (`metrics_series`); relative change = (after − before) / before. `airflow_check` is null when that experiment is not in the run. Numbers only; T6 writes A-07's status from them.
+  18. **Policy table and version.** All constants of decisions 6–17 in one declared mapping `POLICY` in `pipeline/compare.py` (keys exactly the `parameters` keys of the contract) with `COMPARE_VERSION = "m5-v1"`; a unit test pins `COMPARE_FINGERPRINT` (SHA-256 of its canonical JSON). A changed constant is a new version.
+  19. **No finding is pinned in a scenario** (MISTAKES E-09). Real-data scenarios pin completeness, the independent recompute and reproducibility. T5 stops and reports back (narrow question to `/flow:plan M5`) when the analysis cannot run as specified on the real data, e.g. no testable fit for a model; it never changes a constant.
+  20. **Draft findings** in `reports/findings.md`: status line `Status: draft, awaiting Sebastian's approval`; at least three findings, each with claim, the command and the SQL of the pulls behind it, and the numbers; a section answering flow and pressure against voltage (hydrolyzer model first, absorber model second); a section naming the comparisons the data does not support, with the reason. Every number cited carries a reference comment `<!-- ref: <path> -->` right after it; the path addresses `reports/comparison_summary.json` with `/` between keys and `key=value[,key=value]` selecting a list item (e.g. `voltage_models/model=hydrolyzer,window=steady,scope=pooled/terms/name=flow/coefficient`). The written number equals the referenced value rounded to the digits written. `tests/unit/test_findings_doc.py` checks every reference (the M5 CI increment in ROADMAP). Changing the status line after approval is a one-line edit by execute.
+  21. **Exit codes:** 0 outputs written; 2 refused, nothing written (database missing — never created —, `readings_processed` with no rows for the policy version, `metrics_series` with no rows for the metrics and policy version, experiments file unreadable, Postgres unreachable or migration 0003 not applied, an experiment missing from Postgres `experiment` or without `experiment_metrics` rows for the metrics version, `window_mismatch`); 3 a query failed. Outputs written only on 0, at the end.
+  22. **Calibrate before scaling:** EXP_001 first against an independent plain-Python recompute from SELECT pulls (no pipeline imports, the bootstrap re-implemented from decision 10's text), then all six.
+  23. **Branch `m5-comparison`, cut from `master` at `262fb1f`.** The first commit carries this record and the M5 contract files. Commit and push at the end of M5; merge waits for Sebastian's approval of the findings.
+  24. **Housekeeping:** S4.9, S4.24 and S4.25 reworded to what the build gives and Sebastian ruled (Next steps entries of 2026-11-24, judge block `@ a7bade1`); M4 decision 21 added; the M4 contract example's `series_written.capture_rate` changed from 268 to 269 (example only; the schema is unchanged and no caller reads the example's numbers). No code change.
 
 ### Assumptions and open questions
 - Partial accept on 3.11.2 behaves as documented — a real test in M2 decides (Claude).
@@ -175,6 +214,10 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M4: air flow is actual m³/h at ambient conditions, ppm is by volume, humidity is ignored, outlet volume equals inlet volume (new A-08; Claude decides, Sebastian reviews in the M4 report). Wrong if the meter reports normal m³/h: capture rate would then be off by the ambient-to-standard density ratio (up to about 12 %).
 - M4: the expected labels in S4.24 come from the M3 cleaning summary and the raw ambient file (EXP_005 ambient pressure UNCERTAIN 06:00Z–06:29Z, contiguous). Coverages are approximate (±0.01) until T4 measures them (Claude).
 - M4: `SEC_FLOOR_KWH_PER_KG = 0.10` is a lower bound below the minimum work to separate CO2 from 400 ppm air (about 0.12 kWh/kg at 25 °C, RT·ln(1/x) in the small-capture limit). It catches unit errors, not inefficiency (Claude).
+- M5: one run per condition, so a difference between two runs cannot be separated from day-to-day variation (sorbent batch, date, ambient). Findings are worded "in this run" (new A-09 at T6; Claude decides, Sebastian approves the findings).
+- M5: the comparability tolerances (5 % on setpoints and flows, 5 °C ambient, 15 %RH humidity) are judgement, not calibration; the measured condition values are reported beside each factor so a reader can disagree (Claude).
+- M5: the block length (120 s) is longer than the measured current lag (23–24 s) and short enough for about 60 blocks per whole run and 7 per steady window on the fixture; a much longer correlation time in the real residuals would make the intervals too narrow. T5 reports the lag-1 block correlation of the residuals for EXP_001 in the execute log so the judge can see it (Claude).
+- M5: the fixture's planted coefficients (T3) must be recoverable by OLS: flow and pressure patterns independent (VIF well under 10), voltage generated from the exact values the join pairs (temperature as-of), and every planted reading accepted by cleaning; if cleaning excludes anything unplanned, T3 changes the construction, not the rules (Claude).
 - M3: EXP_004 pressure −3.1 bar: its acquisition flag decides whether the reason is `flag_uncertain` or `outside_physical_limits`; either way it is excluded (Claude, at execute).
 
 ### Next steps (not in this budget)
@@ -183,7 +226,7 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - Multi-pass merge in the external sort — only needed past the OS open-file limit — small.
 - M2 verify's three low findings (offset minutes over 59 accepted, signed-zero tie on file order, second `up` overwrites `.env`) belong to M2, not M2.5 — fix before the M2 merge or record as accepted — small.
 - Core 3.11.2 gets four things wrong that M3's cleaning SQL must avoid or work around: `COUNT(*) FILTER` counts NULL conditions produced by a window function such as `LAG` (at least; a NULL from a plain row is not counted — M2.5 judge), `-0.0` is not equal to `0.0`, `PERCENTILE_CONT` is only about 7 digits accurate, and parallel sums vary in the last bits (ADR-0014). Found 2026-11-23 in M2.5; the rollup driver uses none of the first three (grep) but its sums have the last property — small.
-- The profile measures pressure drop against air flow at the same instant: R squared below 0.17 in all six experiments, although the data dictionary says it scales with air flow. M5 should check whether a lag or another definition changes that before anyone cites it — small, found 2026-11-23.
+- The profile measures pressure drop against air flow at the same instant: R squared below 0.17 in all six experiments, although the data dictionary says it scales with air flow. M5 should check whether a lag or another definition changes that before anyone cites it — small, found 2026-11-23. **Taken into M5** (decision 16).
 - The rollup driver (`pipeline/rollup_run.py`) raises `TypeError` on a stored point with no value, because `compute_rollup` takes `min()` and `sum()` over a `None`. M2 stores an empty value as exactly such a point (decision 6). The real file has 0 of them, so nothing fails today; M3 must decide whether the rollup skips them or counts them as missing — small, found 2026-11-23 while writing the M2 report. **Taken into M3** (decision 18: `count_no_value`).
 - Time-chunked cleaning for continuous plant data: process fixed time windows with an overlap of one flatline window on each side, carry nothing else across — remainder of U-06 — medium.
 - Cross-signal exclusion rules (power against voltage × current, air flow against fan speed): M4 does the power cross-check as a metric check; flatline already catches the EXP_004 air-flow case — medium.
@@ -203,6 +246,14 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - `.gitattributes` now has `migrations/*.sql -text`, so Windows checkouts keep the LF bytes whose checksums `schema_migrations` recorded (M4 execute, Sebastian agreed 2026-11-24). Without it the runner refused 0001 on any CRLF checkout.
 - S4.24 pins `sec_kwh_per_kg` complete for EXP_002; the real run gives partial (coverage 0.9329), because the value's coverage is the overlap of power and capture and EXP_002's power coverage is 0.9331. The other pinned labels match. Not a constant change; the plan's prediction missed the overlap. Reword S4.24 at the next `/flow:plan M4`; Sebastian reviews it in the M4 report — small, found 2026-11-24 by the lead after T4.
 - `plausibility[].limit` is required to be a number in the contract, so `capture_below_inlet` writes limit 0.0 (with `passed` null) when the inlet total is null. Allow null in the schema at the next contract change — small, found 2026-11-24 in M4 T1.
+- The S4.9, S4.24 and S4.25 rewordings above: **done** at the M5 plan (M5 decision 24).
+- M4 read-back ignores the cleaning policy version (M4 judge, medium): `count_series` in `pipeline/metrics_store.py` filters on experiment, metric and metrics version only, so once `metrics_series` holds a second policy version every later metrics run exits 4. Fix: add `policy_version` to `count_series` and its call in `pipeline/metrics_run.py`, with the judge's proposed test `test_count_series_counts_only_the_given_policy_version`. M5 reads `metrics_series` with the policy version, so it is not affected. Also: the Postgres key `(experiment_id, metrics_version, metric)` has no policy version, so a run under a second policy overwrites the first one's rows — a design point for whoever adds a second policy version — small.
+- Storing aligned series (experiment time) or comparison results where Grafana can read them: M6 decides how the overlay works (M5 decision 4) — small to medium.
+- Replicate runs per condition: the only way to turn "in this run" into a claim about a condition (M5 decision 15) — needs new experiments, not code.
+- Residual autocorrelation is not in `comparison_summary.json` (M5 execute): T5 measured the lag-1 correlation of 120 s block means of the hydrolyzer steady residuals (EXP_005 0.87, the others -0.15 to 0.12) in a scratch script; the findings cite it from the log, outside the reference test. Add it to the summary and contract so the finding can carry a reference, and measure it for the absorber model too — small, found 2026-11-24.
+- The compare fixture cannot test the absorber voltage model (M5 execute): the "+ at even reading index" noise makes current and air flow constant at the 0.5 Hz pressure-drop instants, so the normal matrix is singular and absorber fits are `not_testable` there. T1's unit tests cover the testable path. Change the fixture noise phase for 0.5 Hz joins at the next `/flow:plan M5` if an end-to-end absorber fit is wanted — small, found 2026-11-24.
+- M5 decision 13 text vs build (M5 execute): steady KPI series are restricted to instants inside the steady windows before covered intervals are taken (fixture coverage 838/840), where the literal text (covered intervals of the whole series, then clipped) gives 840/840. The build matches the fixture README and S5.15; reword decision 13 at the next `/flow:plan M5` (ADR-0017 records it) — small, found 2026-11-24.
+- Partial-sum blocks split covered pairs at the 120 s block edges (M5 execute, matches the independent recompute); decision 13's text says "each block contributing its partial sums" without saying how a pair that straddles an edge is split. Reword at the next plan — small.
 
 ### Checks
 Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes the worktree
@@ -225,6 +276,8 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 | integration | `python -m pytest -v` | . | stack up; the whole suite in one session (catches basename clashes, M3 verify correction); any skip counts as a failure | ci.yml (new row in M4) |
 | e2e | `python -m scripts.metrics --report-dir .flow-tmp/metrics` | . | stack up; `python -m scripts.ingest` then `python -m scripts.clean --report-dir .flow-tmp/clean` ran first on the real CSV; Postgres migrated (0003) and experiments loaded (`verify_stack.py up` does both) | new in M4 |
 | contract | `check-jsonschema --schemafile contracts/metrics_summary.schema.json contracts/examples/metrics_summary.example.json` | . | requirements installed | new in M4 |
+| e2e | `python -m scripts.compare --report-dir .flow-tmp/compare` | . | stack up; `python -m scripts.ingest`, `python -m scripts.clean --report-dir .flow-tmp/clean` and `python -m scripts.metrics --report-dir .flow-tmp/metrics` ran first on the real CSV | new in M5 |
+| contract | `check-jsonschema --schemafile contracts/comparison_summary.schema.json contracts/examples/comparison_summary.example.json` | . | requirements installed | new in M5 |
 
 `.workflow/verify-env.json`:
 ```json
@@ -1034,7 +1087,7 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 
   Scenario: S4.9 Capture rate and captured CO2 match the hand computation
     Given the fixture run
-    Then metrics_series holds 268 capture_rate rows, none from +362 s to +418 s and none at +400, +500, +502 s
+    Then metrics_series holds 269 capture_rate rows, none from +362 s to +418 s and none at +400, +500, +502 s
     And each row equals air_flow × (co2_in − co2_out) × 1e-6 × p·0.04401 / (8.314462618 · T) with p and T from the as-of ambient readings
     And co2_captured_kg, co2_inlet_kg and capture_rate_mean_kg_h equal the hand computation, coverage 532 / 600, status partial
 
@@ -1116,12 +1169,14 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
     When python -m scripts.metrics runs
     Then the exit code is 0, six experiments are reported, each with all 13 metrics
     And energy_kwh is partial only for EXP_002 (coverage about 0.93), complete for the other five
-    And co2_captured_kg, capture_rate_mean_kg_h and sec_kwh_per_kg are partial for EXP_004 (about 0.50), EXP_005 (about 0.75) and EXP_006 (about 0.36), complete for EXP_001–EXP_003
+    And co2_captured_kg and capture_rate_mean_kg_h are partial for EXP_004 (about 0.50), EXP_005 (about 0.75) and EXP_006 (about 0.36), complete for EXP_001–EXP_003
+    And sec_kwh_per_kg is partial for EXP_002 (about 0.93, the power ∩ capture overlap), EXP_004, EXP_005 and EXP_006, complete for EXP_001 and EXP_003
     And capture_efficiency_mean is partial only for EXP_006 (about 0.36)
 
   Scenario: S4.25 Computed and logged power agree on real accepted data
     Given the real run
-    Then within_tolerance_fraction is at least 0.99 for every experiment
+    Then within_tolerance_fraction is at least 0.99 for every experiment except EXP_001
+    And EXP_001's shortfall (0.983, one 120 s stretch of logged power about 6 kW above voltage × current) is reported in reports/M4.md as a cross-check result (Sebastian's ruling, 2026-11-24)
     And every energy_agreement check passes
 
   Scenario: S4.26 An independent recompute gives the same numbers
@@ -1165,7 +1220,233 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 - After the judge: commit, push `m4-metrics`, CI green, open `reports/M4.md` in the doc viewer. Merge waits for approval.
 
 #### M5: Comparison and findings (F)
-- Not yet detailed. Scope: `docs/ROADMAP.md` § M5. Headline findings need Sebastian's approval.
+- Depends on: M4 (accepted as done, M5 decision 2)
+- Judge: verify · Touches: — (read-only against both stores; writes files only)
+- Gates: —
+- Contract: `contracts/comparison_summary.schema.json` (shape of `comparison_summary.json`), example `contracts/examples/comparison_summary.example.json` (shaped like a fixture run; its numbers are illustrative, not expected test values). `parameters` keys are exactly the keys of `POLICY` in `pipeline/compare.py`.
+- Order of work: T1 ∥ T2 ∥ T3 → T4 → T5 (calibrate EXP_001, then all six; decision 22) → T6.
+- Command: `python -m scripts.compare [--database NAME] [--experiments PATH] [--report-dir DIR] [--policy-version V] [--metrics-version V] [--pg-schema NAME]`. Defaults `dac_raw`, `data/raw/experiments.json`, `reports/`, `pipeline.cleaning_policy.POLICY_VERSION`, `pipeline.metrics.METRICS_VERSION`, `public`. InfluxDB host/token and `POSTGRES_*` from `.env`, as `scripts.metrics`. Exit codes: decision 21. Outputs in `--report-dir`: `comparison_summary.json` (contract) and `comparison_report.md` (rendered from the summary: per experiment the phases in experiment time, the measured conditions and the steady KPIs; the voltage models as tables per model and window; the evidence statuses; the 15-pair comparability matrix with per-KPI differences; the pressure-drop check; the air-flow check).
+- Summary shape (the contract pins it; floats rounded to 9 significant digits; lists sorted as stated):
+  - `schema_version` 1; `compare_version`; `policy_version`; `metrics_version`; `source` {database, experiments_file, pg_schema}; `parameters` {the `POLICY` table}.
+  - `experiments[]` by id: {experiment_id, start, end, duration_s, `metadata` {current_setpoint_nominal_a, air_flow_nominal_m3h, solvent_flow_nominal_lmin, operator, sorbent_batch, notes} (from Postgres, nulls kept), `conditions` {current_setpoint_a, current_setpoint_profile, air_flow_m3h, solvent_flow_lmin, ambient_temperature_c, relative_humidity_pct} (measured, decision 14; null when no readings), `phases[]` in time order {index, state, start_s, end_s, window_start_s, window_end_s} (experiment time; both window fields null when the phase is too short), `steady_seconds`, `kpis` {5 names: {value, unit, coverage, status, interval_low, interval_high}}, `whole_run_metrics` {13 names: {value, unit, coverage, status}} (copied from `experiment_metrics`)}.
+  - `voltage_models[]` sorted by model, window, scope (experiment ids, then `pooled`): {model (`hydrolyzer` \| `absorber`), window (`steady` \| `whole_run`), scope, testable, instants, r2 (null when not testable), resamples_used, resamples_singular, `terms[]` in predictor order {name, unit, coefficient, interval_low, interval_high, r2_drop, vif, plain_corr, best_lag_s, corr_at_best_lag, corr_at_zero} (lag fields null for current and electrolyte_temperature, and every number null when not testable), `joint` {terms (the two names), r2_drop, separable}}.
+  - `voltage_evidence[]` sorted by model, window, term (the X1 and X2 terms only): {model, window, term, status (`supported` \| `single_run` \| `not_resolved` \| `inconsistent` \| `not_testable`), sign (`positive` \| `negative` \| null), experiments_testable, experiments_excluding_zero, pooled_coefficient, pooled_interval_low, pooled_interval_high}.
+  - `comparisons[]` sorted by (a, b): {a, b, conditions_status (`same_conditions` \| `supported` \| `confounded`), differing (factor names, in factor order), `factors[]` in factor order {factor, a, b, differs (bool \| null)}, `recorded_differences[]` {field, a, b} (operator, when different), `kpis[]` in KPI order {name, unit, difference, interval_low, interval_high, excludes_zero (bool \| null), coverage_status (`both_complete` \| `partial_coverage` \| `not_available`)}}.
+  - `pressure_drop_check` {`per_experiment[]` {experiment_id, instants, slope_air_flow, intercept_air_flow, r2_air_flow, slope_air_flow_sq, intercept_air_flow_sq, r2_air_flow_sq, best_lag_s, corr_at_best_lag, corr_at_zero}, `across` {points[] {experiment_id, air_flow_median, pressure_drop_median}, slope, intercept, r2}}.
+  - `airflow_check` (null when the experiment is not in the run) {experiment_id, boundary, `signals[]` in the order air_flow, fan_speed, pressure_drop, co2_in_ppm, co2_out_ppm, capture_efficiency {signal, source (`raw` \| `accepted` \| `metrics_series`), before_points, before_median, after_points, after_median, relative_change}}.
+  - `timing` {seconds, queries} — the only part allowed to differ between runs.
+- Names (fixed): models and predictors `hydrolyzer`: current (A), electrolyte_temperature (°C), flow (L/min), pressure (bar); `absorber`: current, electrolyte_temperature, air_flow (m³/h), pressure_drop (mbar); coefficient unit = `V per <unit>`. KPIs: voltage_mean_v (V), mean_power_kw (kW), capture_rate_mean_kg_h (kg/h), capture_efficiency_mean (fraction), sec_kwh_per_kg (kWh/kg). Factors: current_setpoint, current_setpoint_profile, air_flow, solvent_flow, ambient_temperature, relative_humidity, sorbent_batch. `POLICY` keys: settle_s 60, bootstrap_block_s 120, bootstrap_resamples 1000, bootstrap_seed 20261124, interval_level 0.95, lag_max_s 60, temp_max_age_s 10, min_instants 300, vif_limit 10, condition_tol_rel 0.05, ambient_tol_c 5, humidity_tol_pct 15, airflow_check_experiment "EXP_004", airflow_check_boundary "2026-03-02T09:00:00Z".
+- Interfaces between tasks (pinned so T1, T2 and T3 can run in parallel; T4 may rely only on these names):
+  - T1, `pipeline/compare.py` (pure; stdlib plus read-only use of `pipeline.metrics`): `COMPARE_VERSION`, `COMPARE_FINGERPRINT`, `POLICY`, `policy_fingerprint()`, `MODELS` (model → tuple of 4 predictor names), `PREDICTOR_UNITS`, `KPI_UNITS`, `FACTORS`. Series are `list[tuple[int, float]]` (ns, value), ascending; windows `list[tuple[int, int]]` (ns, `[start, end)`). Functions: `experiment_time_s(t_ns, start_ns) -> float`; `phases(events: list[tuple[int, int, str]], settle_s) -> list[Phase]` (dataclass: index, state, start_ns, end_ns, window `tuple[int, int] | None`); `steady_windows(phases) -> list[tuple[int, int]]`; `model_rows(model, series: dict[str, Series], windows) -> Rows` (dataclass of aligned instants, their window index and window start, voltage and predictor columns; decision 7); `analyse_model(rows, model, window, scope, lag_series: dict[str, Series], policy=POLICY) -> dict` (one `voltage_models` entry; decisions 8, 10, 11); `analyse_pooled(rows_by_experiment: dict[str, Rows], model, window, policy=POLICY) -> dict` (the `pooled` entry; lag fields null); `evidence(entries: list[dict], pooled: dict) -> list[dict]` (`voltage_evidence` entries for one model and window); `measured_conditions(series: dict[str, Series], windows) -> dict` (the `conditions` object); `compare_factors(meta_a, cond_a, meta_b, cond_b, policy=POLICY) -> list[dict]`; `conditions_status(factors) -> tuple[str, list[str]]`; `steady_kpis(series: dict[str, Series], windows, experiment_id, policy=POLICY) -> KpiResult` (dataclass: `entries` = the `kpis` object, `samples` = KPI name → 1,000 resample values or empty when the value is null); `kpi_differences(a: KpiResult, b: KpiResult, policy=POLICY) -> list[dict]`; `pressure_drop_fit(air_flow, pressure_drop, windows, policy=POLICY) -> dict` (one `per_experiment` entry without the id); `across_line(points: list[tuple[float, float]]) -> dict` (slope, intercept, r2); `split_check(series: Series, boundary_ns) -> dict` (points and medians before/after, relative change). Signal keys in `series` are the plain signal names (`voltage`, `current`, `flow`, …) plus the `metrics_series` names (`power_computed`, `capture_rate`, `capture_efficiency`).
+  - T2, `pipeline/compare_store.py`: `CompareGateway(MetricsGateway)` (inherits `tables`, `has_policy_rows`, `accepted_series`, `close`; never writes) adds `raw_series(experiment_id, signal, start, end, policy_version) -> list[tuple[int, float | None]]` (`value_raw` of every `readings_processed` row of that version, ascending), `state_events(experiment_id, signal, start, end, policy_version) -> list[tuple[int, int, str]]` (accepted `state_intervals` rows: time, `end_ns`, `value`; ascending), `metric_series(experiment_id, metric, metrics_version, policy_version, start, end) -> list[tuple[int, float]]` (filters on both versions), `has_metrics_rows(metrics_version, policy_version) -> bool`. Postgres (reusing `pg_connect` and `pg_check` from `pipeline/metrics_store.py`): `experiment_rows(conn, ids) -> dict[str, dict]` (every column of `experiment`, `start_time`/`end_time` as aware UTC datetimes, nulls as None), `experiment_metric_rows(conn, metrics_version, ids) -> dict[str, dict[str, dict]]` (id → metric → {value, unit, coverage, status}). T2 does not import `pipeline/compare.py`.
+  - T3, `tests/fixtures/compare/`: `readings.csv`, `experiments.json`, `readings.sha256`, `make_fixture.py` (stdlib, deterministic), `README.md` with the construction and every hand-computed expected number S5.13–S5.16 use.
+- Example map (rule → one example; boundaries included):
+
+  | Rule | Example |
+  |---|---|
+  | Experiment time | instant 08:05:00Z of an experiment starting 08:00:00Z → 300.0 s; same offset on another date → same value |
+  | Settle margin | phase [600, 660) s with margin 60 → no window; [600, 661) → window [660, 661) |
+  | Exact join, as-of | temperature 10 s old → used; 10 s + 1 ns → instant dropped |
+  | Testable | 299 rows → not testable; 300 → testable |
+  | Excludes zero | interval [0.0, 0.4] → does not; [0.001, 0.4] → does |
+  | Evidence | (0.1, 0.5), (0.2, 0.9) → supported positive; (0.1, 0.5), (−0.9, −0.2) → inconsistent; (0.1, 0.5), (−0.3, 0.4) → not_resolved; one testable (0.1, 0.5) → single_run |
+  | Collinear | pressure = 0.05 × flow + tiny noise → VIF ≥ 10, separable false |
+  | Relative factor | setpoint 150 vs 157.5 → same (7.5 ≤ 7.875); 150 vs 158 → differs |
+  | Absolute factor | ambient 10 °C vs 15 °C → same; 10 vs 15.01 → differs |
+  | Unknown factor | batch null vs "SB-2026-014" → differs null, counted as differing |
+  | Lag tie | equal |corr| at 3 s and 7 s → 3 s |
+  | KPI coverage | one KPI partial → coverage_status partial_coverage; one null → not_available, difference null |
+  | Read-only | dumps of every table before and after are equal |
+  | Refusal | `--metrics-version m4-none` → exit 2, nothing written |
+
+- Fixture `tests/fixtures/compare/` (built by a deterministic stdlib script like the M4 fixture). Three experiments of 1,200 s: EXP_001 2026-05-04T08:00:00Z, EXP_002 2026-05-11T09:00:00Z, EXP_003 2026-05-18T07:30:00Z. Metadata: setpoint nominal 150 / 200 / 150 A, air flow nominal 1200 / 1200 / 2400 m³/h, solvent flow 8.0 for all, sorbent batch `SB-A` / `SB-A` / `SB-B`, operator `Op A` / `Op A` / `Op B`, notes null. All timestamps `Z`, all `GOOD` unless stated. Normal noise is a fixed alternation of ± half the signal's declared step (`pipeline/cleaning_policy.py`), `+` at even reading index, so cleaning accepts every normal reading. Instants relative to each start:
+  - process_state `STARTUP` 0, `STEADY_STATE` +120, `LOAD_CHANGE` +600, `STEADY_STATE` +660, `SHUTDOWN` +1140.
+  - Hydrolyzer 1 Hz: current_setpoint = nominal, + 20 A from +600 to +659 (no noise); current = setpoint ± noise (no lag); flow = 40 + triangle wave (period 300 s, amplitude 2 L/min) ± noise; pressure = 2.5 + triangle wave (period 420 s, amplitude 0.1 bar) ± noise; voltage = 40 + 0.3 × current − 0.2 × flow + 3.0 × pressure − 0.1 × T + e, where T is the electrolyte temperature reading the as-of join pairs with that instant and e is an independent deterministic sequence (`random.Random("compare-fixture").uniform(-0.05, 0.05)`, same sequence in each experiment); power = voltage × current. Every input value is rounded to the decimals written before voltage is computed from it; voltage written with 6 decimals.
+  - Hydrolyzer 0.2 Hz: electrolyte_temperature = 35 + 0.005 °C per s ± noise.
+  - Absorber: air_flow 1 Hz = nominal ± noise; pressure_drop 0.5 Hz = 15 × (air_flow / 1200)² ± noise; co2_in_ppm 420 ± noise and co2_out_ppm 105 ± noise at 0.5 Hz; solvent_flow 0.5 Hz 8.0 ± noise.
+  - Ambient 1/60 Hz: ambient_temperature 15, ambient_pressure 1013.25, relative_humidity 50, each ± noise.
+  - Planted exclusion: EXP_001 voltage at +300 s is `BAD`.
+  - T3 checks first that cleaning this fixture excludes exactly that one reading and nothing else (S5.12); if not, the construction changes, not the rules. T3 also records in the README: phases and windows; the fit instants per model and window (hydrolyzer steady 839 / 840 / 840 expected from the construction); the planted coefficients; `voltage_mean_v` and `mean_power_kw` of each experiment over the steady windows and their coverage, computed in plain arithmetic from the CSV; the expected comparability statuses.
+- Scenarios:
+  ```gherkin
+  Scenario: S5.1 Experiment time is seconds since the experiment's start
+    Given an experiment starting 2026-05-04T08:00:00Z and another starting 2026-05-11T09:00:00Z
+    When experiment_time_s runs on 2026-05-04T08:05:00Z and on 2026-05-11T09:05:00Z
+    Then both give 300.0
+
+  Scenario: S5.2 Phase windows come from process_state, trimmed by the settle margin
+    Given state events STARTUP [0, 120), STEADY_STATE [120, 600), LOAD_CHANGE [600, 660), STEADY_STATE [660, 1140), SHUTDOWN [1140, 1200) s
+    When phases runs with settle_s 60
+    Then the windows are [60, 120), [180, 600), none, [720, 1140), none
+    And steady_windows gives [180, 600) and [720, 1140)
+    And a phase of 61 s gives a window of 1 s
+
+  Scenario: S5.3 The regression recovers planted coefficients and each term's drop in R squared
+    Given rows where voltage = 40 + 0.3 current − 0.2 flow + 3.0 pressure − 0.1 temperature exactly, with independent predictor patterns
+    When analyse_model runs
+    Then each coefficient equals the planted value to 1e-9, r2 is 1 to 1e-9
+    And r2_drop of each term equals 1 minus the R squared of the model without it
+    And a set of 299 rows is not testable and 300 rows is
+
+  Scenario: S5.4 Flow and pressure too collinear to separate give only a joint effect
+    Given rows where pressure = 0.05 × flow plus a perturbation of 1e-4
+    When analyse_model runs
+    Then the vif of flow and pressure is at least 10 and joint.separable is false
+    And joint.r2_drop is reported
+
+  Scenario: S5.5 The block bootstrap is deterministic for its seed and covers the planted value
+    Given rows with planted coefficients and independent noise
+    When analyse_model runs twice with the same policy
+    Then the intervals are identical
+    And each interval contains its coefficient estimate
+    And a resample whose normal matrix is singular is counted in resamples_singular and skipped
+
+  Scenario: S5.6 The evidence rule gives its five statuses at their boundaries
+    Given per-experiment intervals (0.1, 0.5) and (0.2, 0.9)
+    Then the status is supported with sign positive
+    And (0.1, 0.5) with (−0.9, −0.2) is inconsistent; (0.1, 0.5) with (−0.3, 0.4) is not_resolved; (0.0, 0.5) with (0.2, 0.9) is not_resolved
+    And a single testable (0.1, 0.5) is single_run; no testable fit is not_testable
+
+  Scenario: S5.7 The comparability rule gives supported, confounded or same conditions
+    Given two experiments that differ only in setpoint 150 against 158 A
+    Then conditions_status is supported and differing is [current_setpoint]
+    And 150 against 157.5 A does not differ; ambient 10 against 15 °C does not differ, 10 against 15.01 does
+    And a null sorbent batch gives differs null and counts as differing
+    And two differing factors give confounded, naming both; none gives same_conditions
+    And a KPI partial on one side gives coverage_status partial_coverage, a null KPI gives not_available with a null difference
+
+  Scenario: S5.8 The lag search picks the strongest shift, ties to the smaller one
+    Given a residual that equals the term shifted by 7 s
+    Then best_lag_s is 7
+    And with equal |corr| at 3 s and 7 s, best_lag_s is 3
+    And a shift with fewer than min_instants pairs is skipped
+
+  Scenario: S5.9 The comparison policy is pinned by a fingerprint
+    Given pipeline/compare.py
+    Then COMPARE_FINGERPRINT equals the SHA-256 of the canonical JSON of POLICY and COMPARE_VERSION is m5-v1
+
+  Scenario: S5.10 Reads return only accepted rows and phases of one policy version, in time order
+    Given a throwaway database with readings_processed and state_intervals rows of two policy versions, accepted and excluded, and metrics_series rows of two metrics versions
+    When the CompareGateway reads one experiment window
+    Then state_events returns only the accepted events of that policy version with their end_ns, ascending
+    And raw_series returns value_raw of every row of that version, including excluded ones
+    And metric_series returns only rows of the given metrics and policy version
+    And has_metrics_rows is false for a version with no rows
+
+  Scenario: S5.11 Metadata and M4 metrics are read from Postgres, nulls kept
+    Given migrations 0001–0003 in a throwaway schema, the fixture experiments loaded and experiment_metrics rows written
+    When experiment_rows and experiment_metric_rows run
+    Then every experiment column is returned with nulls as None and start_time as aware UTC
+    And each experiment has its metric rows for the asked metrics version only
+
+  Scenario: S5.12 Cleaning the compare fixture excludes exactly the planted reading
+    Given the compare fixture ingested into a throwaway database
+    When python -m scripts.clean runs on it
+    Then exactly one reading is excluded: EXP_001 voltage at +300 s, reason flag_bad
+    And no gap or flatline interval is recorded
+
+  Scenario: S5.13 The fixture run reports each experiment's phases in experiment time
+    Given the fixture ingested, cleaned and its metrics computed into a throwaway database and Postgres schema
+    When python -m scripts.compare runs on it
+    Then the exit code is 0
+    And every experiment lists 5 phases with windows [60, 120), [180, 600), none, [720, 1140), none and steady_seconds 840
+
+  Scenario: S5.14 The fixture run recovers the planted flow and pressure effects
+    Given the same run
+    Then the hydrolyzer steady fits have 839, 840 and 840 instants
+    And each experiment's flow coefficient is within 0.02 of −0.2 and its pressure coefficient within 0.3 of 3.0, both intervals excluding zero
+    And voltage_evidence for hydrolyzer steady gives supported, negative for flow and positive for pressure
+    And voltage_models has entries for both models, both windows, every experiment and pooled
+
+  Scenario: S5.15 Steady-state KPIs on the fixture equal the hand computation
+    Given the same run
+    Then voltage_mean_v and mean_power_kw of each experiment equal the README's hand computation to 9 significant digits, with the README's coverage and status
+    And the EXP_002 minus EXP_001 voltage_mean_v difference is within 0.1 V of 15.0 and excludes zero
+
+  Scenario: S5.16 The fixture's comparability matrix names the planted differing factors
+    Given the same run
+    Then EXP_001–EXP_002 is supported with differing [current_setpoint]
+    And EXP_001–EXP_003 is confounded with differing [air_flow, sorbent_batch] and recorded_differences naming operator
+    And EXP_002–EXP_003 is confounded with differing [current_setpoint, air_flow, sorbent_batch]
+
+  Scenario: S5.17 The command changes no store and a rerun is identical except timing
+    Given the fixture run
+    Then full dumps of every InfluxDB table of the throwaway database and of the Postgres tables are equal before and after, and the database list is unchanged
+    And a second run gives a summary equal to the first except timing, and an equal report
+
+  Scenario: S5.18 Refusals exit 2 and a failing query exits 3, writing nothing
+    When the command runs with --database dac_missing, --policy-version m3-none, --metrics-version m4-none, an unreadable experiments file, a Postgres schema without migration 0003, an experiment missing from Postgres, or Postgres start_time differing from the file
+    Then the exit code is 2, the report directory is empty and dac_missing is not created
+    And with a fake gateway whose query fails the exit code is 3 and no output is written
+
+  Scenario: S5.19 The summary matches the contract and the report matches the summary
+    Given the fixture run
+    Then comparison_summary.json validates against contracts/comparison_summary.schema.json
+    And comparison_report.md equals the report rendered from that summary
+
+  Scenario: S5.20 The real run covers six experiments, all pairs and both readings of flow and pressure
+    Given the real CSV ingested, cleaned and its metrics computed on a private stack
+    When python -m scripts.compare runs
+    Then the exit code is 0, six experiments are reported, each with its phases, conditions, 5 steady KPIs and 13 whole-run metrics
+    And voltage_models has 28 entries (2 models × 2 windows × (6 experiments + pooled))
+    And voltage_evidence has 8 entries and comparisons has 15
+    And pressure_drop_check has six per-experiment entries and airflow_check is present for EXP_004
+
+  Scenario: S5.21 An independent recompute equals the real summary
+    Given plain SELECT pulls of the accepted inputs, state_intervals and metrics_series, and a script that imports no pipeline code
+    When it recomputes phases, conditions, every fit, interval, lag, evidence status, KPI, comparison, the pressure-drop check and the air-flow check
+    Then all equal the summary to 9 significant digits
+
+  Scenario: S5.22 A fresh private stack reproduces the committed summary
+    Given a fresh private stack with ingest, clean and metrics run on the real CSV
+    When python -m scripts.compare runs
+    Then its summary equals the committed reports/comparison_summary.json except timing and its report equals reports/comparison_report.md
+
+  Scenario: S5.23 The EXP_004 air-flow hour is compared against the other signals
+    Given the real run
+    Then airflow_check lists air_flow from raw values and fan_speed, pressure_drop, co2_in_ppm, co2_out_ppm and capture_efficiency, each with points and medians before and after 09:00Z
+    And the before/after counts of each equal a plain COUNT over the same rows
+
+  Scenario: S5.24 The draft findings hold at least three claims, the flow and pressure answer and the unsupported comparisons
+    Given reports/findings.md
+    Then its status line reads "Status: draft, awaiting Sebastian's approval"
+    And it has at least three findings, each with a claim, the command and SQL behind it, and numbers
+    And it has a section on flow and pressure against voltage with the hydrolyzer model first and the absorber model second
+    And it has a section naming the comparisons the data does not support, with the reason for each
+
+  Scenario: S5.25 Every number in the findings equals the committed summary
+    Given reports/findings.md and reports/comparison_summary.json
+    Then every ref comment resolves to a value in the summary
+    And the number written before it equals that value rounded to the digits written
+    And a finding with no ref comment fails the test
+
+  Scenario: S5.26 The method document matches the code's policy table
+    Given docs/comparison.md
+    Then it lists every POLICY key with its value, every KPI with its unit, every factor and every evidence status, equal to pipeline/compare.py
+  ```
+- QA procedure:
+  1. Private stack up (`.workflow/verify-env.json`; it migrates Postgres including 0003 and loads the six experiments). Create throwaway database `qa_m5` (`POST /api/v3/configure/database`) and Postgres schema `qa_m5` (run `pipeline.pg_migrate.run_migrations` and `pipeline.metadata_loader.load_experiments` with `tests/fixtures/compare/experiments.json` against it, `search_path=qa_m5`). `python -m scripts.ingest --csv tests/fixtures/compare/readings.csv --experiments tests/fixtures/compare/experiments.json --sha256 tests/fixtures/compare/readings.sha256 --database qa_m5 --report-dir <tmp1>` → exit 0. `python -m scripts.clean --database qa_m5 --experiments tests/fixtures/compare/experiments.json --report-dir <tmp2>` → exit 0; its summary excludes exactly EXP_001 voltage +300 s (S5.12). `python -m scripts.metrics --database qa_m5 --experiments tests/fixtures/compare/experiments.json --pg-schema qa_m5 --report-dir <tmp3>` → exit 0 or 1 (plausibility is not what M5 tests).
+  2. Dump every table of `qa_m5` (InfluxDB) and the four Postgres tables of schema `qa_m5` to files A; save the database list. `python -m scripts.compare --database qa_m5 --experiments tests/fixtures/compare/experiments.json --pg-schema qa_m5 --report-dir <tmp4>` → exit 0. Check `<tmp4>/comparison_summary.json` for S5.13–S5.16 against `tests/fixtures/compare/README.md`; `check-jsonschema --schemafile contracts/comparison_summary.schema.json <tmp4>/comparison_summary.json` → ok (S5.19).
+  3. Dump again → equal to A, database list unchanged (S5.17). Run step 2 again into `<tmp5>`; summaries equal without `timing`, reports equal (S5.17).
+  4. `--database dac_missing` → exit 2, `<tmp6>` empty, not in `GET /api/v3/configure/database?format=json`; `--policy-version m3-none` → exit 2; `--metrics-version m4-none` → exit 2; `--pg-schema` of a schema without 0003 → exit 2; an experiments file whose EXP_001 start differs by 1 s → exit 2 (S5.18). `python -m pytest tests/unit -k "compare"` → pass (S5.1–S5.9, S5.18's exit 3). Drop `qa_m5` and the schema.
+  5. Real CSV (copied in by verify-env): `python -m scripts.ingest` → exit 0; `python -m scripts.clean --report-dir <tmp7>` → exit 0; `python -m scripts.metrics --report-dir <tmp8>` → exit 0; `python -m scripts.compare --report-dir <tmp9>` → exit 0; check S5.20 and S5.23 in `<tmp9>/comparison_summary.json` (S5.23's counts with a plain `SELECT COUNT(*)` per signal and side of 09:00Z).
+  6. Independent recompute from plain `SELECT time, value FROM readings_processed WHERE verdict = 'accepted' …`, `SELECT time, end_ns, value FROM state_intervals …` and `SELECT time, value FROM metrics_series …` pulls, no pipeline imports (S5.21). Compare `<tmp9>` with the committed `reports/comparison_summary.json` without `timing` and the reports byte for byte (S5.22). `python -m pytest tests/unit/test_findings_doc.py tests/unit/test_comparison_doc.py` → pass; read `reports/findings.md` for S5.24.
+- Expected changes:
+  - `pipeline/compare.py` (new, pure, stdlib): policy table, version, fingerprint, alignment, phases, instant join, OLS with centring and pivoting, block sufficient statistics and bootstrap, lag search, evidence rule, measured conditions, factors, steady KPIs with bootstrap samples, KPI differences, pressure-drop fits, split check.
+  - `pipeline/compare_store.py` (new): `CompareGateway` reads (reuse `pipeline/metrics_store.py` and `pipeline/cleaning_influx.py` patterns: `window_params`, `WINDOW`, `_table`), Postgres reads (psycopg, `pg_connect`, `pg_check`).
+  - `pipeline/compare_run.py` + `scripts/compare.py` (new): orchestration, refusals, exit codes, summary, report rendering; mirror `pipeline/metrics_run.py` (Config, Deps, Refused, run, write at end; `round_floats`).
+  - `contracts/comparison_summary.schema.json` + example (written at plan time). CI lint job: contract step.
+  - Committed real outputs: `reports/comparison_summary.json`, `reports/comparison_report.md`; `reports/findings.md` (draft); `reports/M5.md` (two-layer milestone report).
+  - Docs: `docs/comparison.md` (alignment, phases, the two models, the bootstrap, the evidence rule, the factors, the KPIs, what the data cannot support and why), ADR-0017, `docs/ASSUMPTIONS.md` (A-07 status from the air-flow check, new A-09, U-05 note), `docs/decisions/README.md`, `docs/ROADMAP.md` (M5 phase, results, deliverable F row).
+- Tests: `tests/unit/test_compare.py` (S5.1–S5.9, every boundary in the example map, the bootstrap re-derived by hand on a 4-block example, KPI ratio-of-sums on a hand example, pressure-drop fit and `across_line` on exact lines, `split_check` with an empty side), `tests/integration/test_compare_store.py` (S5.10, S5.11; throwaway InfluxDB database and Postgres schema), `tests/unit/test_compare_exit_codes.py` (fake gateway: S5.18's exit 3 and every refusal path that needs no live service), `tests/e2e/test_compare_cli.py` (fixture ingest + clean + metrics + compare as subprocesses, marked `influx` and `postgres`: S5.12–S5.19, plus a plain-pull recompute of the fixture's phases, KPIs and hydrolyzer coefficients), `tests/unit/test_findings_doc.py` (S5.25, and S5.24's status line and sections), `tests/unit/test_comparison_doc.py` (S5.26). S5.20–S5.23 run on the real data (Checks row, QA steps 5–6).
+- Tasks (decision 1; checked with `lane.js tasks`):
+  - T1 [W1] Pure analysis functions, policy table, version and fingerprint, with unit tests for every rule and boundary. Owns: `pipeline/compare.py`, `tests/unit/test_compare.py`. Scenarios: S5.1, S5.2, S5.3, S5.4, S5.5, S5.6, S5.7, S5.8, S5.9.
+  - T2 [W1] Read layer: `CompareGateway` over InfluxDB and the Postgres reads, with integration tests. Owns: `pipeline/compare_store.py`, `tests/integration/test_compare_store.py`. Scenarios: S5.10, S5.11.
+  - T3 [W1] Compare fixture: generator, CSV, checksum, experiments file, README with the hand computations; check that cleaning excludes exactly the planted reading. Owns: `tests/fixtures/compare/**`. Scenarios: S5.12.
+  - T4 [W2] `scripts.compare` command and orchestration, summary and report, exit codes, end-to-end tests on the fixture, fake-gateway tests. Owns: `pipeline/compare_run.py`, `scripts/compare.py`, `tests/e2e/test_compare_cli.py`, `tests/unit/test_compare_exit_codes.py`. Scenarios: S5.13, S5.14, S5.15, S5.16, S5.17, S5.18, S5.19. After: T1, T2, T3.
+  - T5 [W3] Real data: calibrate EXP_001, then all six, against an independent plain-Python recompute (decision 22); stop and report on any case decision 19 names; full run into `reports/`; reproduce on a fresh private stack; record the EXP_001 residual block correlation in the execute log. Owns: `reports/comparison_summary.json`, `reports/comparison_report.md`, `.flow-tmp/**`. Scenarios: S5.20, S5.21, S5.22, S5.23. After: T4.
+  - T6 [W4] Write-up: draft findings (decision 20), `docs/comparison.md`, ADR-0017, `docs/ASSUMPTIONS.md`, `docs/decisions/README.md`, `docs/ROADMAP.md`, `reports/M5.md`, CI contract step, the findings and method-document tests. Owns: `docs/**`, `reports/findings.md`, `reports/M5.md`, `.github/workflows/ci.yml`, `tests/unit/test_findings_doc.py`, `tests/unit/test_comparison_doc.py`. Scenarios: S5.24, S5.25, S5.26. After: T5.
+- After the judge: commit, push `m5-comparison`, CI green, open `reports/M5.md` in the doc viewer. The findings stay a draft and the merge waits until Sebastian approves them.
 
 #### M6: Grafana dashboard (G)
 - Not yet detailed. Scope: `docs/ROADMAP.md` § M6.

@@ -30,6 +30,7 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0014](ADR-0014-post-ingest-profiling.md) | Post-ingest profiling: what is measured, SQL versus Python, four engine quirks | M2.5 | C, D | Accepted |
 | [0015](ADR-0015-cleaning-and-quality-pipeline.md) | Cleaning and quality pipeline: one verdict per reading beside the raw value, the rules, the rollup over the verdict | M3 | C, D | Accepted |
 | [0016](ADR-0016-derived-metrics.md) | Derived metrics: a batch job over accepted readings, labelled by coverage, never filled | M4 | E | Accepted |
+| [0017](ADR-0017-comparison-and-findings.md) | Comparison and findings: one clock, block-bootstrap intervals, an evidence rule that can say "not resolved" | M5 | F | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
@@ -75,7 +76,10 @@ any number of ways without touching 0005's reasoning. 0015 is separable from 000
 same reason: those decide what is stored and how it got there, 0015 decides how each stored reading
 is judged, and a different set of rules would not change either. 0016 is separable from 0015 in
 turn: 0015 decides which readings are accepted, 0016 decides what is computed from them and how a
-hole in them is labelled.
+hole in them is labelled. 0017 is separable from 0016 again: 0016 decides what is
+computed per experiment, 0017 decides how experiments are put side by side, which pairs may be
+compared, and what evidence a claim needs. The metrics would be the same under any comparison
+rule, and the comparison rule would be the same under another metric formula.
 
 ## Status values
 

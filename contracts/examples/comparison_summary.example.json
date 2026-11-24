@@ -1,0 +1,2229 @@
+{
+  "schema_version": 1,
+  "compare_version": "m5-v1",
+  "policy_version": "m3-v1",
+  "metrics_version": "m4-v1",
+  "source": {
+    "database": "test_compare_fixture",
+    "experiments_file": "tests/fixtures/compare/experiments.json",
+    "pg_schema": "test_compare"
+  },
+  "parameters": {
+    "settle_s": 60,
+    "bootstrap_block_s": 120,
+    "bootstrap_resamples": 1000,
+    "bootstrap_seed": 20261124,
+    "interval_level": 0.95,
+    "lag_max_s": 60,
+    "temp_max_age_s": 10,
+    "min_instants": 300,
+    "vif_limit": 10,
+    "condition_tol_rel": 0.05,
+    "ambient_tol_c": 5,
+    "humidity_tol_pct": 15,
+    "airflow_check_experiment": "EXP_004",
+    "airflow_check_boundary": "2026-03-02T09:00:00Z"
+  },
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "start": "2026-05-04T08:00:00Z",
+      "end": "2026-05-04T08:20:00Z",
+      "duration_s": 1200,
+      "metadata": {
+        "current_setpoint_nominal_a": 150.0,
+        "air_flow_nominal_m3h": 1200.0,
+        "solvent_flow_nominal_lmin": 8.0,
+        "operator": "Op A",
+        "sorbent_batch": "SB-A",
+        "notes": null
+      },
+      "conditions": {
+        "current_setpoint_a": 150.0,
+        "current_setpoint_profile": "constant",
+        "air_flow_m3h": 1200.0,
+        "solvent_flow_lmin": 8.0,
+        "ambient_temperature_c": 15.0,
+        "relative_humidity_pct": 50.0
+      },
+      "phases": [
+        {
+          "index": 0,
+          "state": "STARTUP",
+          "start_s": 0,
+          "end_s": 120,
+          "window_start_s": 60,
+          "window_end_s": 120
+        },
+        {
+          "index": 1,
+          "state": "STEADY_STATE",
+          "start_s": 120,
+          "end_s": 600,
+          "window_start_s": 180,
+          "window_end_s": 600
+        },
+        {
+          "index": 2,
+          "state": "LOAD_CHANGE",
+          "start_s": 600,
+          "end_s": 660,
+          "window_start_s": null,
+          "window_end_s": null
+        },
+        {
+          "index": 3,
+          "state": "STEADY_STATE",
+          "start_s": 660,
+          "end_s": 1140,
+          "window_start_s": 720,
+          "window_end_s": 1140
+        },
+        {
+          "index": 4,
+          "state": "SHUTDOWN",
+          "start_s": 1140,
+          "end_s": 1200,
+          "window_start_s": null,
+          "window_end_s": null
+        }
+      ],
+      "steady_seconds": 840,
+      "kpis": {
+        "voltage_mean_v": {
+          "value": 80.75,
+          "unit": "V",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 80.66925,
+          "interval_high": 80.83075
+        },
+        "mean_power_kw": {
+          "value": 12.1125,
+          "unit": "kW",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 12.100388,
+          "interval_high": 12.124612
+        },
+        "capture_rate_mean_kg_h": {
+          "value": 0.68,
+          "unit": "kg/h",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 0.67932,
+          "interval_high": 0.68068
+        },
+        "capture_efficiency_mean": {
+          "value": 0.75,
+          "unit": "fraction",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 0.74925,
+          "interval_high": 0.75075
+        },
+        "sec_kwh_per_kg": {
+          "value": 17.8125,
+          "unit": "kWh/kg",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 17.794687,
+          "interval_high": 17.830312
+        }
+      },
+      "whole_run_metrics": {
+        "energy_kwh": {
+          "value": 1.0,
+          "unit": "kWh",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "energy_logged_kwh": {
+          "value": 1.0,
+          "unit": "kWh",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "energy_relative_difference": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "mean_power_kw": {
+          "value": 1.0,
+          "unit": "kW",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "capture_efficiency_mean": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "co2_captured_kg": {
+          "value": 1.0,
+          "unit": "kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "co2_inlet_kg": {
+          "value": 1.0,
+          "unit": "kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "capture_rate_mean_kg_h": {
+          "value": 1.0,
+          "unit": "kg/h",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "sec_kwh_per_kg": {
+          "value": 1.0,
+          "unit": "kWh/kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "completeness": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "valid_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "bad_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "uncertain_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_002",
+      "start": "2026-05-11T09:00:00Z",
+      "end": "2026-05-11T09:20:00Z",
+      "duration_s": 1200,
+      "metadata": {
+        "current_setpoint_nominal_a": 200.0,
+        "air_flow_nominal_m3h": 1200.0,
+        "solvent_flow_nominal_lmin": 8.0,
+        "operator": "Op A",
+        "sorbent_batch": "SB-A",
+        "notes": null
+      },
+      "conditions": {
+        "current_setpoint_a": 200.0,
+        "current_setpoint_profile": "constant",
+        "air_flow_m3h": 1200.0,
+        "solvent_flow_lmin": 8.0,
+        "ambient_temperature_c": 15.0,
+        "relative_humidity_pct": 50.0
+      },
+      "phases": [
+        {
+          "index": 0,
+          "state": "STARTUP",
+          "start_s": 0,
+          "end_s": 120,
+          "window_start_s": 60,
+          "window_end_s": 120
+        },
+        {
+          "index": 1,
+          "state": "STEADY_STATE",
+          "start_s": 120,
+          "end_s": 600,
+          "window_start_s": 180,
+          "window_end_s": 600
+        },
+        {
+          "index": 2,
+          "state": "LOAD_CHANGE",
+          "start_s": 600,
+          "end_s": 660,
+          "window_start_s": null,
+          "window_end_s": null
+        },
+        {
+          "index": 3,
+          "state": "STEADY_STATE",
+          "start_s": 660,
+          "end_s": 1140,
+          "window_start_s": 720,
+          "window_end_s": 1140
+        },
+        {
+          "index": 4,
+          "state": "SHUTDOWN",
+          "start_s": 1140,
+          "end_s": 1200,
+          "window_start_s": null,
+          "window_end_s": null
+        }
+      ],
+      "steady_seconds": 840,
+      "kpis": {
+        "voltage_mean_v": {
+          "value": 95.75,
+          "unit": "V",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 95.65425,
+          "interval_high": 95.84575
+        },
+        "mean_power_kw": {
+          "value": 19.15,
+          "unit": "kW",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 19.13085,
+          "interval_high": 19.16915
+        },
+        "capture_rate_mean_kg_h": {
+          "value": 0.68,
+          "unit": "kg/h",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 0.67932,
+          "interval_high": 0.68068
+        },
+        "capture_efficiency_mean": {
+          "value": 0.75,
+          "unit": "fraction",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 0.74925,
+          "interval_high": 0.75075
+        },
+        "sec_kwh_per_kg": {
+          "value": 28.161765,
+          "unit": "kWh/kg",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 28.133603,
+          "interval_high": 28.189927
+        }
+      },
+      "whole_run_metrics": {
+        "energy_kwh": {
+          "value": 1.0,
+          "unit": "kWh",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "energy_logged_kwh": {
+          "value": 1.0,
+          "unit": "kWh",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "energy_relative_difference": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "mean_power_kw": {
+          "value": 1.0,
+          "unit": "kW",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "capture_efficiency_mean": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "co2_captured_kg": {
+          "value": 1.0,
+          "unit": "kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "co2_inlet_kg": {
+          "value": 1.0,
+          "unit": "kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "capture_rate_mean_kg_h": {
+          "value": 1.0,
+          "unit": "kg/h",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "sec_kwh_per_kg": {
+          "value": 1.0,
+          "unit": "kWh/kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "completeness": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "valid_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "bad_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "uncertain_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        }
+      }
+    },
+    {
+      "experiment_id": "EXP_003",
+      "start": "2026-05-18T07:30:00Z",
+      "end": "2026-05-18T07:50:00Z",
+      "duration_s": 1200,
+      "metadata": {
+        "current_setpoint_nominal_a": 150.0,
+        "air_flow_nominal_m3h": 2400.0,
+        "solvent_flow_nominal_lmin": 8.0,
+        "operator": "Op B",
+        "sorbent_batch": "SB-B",
+        "notes": null
+      },
+      "conditions": {
+        "current_setpoint_a": 150.0,
+        "current_setpoint_profile": "constant",
+        "air_flow_m3h": 2400.0,
+        "solvent_flow_lmin": 8.0,
+        "ambient_temperature_c": 15.0,
+        "relative_humidity_pct": 50.0
+      },
+      "phases": [
+        {
+          "index": 0,
+          "state": "STARTUP",
+          "start_s": 0,
+          "end_s": 120,
+          "window_start_s": 60,
+          "window_end_s": 120
+        },
+        {
+          "index": 1,
+          "state": "STEADY_STATE",
+          "start_s": 120,
+          "end_s": 600,
+          "window_start_s": 180,
+          "window_end_s": 600
+        },
+        {
+          "index": 2,
+          "state": "LOAD_CHANGE",
+          "start_s": 600,
+          "end_s": 660,
+          "window_start_s": null,
+          "window_end_s": null
+        },
+        {
+          "index": 3,
+          "state": "STEADY_STATE",
+          "start_s": 660,
+          "end_s": 1140,
+          "window_start_s": 720,
+          "window_end_s": 1140
+        },
+        {
+          "index": 4,
+          "state": "SHUTDOWN",
+          "start_s": 1140,
+          "end_s": 1200,
+          "window_start_s": null,
+          "window_end_s": null
+        }
+      ],
+      "steady_seconds": 840,
+      "kpis": {
+        "voltage_mean_v": {
+          "value": 80.75,
+          "unit": "V",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 80.66925,
+          "interval_high": 80.83075
+        },
+        "mean_power_kw": {
+          "value": 12.1125,
+          "unit": "kW",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 12.100388,
+          "interval_high": 12.124612
+        },
+        "capture_rate_mean_kg_h": {
+          "value": 1.36,
+          "unit": "kg/h",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 1.35864,
+          "interval_high": 1.36136
+        },
+        "capture_efficiency_mean": {
+          "value": 0.75,
+          "unit": "fraction",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 0.74925,
+          "interval_high": 0.75075
+        },
+        "sec_kwh_per_kg": {
+          "value": 8.90625,
+          "unit": "kWh/kg",
+          "coverage": 0.997619048,
+          "status": "complete",
+          "interval_low": 8.897344,
+          "interval_high": 8.915156
+        }
+      },
+      "whole_run_metrics": {
+        "energy_kwh": {
+          "value": 1.0,
+          "unit": "kWh",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "energy_logged_kwh": {
+          "value": 1.0,
+          "unit": "kWh",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "energy_relative_difference": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "mean_power_kw": {
+          "value": 1.0,
+          "unit": "kW",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "capture_efficiency_mean": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "co2_captured_kg": {
+          "value": 1.0,
+          "unit": "kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "co2_inlet_kg": {
+          "value": 1.0,
+          "unit": "kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "capture_rate_mean_kg_h": {
+          "value": 1.0,
+          "unit": "kg/h",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "sec_kwh_per_kg": {
+          "value": 1.0,
+          "unit": "kWh/kg",
+          "coverage": 0.99,
+          "status": "complete"
+        },
+        "completeness": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "valid_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "bad_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "uncertain_fraction": {
+          "value": 1.0,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        }
+      }
+    }
+  ],
+  "voltage_models": [
+    {
+      "model": "absorber",
+      "window": "steady",
+      "scope": "EXP_001",
+      "testable": true,
+      "instants": 419,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "absorber",
+      "window": "steady",
+      "scope": "EXP_002",
+      "testable": true,
+      "instants": 420,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "absorber",
+      "window": "steady",
+      "scope": "EXP_003",
+      "testable": true,
+      "instants": 420,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "absorber",
+      "window": "steady",
+      "scope": "pooled",
+      "testable": true,
+      "instants": 1259,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "absorber",
+      "window": "whole_run",
+      "scope": "EXP_001",
+      "testable": true,
+      "instants": 599,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "absorber",
+      "window": "whole_run",
+      "scope": "EXP_002",
+      "testable": true,
+      "instants": 600,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "absorber",
+      "window": "whole_run",
+      "scope": "EXP_003",
+      "testable": true,
+      "instants": 600,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "absorber",
+      "window": "whole_run",
+      "scope": "pooled",
+      "testable": true,
+      "instants": 1799,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "air_flow",
+          "unit": "V per m³/h",
+          "coefficient": 0.0001,
+          "interval_low": -0.000905,
+          "interval_high": 0.001105,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "pressure_drop",
+          "unit": "V per mbar",
+          "coefficient": -0.01,
+          "interval_low": -0.0115,
+          "interval_high": -0.0085,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        }
+      ],
+      "joint": {
+        "terms": [
+          "air_flow",
+          "pressure_drop"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "steady",
+      "scope": "EXP_001",
+      "testable": true,
+      "instants": 839,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "steady",
+      "scope": "EXP_002",
+      "testable": true,
+      "instants": 840,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "steady",
+      "scope": "EXP_003",
+      "testable": true,
+      "instants": 840,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "steady",
+      "scope": "pooled",
+      "testable": true,
+      "instants": 2519,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "whole_run",
+      "scope": "EXP_001",
+      "testable": true,
+      "instants": 1199,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "whole_run",
+      "scope": "EXP_002",
+      "testable": true,
+      "instants": 1200,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "whole_run",
+      "scope": "EXP_003",
+      "testable": true,
+      "instants": 1200,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": 0,
+          "corr_at_best_lag": 0.2,
+          "corr_at_zero": 0.2
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "whole_run",
+      "scope": "pooled",
+      "testable": true,
+      "instants": 3599,
+      "r2": 0.998,
+      "resamples_used": 1000,
+      "resamples_singular": 0,
+      "terms": [
+        {
+          "name": "current",
+          "unit": "V per A",
+          "coefficient": 0.3,
+          "interval_low": 0.284,
+          "interval_high": 0.316,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "electrolyte_temperature",
+          "unit": "V per °C",
+          "coefficient": -0.1,
+          "interval_low": -0.106,
+          "interval_high": -0.094,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "flow",
+          "unit": "V per L/min",
+          "coefficient": -0.2,
+          "interval_low": -0.211,
+          "interval_high": -0.189,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        },
+        {
+          "name": "pressure",
+          "unit": "V per bar",
+          "coefficient": 3.0,
+          "interval_low": 2.849,
+          "interval_high": 3.151,
+          "r2_drop": 0.01,
+          "vif": 1.02,
+          "plain_corr": 0.1,
+          "best_lag_s": null,
+          "corr_at_best_lag": null,
+          "corr_at_zero": null
+        }
+      ],
+      "joint": {
+        "terms": [
+          "flow",
+          "pressure"
+        ],
+        "r2_drop": 0.05,
+        "separable": true
+      }
+    }
+  ],
+  "voltage_evidence": [
+    {
+      "model": "absorber",
+      "window": "steady",
+      "term": "air_flow",
+      "status": "not_resolved",
+      "sign": null,
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 0,
+      "pooled_coefficient": 0.0001,
+      "pooled_interval_low": -0.000902,
+      "pooled_interval_high": 0.001102
+    },
+    {
+      "model": "absorber",
+      "window": "steady",
+      "term": "pressure_drop",
+      "status": "not_resolved",
+      "sign": null,
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 0,
+      "pooled_coefficient": -0.01,
+      "pooled_interval_low": -0.0112,
+      "pooled_interval_high": -0.0088
+    },
+    {
+      "model": "absorber",
+      "window": "whole_run",
+      "term": "air_flow",
+      "status": "not_resolved",
+      "sign": null,
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 0,
+      "pooled_coefficient": 0.0001,
+      "pooled_interval_low": -0.000902,
+      "pooled_interval_high": 0.001102
+    },
+    {
+      "model": "absorber",
+      "window": "whole_run",
+      "term": "pressure_drop",
+      "status": "not_resolved",
+      "sign": null,
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 0,
+      "pooled_coefficient": -0.01,
+      "pooled_interval_low": -0.0112,
+      "pooled_interval_high": -0.0088
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "steady",
+      "term": "flow",
+      "status": "supported",
+      "sign": "negative",
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 3,
+      "pooled_coefficient": -0.2,
+      "pooled_interval_low": -0.205,
+      "pooled_interval_high": -0.195
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "steady",
+      "term": "pressure",
+      "status": "supported",
+      "sign": "positive",
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 3,
+      "pooled_coefficient": 3.0,
+      "pooled_interval_low": 2.939,
+      "pooled_interval_high": 3.061
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "whole_run",
+      "term": "flow",
+      "status": "supported",
+      "sign": "negative",
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 3,
+      "pooled_coefficient": -0.2,
+      "pooled_interval_low": -0.205,
+      "pooled_interval_high": -0.195
+    },
+    {
+      "model": "hydrolyzer",
+      "window": "whole_run",
+      "term": "pressure",
+      "status": "supported",
+      "sign": "positive",
+      "experiments_testable": 3,
+      "experiments_excluding_zero": 3,
+      "pooled_coefficient": 3.0,
+      "pooled_interval_low": 2.939,
+      "pooled_interval_high": 3.061
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "EXP_001",
+      "b": "EXP_002",
+      "conditions_status": "supported",
+      "differing": [
+        "current_setpoint"
+      ],
+      "factors": [
+        {
+          "factor": "current_setpoint",
+          "a": 150.0,
+          "b": 200.0,
+          "differs": true
+        },
+        {
+          "factor": "current_setpoint_profile",
+          "a": "constant",
+          "b": "constant",
+          "differs": false
+        },
+        {
+          "factor": "air_flow",
+          "a": 1200.0,
+          "b": 1200.0,
+          "differs": false
+        },
+        {
+          "factor": "solvent_flow",
+          "a": 8.0,
+          "b": 8.0,
+          "differs": false
+        },
+        {
+          "factor": "ambient_temperature",
+          "a": 15.0,
+          "b": 15.0,
+          "differs": false
+        },
+        {
+          "factor": "relative_humidity",
+          "a": 50.0,
+          "b": 50.0,
+          "differs": false
+        },
+        {
+          "factor": "sorbent_batch",
+          "a": "SB-A",
+          "b": "SB-A",
+          "differs": false
+        }
+      ],
+      "recorded_differences": [],
+      "kpis": [
+        {
+          "name": "voltage_mean_v",
+          "unit": "V",
+          "difference": 15.0,
+          "interval_low": 14.99,
+          "interval_high": 15.01,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "mean_power_kw",
+          "unit": "kW",
+          "difference": 7.0375,
+          "interval_low": 7.0275,
+          "interval_high": 7.0475,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "capture_rate_mean_kg_h",
+          "unit": "kg/h",
+          "difference": 0.0,
+          "interval_low": -0.01,
+          "interval_high": 0.01,
+          "excludes_zero": false,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "capture_efficiency_mean",
+          "unit": "fraction",
+          "difference": 0.0,
+          "interval_low": -0.01,
+          "interval_high": 0.01,
+          "excludes_zero": false,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "sec_kwh_per_kg",
+          "unit": "kWh/kg",
+          "difference": 10.349265,
+          "interval_low": 10.339265,
+          "interval_high": 10.359265,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        }
+      ]
+    },
+    {
+      "a": "EXP_001",
+      "b": "EXP_003",
+      "conditions_status": "confounded",
+      "differing": [
+        "air_flow",
+        "sorbent_batch"
+      ],
+      "factors": [
+        {
+          "factor": "current_setpoint",
+          "a": 150.0,
+          "b": 150.0,
+          "differs": false
+        },
+        {
+          "factor": "current_setpoint_profile",
+          "a": "constant",
+          "b": "constant",
+          "differs": false
+        },
+        {
+          "factor": "air_flow",
+          "a": 1200.0,
+          "b": 2400.0,
+          "differs": true
+        },
+        {
+          "factor": "solvent_flow",
+          "a": 8.0,
+          "b": 8.0,
+          "differs": false
+        },
+        {
+          "factor": "ambient_temperature",
+          "a": 15.0,
+          "b": 15.0,
+          "differs": false
+        },
+        {
+          "factor": "relative_humidity",
+          "a": 50.0,
+          "b": 50.0,
+          "differs": false
+        },
+        {
+          "factor": "sorbent_batch",
+          "a": "SB-A",
+          "b": "SB-B",
+          "differs": true
+        }
+      ],
+      "recorded_differences": [
+        {
+          "field": "operator",
+          "a": "Op A",
+          "b": "Op B"
+        }
+      ],
+      "kpis": [
+        {
+          "name": "voltage_mean_v",
+          "unit": "V",
+          "difference": 0.0,
+          "interval_low": -0.01,
+          "interval_high": 0.01,
+          "excludes_zero": false,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "mean_power_kw",
+          "unit": "kW",
+          "difference": 0.0,
+          "interval_low": -0.01,
+          "interval_high": 0.01,
+          "excludes_zero": false,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "capture_rate_mean_kg_h",
+          "unit": "kg/h",
+          "difference": 0.68,
+          "interval_low": 0.67,
+          "interval_high": 0.69,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "capture_efficiency_mean",
+          "unit": "fraction",
+          "difference": 0.0,
+          "interval_low": -0.01,
+          "interval_high": 0.01,
+          "excludes_zero": false,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "sec_kwh_per_kg",
+          "unit": "kWh/kg",
+          "difference": -8.90625,
+          "interval_low": -8.91625,
+          "interval_high": -8.89625,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        }
+      ]
+    },
+    {
+      "a": "EXP_002",
+      "b": "EXP_003",
+      "conditions_status": "confounded",
+      "differing": [
+        "current_setpoint",
+        "air_flow",
+        "sorbent_batch"
+      ],
+      "factors": [
+        {
+          "factor": "current_setpoint",
+          "a": 200.0,
+          "b": 150.0,
+          "differs": true
+        },
+        {
+          "factor": "current_setpoint_profile",
+          "a": "constant",
+          "b": "constant",
+          "differs": false
+        },
+        {
+          "factor": "air_flow",
+          "a": 1200.0,
+          "b": 2400.0,
+          "differs": true
+        },
+        {
+          "factor": "solvent_flow",
+          "a": 8.0,
+          "b": 8.0,
+          "differs": false
+        },
+        {
+          "factor": "ambient_temperature",
+          "a": 15.0,
+          "b": 15.0,
+          "differs": false
+        },
+        {
+          "factor": "relative_humidity",
+          "a": 50.0,
+          "b": 50.0,
+          "differs": false
+        },
+        {
+          "factor": "sorbent_batch",
+          "a": "SB-A",
+          "b": "SB-B",
+          "differs": true
+        }
+      ],
+      "recorded_differences": [
+        {
+          "field": "operator",
+          "a": "Op A",
+          "b": "Op B"
+        }
+      ],
+      "kpis": [
+        {
+          "name": "voltage_mean_v",
+          "unit": "V",
+          "difference": -15.0,
+          "interval_low": -15.01,
+          "interval_high": -14.99,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "mean_power_kw",
+          "unit": "kW",
+          "difference": -7.0375,
+          "interval_low": -7.0475,
+          "interval_high": -7.0275,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "capture_rate_mean_kg_h",
+          "unit": "kg/h",
+          "difference": 0.68,
+          "interval_low": 0.67,
+          "interval_high": 0.69,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "capture_efficiency_mean",
+          "unit": "fraction",
+          "difference": 0.0,
+          "interval_low": -0.01,
+          "interval_high": 0.01,
+          "excludes_zero": false,
+          "coverage_status": "both_complete"
+        },
+        {
+          "name": "sec_kwh_per_kg",
+          "unit": "kWh/kg",
+          "difference": -19.255515,
+          "interval_low": -19.265515,
+          "interval_high": -19.245515,
+          "excludes_zero": true,
+          "coverage_status": "both_complete"
+        }
+      ]
+    }
+  ],
+  "pressure_drop_check": {
+    "per_experiment": [
+      {
+        "experiment_id": "EXP_001",
+        "instants": 420,
+        "slope_air_flow": 0.025,
+        "intercept_air_flow": -15.0,
+        "r2_air_flow": 0.9,
+        "slope_air_flow_sq": 1.04e-05,
+        "intercept_air_flow_sq": 0.0,
+        "r2_air_flow_sq": 0.9,
+        "best_lag_s": 0,
+        "corr_at_best_lag": 0.95,
+        "corr_at_zero": 0.95
+      },
+      {
+        "experiment_id": "EXP_002",
+        "instants": 420,
+        "slope_air_flow": 0.025,
+        "intercept_air_flow": -15.0,
+        "r2_air_flow": 0.9,
+        "slope_air_flow_sq": 1.04e-05,
+        "intercept_air_flow_sq": 0.0,
+        "r2_air_flow_sq": 0.9,
+        "best_lag_s": 0,
+        "corr_at_best_lag": 0.95,
+        "corr_at_zero": 0.95
+      },
+      {
+        "experiment_id": "EXP_003",
+        "instants": 420,
+        "slope_air_flow": 0.025,
+        "intercept_air_flow": -15.0,
+        "r2_air_flow": 0.9,
+        "slope_air_flow_sq": 1.04e-05,
+        "intercept_air_flow_sq": 0.0,
+        "r2_air_flow_sq": 0.9,
+        "best_lag_s": 0,
+        "corr_at_best_lag": 0.95,
+        "corr_at_zero": 0.95
+      }
+    ],
+    "across": {
+      "points": [
+        {
+          "experiment_id": "EXP_001",
+          "air_flow_median": 1200.0,
+          "pressure_drop_median": 15.0
+        },
+        {
+          "experiment_id": "EXP_002",
+          "air_flow_median": 1200.0,
+          "pressure_drop_median": 15.0
+        },
+        {
+          "experiment_id": "EXP_003",
+          "air_flow_median": 2400.0,
+          "pressure_drop_median": 60.0
+        }
+      ],
+      "slope": 0.0375,
+      "intercept": -30.0,
+      "r2": 1.0
+    }
+  },
+  "airflow_check": null,
+  "timing": {
+    "seconds": 4.2,
+    "queries": 120
+  }
+}

@@ -44,6 +44,13 @@ jobs:
           check-jsonschema
           --schemafile contracts/metrics_summary.schema.json
           contracts/examples/metrics_summary.example.json
+      # Same for the comparison summary (M5); the fixture run's output is validated in
+      # tests/e2e/test_compare_cli.py. The real-data comparison run is not run in CI.
+      - name: Validate the comparison summary contract example
+        run: >-
+          check-jsonschema
+          --schemafile contracts/comparison_summary.schema.json
+          contracts/examples/comparison_summary.example.json
 
   integration:
     runs-on: ubuntu-latest
