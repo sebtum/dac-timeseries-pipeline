@@ -80,6 +80,36 @@ Real run (policy `m3-v1`): 519,906 rows in `readings_processed`, 74 in `state_in
 `quality_intervals` (29 gaps, 5 flatline runs); 150 series, 519,980 readings = 514,443 accepted +
 5,537 excluded.
 
+### The metrics tables (M4, ADR-0016)
+
+One more InfluxDB table and two Postgres tables, written by `python -m scripts.metrics` after
+cleaning. The formulas, units and rules are in [`metrics.md`](metrics.md).
+
+**InfluxDB `metrics_series`**, in the **same database** as the raw and processed tables
+(`dac_raw`), so it expires with raw. One row per instant where the derived value exists.
+
+| | `metrics_series` |
+|---|---|
+| **tags** | `experiment_id`, `metric` (`power_computed` W, `power_residual` W, `capture_efficiency` fraction, `capture_rate` kg/h), `metrics_version` (`m4-v1`), `policy_version` (the cleaning rule set the inputs came from, `m3-v1`) |
+| **time** | the instant of the value |
+| **fields (float)** | `value` |
+
+**Postgres**, created by migration `0003_experiment_metrics.sql`. Both tables are upserted in one
+transaction per run, so a rerun overwrites identical rows and a failed run leaves nothing partial.
+They outlive raw retention on purpose: they are small summaries. Every `experiment_id` references
+`experiment`, so a metric joins to the experiment metadata.
+
+| | `experiment_metrics` | `signal_quality` |
+|---|---|---|
+| **what a row is** | one metric of one experiment (13 per experiment) | one signal of one experiment (25 per experiment) |
+| **primary key** | `experiment_id, metrics_version, metric` | `experiment_id, metrics_version, source, signal` |
+| **columns** | `policy_version`, `value` (null when status is `none`), `unit`, `coverage` (null for the four quality shares), `status` (`complete`, `partial` or `none`; null for the quality shares) | `policy_version`, `nominal_interval_s` (null for state signals), `present`, `expected` (null for state signals), `accepted`, `bad`, `uncertain`, `completeness`, `valid_fraction`, `bad_fraction`, `uncertain_fraction` (each null when its denominator is 0) |
+
+Real run (metrics `m4-v1`): 121,167 points in `metrics_series` (24 series: 6 experiments x 4),
+78 rows in `experiment_metrics` and 150 in `signal_quality`; the counts are read back after the
+write and checked against what was written. The summary is `reports/metrics_summary.json`
+(contract `contracts/metrics_summary.schema.json`).
+
 ## 2. Cardinality — 150 series, measured
 
 **150 series**, measured directly against the raw CSV by the pre-ingest census
@@ -212,6 +242,7 @@ must therefore be *monitored*, not merely scheduled (ADR-0011, Consequences).
 - ADR-0012 — Postgres migrations, `experiments.json` loader with per-field provenance
 - ADR-0013 — Ingestion (the conflicts table)
 - ADR-0015 — Cleaning and quality pipeline (the three processed tables, the rollup over the verdict)
+- ADR-0016 — Derived metrics (`metrics_series`, `experiment_metrics`, `signal_quality`)
 - `reports/pre_ingest_census.md` — measured row/series counts, quality distribution
 - `task/DATA_DICTIONARY.md` — per-signal nominal sample rates
 - `docs/plans/M1.md` — local retention values (T2 scope, "Three calls made in this phase")

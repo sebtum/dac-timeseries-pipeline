@@ -175,3 +175,57 @@ Status: implemented and verified by me, **not committed, not pushed, judge not r
 
 Remaining gaps: judge (`/flow:verify M3`), judges for M2 and M2.5 at the commit, commit and push, CI run. Rollup speed (12 min) and the other Next-steps lines are in Spec.
 State left behind: dev `dac-influxdb` running (holds processed tables and `readings_rollup`); `dac-postgres` stopped; `.env` dev; `.flow-tmp/` scratch.
+
+### M4
+
+Branch `m4-metrics` cut from `master` (`a7bade1`), uncommitted. Mode standard, tasks T1-T5 by agents (decision 1). Dev `dac-influxdb` and `dac-postgres` started for the run (they were stopped).
+
+**W1 T2 done.** Migration 0003, `pipeline/metrics_store.py` (`MetricsGateway(host, token, database, *, batch_size)` subclasses `CleaningGateway`; `pg_connect`, `pg_check`, `missing_experiments`, `upsert_*`, `write_postgres`, `count_rows`), `tests/integration/test_metrics_store.py` (17) and `test_migrations.py` (+1). 23 passed, 0 skipped against live dev stack; ruff clean; no database leaked. Notes: `has_policy_rows` has no time window (T4 confirms it on real `dac_raw`, 72 h limit); `count_series` counts any `policy_version` for the same experiment, metric and `metrics_version`; `write_series` over 10,000 points goes in several batches; `pg_check` also requires `experiment`. Row-dict keys = table columns, missing or extra key raises `ValueError`.
+
+**W1 T1 done.** `pipeline/metrics.py` (pure, stdlib) and `tests/unit/test_metrics.py` (72). Fingerprint `ac004cdd...b518b` pinned. POLICY has exactly the 10 keys the contract schema lists; `KELVIN_OFFSET` and unit scalings are module constants outside POLICY (not in the fingerprint). Choices: inlet series uses the capture series' instants (shared coverage); an efficiency instant with co2_in = 0 is skipped; coverage 0.0 with status none when no covered time; p95 of |residual| by linear interpolation. Contract doubt: `plausibility.limit` must be a number, so `capture_below_inlet` emits limit 0.0 with passed null when inlet is null (appended to Next steps).
+**W1 check:** `lane.js check --wave W1` ok (7 files, all allowed); `pytest tests/unit` 391 passed; ruff check and format clean; `contract.js --static` 4 PASS.
+
+**W2 T3 done.** `pipeline/metrics_run.py`, `scripts/metrics.py`, fixture `tests/fixtures/metrics/` (README with hand computations from plain decimal arithmetic), `tests/unit/test_metrics_exit_codes.py` (27), `tests/e2e/test_metrics_cli.py` (22, includes an independent recompute of every metric and series row). Fixture run: exit 0, balanced, plausibility_failed 0; cleaning of the fixture excludes exactly the four planted readings.
+- **Spec inconsistency (I checked it by hand):** S4.9 pins 268 `capture_rate` rows; the construction gives 269. 297 efficiency instants, minus the 28 even seconds from +362 to +418 other than +400 (+400 is already outside the 297). The pinned coverage 532/600 matches 269. Tests, README and summary use 269. Spec text and the contract example (illustrative) still say 268; noted under Next steps, left for `/flow:plan`.
+- `parameters` in the summary is not rounded to 9 digits (the gas constant has 10 and must equal `POLICY`). Fixture "even seconds" noise rule is applied by reading index for 0.5 Hz and per-minute signals (by second, the CO2 noise would be constant and cleaning would call it a flatline). `residual_p95_abs_w` in the fixture run is about 1.8e-12 (decimal representation), the test allows 1e-9. A missing processed table or no rows for the policy version is refusal `no_cleaned_readings`.
+- Fixture numbers: energy_kwh 2.43332058 (584/600), energy_logged_kwh 2.44590461 (587/600), difference 3.45e-05, mean power 14.9999214 kW, efficiency mean 0.750002923 (592/600), CO2 captured 0.104296861 kg, inlet 0.139062481 kg (532/600), capture rate 0.705768232 kg/h, sec 21.2532386 kWh/kg (517/600). Series written 586 / 586 / 297 / 269.
+**W2 check:** `lane.js check --wave W2` ok (9 files, all allowed); unit + new e2e + integration (metrics store, migrations) 463 passed, 0 skipped; ruff clean; `contract.js --static` 4 PASS; raw SHA-256 matches. Databases back to `_internal, dac_pinned, dac_raw, dac_rollup`.
+
+**W3 T4 stopped (no write to `reports/`).** Calibration is done and clean; steps 4 and 5 (final run into `reports/`, rerun, fresh private stack) are not.
+- Calibration (scratch `.flow-tmp/t4m/`, independent recompute with no pipeline imports): EXP_001, EXP_004 and all six, 0 differences at 9 digits (13 metrics, coverages, power_check, efficiency_check, 25 signals, plausibility, stored `metrics_series`). S4.24 labels all match. Plausibility: 0 failed, `energy_agreement` passes (largest 0.0067, EXP_001). S4.27: 150 series equal the cleaning summary. S4.26 passes. `has_policy_rows` works on real `dac_raw` without a time window. Raw SHA-256 matches; `.env` is dev. Full `pytest -q -rs` on dev stack: 563 passed, 0 skipped.
+- **Stop 1, S4.25:** EXP_001 `within_tolerance_fraction` = 0.983158 (7005 of 7125), under 0.99. Cause: 120 consecutive instants 09:23:20 to 09:25:19 on 2026-05-04 where logged `power` is about 6 kW above voltage x current; all three signals accepted by cleaning, no spike or flatline. Other five experiments 1.0. Energy still agrees (0.67 %). A narrow question for `/flow:plan M4` (threshold, report as a cross-check finding, or a cleaning rule that reopens M3). No code or constant changed. Logged as E-09.
+- **Stop 2, dev Postgres cannot take migration 0003:** `python -m scripts.migrate` refuses: migration 0001 recorded checksum 52d6ff5d (the LF bytes), working-tree file is CRLF (`core.autocrlf=true`, index is LF; `.gitattributes` only pins `tests/fixtures/**`). A fresh private stack and Linux CI migrate fine. Not patched by me. Options: pin `migrations/*.sql` to LF in `.gitattributes` and re-checkout, or hash with line endings normalised in `pipeline/pg_migrate.py`. Calibration used a throwaway schema `t4m_calib` (dropped).
+- State: dev `dac-influxdb` and `dac-postgres` up; `.env` dev; dev `dac_raw` now holds `metrics_series` (121,167 points from the calibration run; the real run rewrites the same keys); dev Postgres `public` has no 0003 tables.
+- Open design note: `residual_median_w` is the median of the signed residual (not absolute); worth one line in `docs/metrics.md`.
+
+### M4 interim status (revision `a7bade1` + uncommitted, branch `m4-metrics`)
+T1, T2, T3 done and checked; T4 stopped on S4.25 and the dev-Postgres checksum; T5 (write-up) not started. Not committed, not pushed, judge not run.
+
+**Decisions after the T4 stop (Sebastian, 2026-11-24: "follow your recommendations").** (1) S4.25 keeps 0.99; EXP_001's 0.983 is reported as a cross-check result in the M4 report (recorded in Spec Next steps, S4.25 reworded at the next plan). (2) `.gitattributes` gets `migrations/*.sql -text`; I recreated `migrations/0001`, `0002` from the index (LF, checksum `52d6ff5d` matches the recorded one) and converted `0003` to LF; `python -m scripts.migrate` then applied 0003 on dev Postgres. T4 resumes at its steps 4-6.
+
+**W3 T4 done (second pass).** `reports/metrics_summary.json`, `reports/metrics_report.md` written by `python -m scripts.metrics --report-dir reports` on dev: exit 0, 6 experiments, 121,167 points, 228 Postgres rows (78 + 150), balanced, inputs unchanged, 0 plausibility failures. Independent recompute: 0 differences at 9 digits (13 metrics, power_check, efficiency_check, 150 signals, stored series). Schema valid; S4.27 150 of 150 series; rerun on dev identical except timing; fresh private stack (`m4t4`, ingest, clean, metrics) equal to the committed summary without timing, reports byte-equal; stack down, `.env` dev again. Full `pytest -q -rs` on dev: 563 passed, 0 skipped. Raw SHA-256 matches.
+- S4.25 as restated by Sebastian: experiments 2-6 are 1.0; EXP_001 0.983157895 (7005 of 7125); all four energy_agreement checks pass (EXP_001 relative difference 0.00675, which the 120 s block explains).
+- **S4.24 does not match in one cell** (the T4 agents reported all labels matching; I compared the summary myself): EXP_002 `sec_kwh_per_kg` is partial (0.9329), not complete. Cause: its coverage is the overlap of power (0.9331) and capture (0.9997). Everything else matches. Recorded in E-09 and Spec Next steps; not a constant change.
+- Lead cleanup: the fresh-stack `python -m scripts.ingest` wrote to the default `reports/` and changed the timing lines of the committed M2 ingest outputs; restored from git (timing only).
+- Not recorded by the agents' claim: the Postgres password default appears in `docker-compose.yml`, `.env.example`, `ci.yml` and a handoff doc, all pre-M4 files.
+
+**W4 T5 done.** `docs/metrics.md`, `docs/decisions/ADR-0016-derived-metrics.md` (20 decisions + 12 "decided at execute"), `docs/schema.md`, `docs/ASSUMPTIONS.md` (A-08, U-06 note), `docs/decisions/README.md`, `docs/ROADMAP.md`, `.github/workflows/ci.yml` (metrics contract step), `tests/unit/test_metrics_doc.py` (44, 12 mutation checks), `reports/M4.md`. `lane.js check --wave W4` ok (9 files, all allowed).
+
+### M4 final (revision `a7bade1` + uncommitted, branch `m4-metrics`)
+
+Status: implemented and verified by me; **not committed, not pushed, judge not run, CI not run**. Mode standard, tasks T1-T5 by agents.
+
+| Command | Result |
+|---|---|
+| `ruff check .` / `ruff format --check .` | clean (109 files) |
+| `python -m pytest tests/unit -q` | 462 passed |
+| `python -m pytest -q -rs` (dev stack, T4) | 563 passed, 0 skipped (before the T5 doc test; unit rerun after: 462 passed) |
+| `node contract.js --static` | 4 PASS |
+| `python -m scripts.metrics --report-dir reports` on real data | exit 0, 6 experiments, 121,167 points, 228 Postgres rows, balanced, inputs unchanged, 0 plausibility failures |
+| independent recompute (no pipeline imports) vs summary | 0 differences at 9 digits, all six |
+| re-run on dev; fresh private stack (ingest, clean, metrics) | summary equal except timing, report byte-equal |
+| SHA-256 of raw CSV | OK |
+| GitHub Actions, judge | not run |
+
+Remaining gaps (all in `reports/M4.md`): S4.25 met as Sebastian restated it (EXP_001 0.983 reported, 0.99 kept for the rest); S4.24 EXP_002 `sec_kwh_per_kg` partial, not complete; S4.9 fixture count 269 not 268 (spec text and contract example not edited, Next steps); `plausibility.limit` null workaround; `count_series` ignores the policy version. Judge `/flow:verify M4`, commit and push `m4-metrics`, CI, merge approval.
+State left behind: dev `dac-influxdb` and `dac-postgres` running; dev Postgres has 0003 applied; dev `dac_raw` holds `metrics_series`; `.env` dev; `.flow-tmp/t4m/` scratch.
