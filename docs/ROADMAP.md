@@ -20,7 +20,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M2 | Ingestion | B | Verify | [0007](decisions/ADR-0007-duplicate-resolution-idempotency.md), [0013](decisions/ADR-0013-ingestion.md) |
 | M2.5 | Post-ingest profiling | — | Verify | [0010](decisions/ADR-0010-profile-post-ingest-in-database.md), [0014](decisions/ADR-0014-post-ingest-profiling.md) |
 | M3 | Quality & cleaning pipeline | C, D | Verify | [0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md) |
-| M4 | Derived metrics | E | Not started | — |
+| M4 | Derived metrics | E | Verify (built 2026-11-24, judge not run) | [0016](decisions/ADR-0016-derived-metrics.md) |
 | M5 | Comparison & findings | F | Not started | — |
 | M6 | Grafana dashboard | G | Not started | — |
 | M7 | Edge, cloud, presentation | H, I, J | Not started | — |
@@ -38,7 +38,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | B | Ingestion | M2 | **Built, awaiting the judge** (2026-11-23). Real file: 520,005 rows = 519,980 saved + 15 exact copies + 10 conflict losers + 0 rejected, all 150 series balanced against a count read back from InfluxDB; second run identical; raw SHA-256 unchanged. Report: [`reports/M2.md`](../reports/M2.md). Decisions: [ADR-0013](decisions/ADR-0013-ingestion.md). |
 | C | Data quality pipeline | M3 | **Built, awaiting the judge** (2026-11-23). Real data: 150 series, 519,980 readings = 514,443 accepted + 5,537 excluded, every series balanced against a count read back from InfluxDB, raw tables unchanged. Each reading keeps its raw value, processed value, flag, verdict and reason. Report: [`reports/M3.md`](../reports/M3.md). Decisions: [ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md). Schema: [`schema.md`](schema.md). |
 | D | Cleaning and processing | M3 | **Built, awaiting the judge** (2026-11-23). Per-signal policy table, 25 rows, checked against the code by a test: [`cleaning_policy.md`](cleaning_policy.md). All nine defect kinds covered. Real data: 29 gaps, 5 stuck-sensor runs, 4 impossible values, 4 spikes, 100 BAD and 230 UNCERTAIN readings excluded; rollup rebuilt over the verdict (16,256 buckets). Report: [`reports/M3.md`](../reports/M3.md). Decisions: [ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md). |
-| E | Derived metrics | M4 | Not started |
+| E | Derived metrics | M4 | **Built, awaiting the judge** (2026-11-24). Real data: 13 metrics and 4 derived series for each of the 6 experiments, each metric with a coverage and a label (complete, partial or none); the formulas were recomputed independently in plain Python with 0 differences; energy from voltage times current agrees with the logged power to within 0.67 % in every experiment. These are numbers, not findings. Report: [`reports/M4.md`](../reports/M4.md). Decisions: [ADR-0016](decisions/ADR-0016-derived-metrics.md). Formulas: [`metrics.md`](metrics.md). Schema: [`schema.md`](schema.md). |
 | F | Experiment comparison | M5 | Not started |
 | G | Grafana dashboard | M6 | Not started |
 | H | Edge ingestion & resilience (design) | M7 | Not started |
@@ -471,6 +471,29 @@ integration method for energy; how quality-excluded samples propagate into a der
 how a metric computed over incomplete data is labelled.
 
 **Execute** — metric computation and storage.
+
+**Execute-phase status (2026-11-24).** Built on branch `m4-metrics` (cut from `master`): the
+milestone record is `.workflow/dac.md` (scenarios S4.1-S4.28), the decisions are in
+[ADR-0016](decisions/ADR-0016-derived-metrics.md), the formulas are in [`metrics.md`](metrics.md),
+the committed outputs are `reports/metrics_summary.json` and `reports/metrics_report.md`, and the
+report for review is [`reports/M4.md`](../reports/M4.md). Merge to `master` waits for approval.
+Nothing is committed or pushed yet, the judge has not run, and GitHub Actions has not run.
+Results so far:
+
+- Real run (`python -m scripts.metrics`, dev `dac_raw`): exit 0, 6 experiments, 121,167 points in
+  `metrics_series`, 228 Postgres rows (78 + 150), counts read back and balanced, input tables
+  unchanged, 0 plausibility failures, about 26 s. Re-run on the dev stack and on a fresh private
+  stack: summary identical except timing.
+- Calibration: 0 differences at 9 digits against an independent plain-Python recompute on EXP_001,
+  EXP_004 and all six (13 metrics, power check, efficiency check, 150 signals, stored series).
+- Power cross-check: 5 of 6 experiments within tolerance at every instant. EXP_001 is 0.983 (7,005
+  of 7,125): 120 s of logged power about 6 kW above voltage times current. Reported as a result; the
+  0.99 threshold was kept. Energy still agrees (0.67 %).
+- Tests: unit pass, including the metrics-document test (`tests/unit/test_metrics_doc.py`); the
+  end-to-end, integration and exit-code suites passed in the earlier waves (see the execute log).
+- Added: A-08. Noted: U-06 (metrics are per-experiment batch jobs).
+- Not run: the judge, GitHub Actions. Not committed or pushed. The real-data metrics run is not in
+  CI.
 
 **Verify**
 - Computed power cross-checked against the independently logged `power` signal (the data

@@ -226,6 +226,28 @@ now pins this: a second `up` for the same run keeps its token, a different run i
 
 ---
 
+### E-09 — The M4 plan pinned a wrong row count (268, not 269) and a pass threshold the real data misses   [M4, 2026-11-24]
+
+**Claimed / did:** the M4 plan pinned S4.9 at 268 `capture_rate` rows for the fixture, and S4.25
+at "within_tolerance_fraction at least 0.99 for every experiment" on the real data.
+
+**Actually true:** the fixture construction gives 269 (297 efficiency instants minus the 28 even
+seconds from +362 to +418 other than +400, which was already excluded; the plan counted +400
+twice). On the real data EXP_001 gets 0.9832: 120 consecutive seconds (09:23:20 to 09:25:19) where
+logged power sits about 6 kW above voltage times current, all three marked accepted by cleaning.
+
+**Why I got it wrong:** the count was done by listing exclusions without checking they overlap.
+The 0.99 was a round number chosen before looking at the data's disagreement; the profile had not
+measured power against voltage times current.
+
+A third pinned prediction was also off: S4.24 said `sec_kwh_per_kg` is complete for EXP_002,
+but its coverage is the overlap with the power series, which is 0.933 there, so it is partial.
+The T4 agents reported "all labels match" without comparing this one cell.
+
+**Rule that prevents a repeat:** when a plan pins a count that is a union of excluded sets, count
+the union, not the sum. Do not pin a pass threshold on real data before measuring the quantity it
+bounds (the "validate before scaling" rule applies to acceptance thresholds too).
+
 ## Corrected design calls
 
 Template:

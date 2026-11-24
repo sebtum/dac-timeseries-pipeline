@@ -29,6 +29,7 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0013](ADR-0013-ingestion.md) | Ingestion: timezone, precision, batching, rejects, conflict winner, exit codes | M2 | B | Accepted |
 | [0014](ADR-0014-post-ingest-profiling.md) | Post-ingest profiling: what is measured, SQL versus Python, four engine quirks | M2.5 | C, D | Accepted |
 | [0015](ADR-0015-cleaning-and-quality-pipeline.md) | Cleaning and quality pipeline: one verdict per reading beside the raw value, the rules, the rollup over the verdict | M3 | C, D | Accepted |
+| [0016](ADR-0016-derived-metrics.md) | Derived metrics: a batch job over accepted readings, labelled by coverage, never filled | M4 | E | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
@@ -72,7 +73,9 @@ integers — neither forces the other. 0012 is separable again: the metadata sto
 in 0005, and *how its schema arrives and how corrections survive a reload* could have been answered
 any number of ways without touching 0005's reasoning. 0015 is separable from 0006 and 0013 for the
 same reason: those decide what is stored and how it got there, 0015 decides how each stored reading
-is judged, and a different set of rules would not change either.
+is judged, and a different set of rules would not change either. 0016 is separable from 0015 in
+turn: 0015 decides which readings are accepted, 0016 decides what is computed from them and how a
+hole in them is labelled.
 
 ## Status values
 

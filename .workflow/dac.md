@@ -13,14 +13,20 @@
 - Open questions closed by M2: U-01, U-02, U-07, U-08, U-11 (`docs/ASSUMPTIONS.md`)
 - M2.5: `docs/ROADMAP.md` § M2.5; ADR-0010 (what to measure, where); ADR-0004 and U-05 (query span); `task/DATA_DICTIONARY.md` (nominal rates, typical ranges); MISTAKES.md C-01, C-02
 - M3: `docs/ROADMAP.md` § M3; `task/TASK.md` C, D; ADR-0006 (U-09, U-10), ADR-0011 (rollup over the verdict, UNCERTAIN as BAD, U-04), ADR-0013 (conflicts table, empty values), ADR-0014 and `reports/post_ingest_profile.json` (the measured facts the rules are calibrated on); U-06, U-12; MISTAKES.md C-01, C-02, C-03; approved plan `C:\Users\sebas\.claude\plans\glittery-splashing-nebula-of-6edcf82e-3517-4393-95bf-5335ed2e2c92.md`
+- M4: `docs/ROADMAP.md` § M4; `task/TASK.md` E; `task/DATA_DICTIONARY.md` (units, nominal rates, the power note); ADR-0005 (Postgres for metadata, Grafana reaches it by variable), ADR-0011 (tiers), ADR-0015 and `docs/cleaning_policy.md` (the verdict M4 consumes, the alignment rule it promised: polled signals as-of within 2 × nominal); `reports/cleaning_summary.json` and `reports/post_ingest_profile.json` (measured gaps, exclusions, shared instants); MISTAKES.md C-01, E-04, E-06; approved plan `C:\Users\sebas\.claude\plans\nested-twirling-book-of-20e84ac6-0afe-4726-bfcc-f29c4a1074b7.md`
 
 ### Goal
-Build everything in `task/TASK.md` A–J, one roadmap milestone at a time. Current milestone, M3:
-decide for every stored reading whether it can be trusted, write raw value, processed value, flag,
+Build everything in `task/TASK.md` A–J, one roadmap milestone at a time. Current milestone, M4:
+compute power, energy, capture efficiency, capture rate, energy per kg CO2 and data-quality shares
+per experiment from accepted readings only, label each number with its coverage, store time series
+in InfluxDB and experiment numbers in Postgres, and cross-check power and energy independently.
+M3 (built, merged): decide for every stored reading whether it can be trusted, write raw value, processed value, flag,
 decision and reason side by side, record gaps and stuck stretches as intervals, rebuild the rollup
 over that decision, and prove by counts that nothing was dropped or quietly changed.
 M2.5 (built): measure the stored data and write the numbers to a file, without judging any reading.
 M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing anything, and prove it with counts.
+- Scope (M4): metrics command `scripts.metrics`, pure metric functions with a versioned policy table, InfluxDB table `metrics_series` in `dac_raw`, Postgres migration 0003 (`experiment_metrics`, `signal_quality`), summary contract, hand-built fixture with hand-computed answers, real run with committed outputs, `docs/metrics.md`, ADR-0016, M4 report.
+- Non-goals (M4): `experiment_time` alignment, process-phase segmentation, cross-experiment comparison and findings (M5); dashboard (M6); rolling up the derived series; changing any raw or processed table or the cleaning rules; filling any input; time-chunked processing for continuous data; scheduling (H).
 - Scope (M3): cleaning command, three processed tables in `dac_raw`, summary contract, rollup command over the verdict, policy document, hand-built fixture, real run with committed outputs, ADR-0015, M3 report.
 - Non-goals (M3): changing any raw value or raw table; cross-signal exclusion rules (M4 does the power cross-check); alignment to a common time grid (M4); time-chunked processing for continuous data; scheduling, plugins (H); dashboard (M6).
 - Scope (M2): private test stack, ingest command, rejects file, conflicts table, summary + report, CI fixture test, full real run, M2 report.
@@ -41,6 +47,7 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - Pre-existing changes: ` M CLAUDE.md`, ` M docs/ROADMAP.md`, `?? docs/discuss/M2.md`
 - M2.5 baseline: `77b851678fc9b1cc901df21ad0cb1277c7e4f30e` (branch `m2-ingestion`), clean
 - M3 baseline (planning, 2026-11-23): `77b851678fc9b1cc901df21ad0cb1277c7e4f30e` on branch `m2.5-profiling`, with all of M2.5 uncommitted: ` M .github/workflows/ci.yml`, ` M .gitignore`, ` M .workflow/dac.log.md`, ` M .workflow/dac.md`, ` M docs/ASSUMPTIONS.md`, ` M docs/ROADMAP.md`, ` M docs/decisions/README.md`, ` M pipeline/signals.py`, `?? contracts/examples/post_ingest_profile.example.json`, `?? contracts/post_ingest_profile.schema.json`, `?? docs/decisions/ADR-0014-post-ingest-profiling.md`, `?? pipeline/profiling.py`, `?? pipeline/profiling_sql.py`, `?? reports/M2.5.md`, `?? reports/post_ingest_profile.json`, `?? reports/post_ingest_profile.md`, `?? scripts/post_ingest_profile.py`, `?? tests/e2e/test_profile_cli.py`, `?? tests/fixtures/profile/`, `?? tests/unit/test_profiling.py`. M3 execute starts from the M2.5 commit, on a new branch `m3-cleaning`.
+- M4 baseline (planning, 2026-11-24): `a7bade12486f58fabf3ee5fede4fd67d6b22cee7` on `master` (the M3 merge), clean. M4 execute starts on a new branch `m4-metrics` cut from it; the first commit carries this record and the M4 contract files.
 
 ### Constraints
 - Milestone ids follow `docs/ROADMAP.md`. Only `/flow:plan <id>` details a milestone.
@@ -54,6 +61,9 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M3 never writes `readings_numeric`, `readings_state` or `readings_conflicts`, and never creates a database. It writes only `readings_processed`, `state_intervals`, `quality_intervals` (in the target raw database) and `readings_rollup` (in the rollup database).
 - M3 SQL avoids the Core 3.11.2 quirks in ADR-0014: no `COUNT(*) FILTER` after a window function, no `PERCENTILE_CONT`, no equality on `-0.0`, no reliance on last-bit-stable server sums. The rules themselves run in Python on pulled series.
 - The verdict-word ban (C-02) applied to M2.5 outputs only. M3 is where verdicts live, so its reason codes are verdicts on purpose.
+- M4 never writes `readings_numeric`, `readings_state`, `readings_conflicts`, `readings_processed`, `state_intervals`, `quality_intervals` or `dac_rollup`, and never creates a database. In InfluxDB it writes only `metrics_series` (target raw database); in Postgres only `experiment_metrics` and `signal_quality`. It never changes the `experiment` table.
+- M4 reads only rows with `verdict = 'accepted'` for one cleaning `policy_version` as metric inputs; it reads counts of all rows for the quality shares. Same Core 3.11.2 SQL quirks to avoid as M3 (ADR-0014); integrals and sums are done in Python with `math.fsum`.
+- M4 outputs are not findings. Comparisons between experiments and the flow/pressure-vs-voltage answer are M5 and need Sebastian's approval (CLAUDE.md).
 
 ### Decisions
 - M0, M1 accepted as done under the old method (Sebastian, 2026-11-23).
@@ -126,6 +136,28 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
   25. **For `available_solar_power`, a step is flat only when its change is exactly 0 and the two values are not both 0.0.** The step size of solar grows with its level (EXP_005 starts at 0 kW: steps of about 1 kW per minute at 08:00, 20 to 30 by 09:30), while the declared normal step, 12.255, is the median over six runs that mostly start at 100 to 400 kW; a fixed fraction of it is the wrong yardstick at low power. A frozen sensor repeats one value. Limit: a solar sensor frozen with a little added noise would not be caught. Replaces the night-zero special case (`_ZERO_IS_IDLE`). No run length fixes the dawn hit (execute measured 3, 5, 8). Rejected: exempt solar from flatline (misses a frozen sensor); accept the dawn hit (excludes good data).
   26. **EXP_006 fan_speed 839.2 at 11:10:17 is a real spike and joins S3.29.** Its primary reason stays `conflicting_duplicate`; `spike` is in its flags, as decision 8 requires. `POLICY_VERSION` stays `m3-v1` (nothing written under it yet); the fingerprint is re-pinned to the amended table.
   27. **M3 runs as 5 tasks, each by its own agent** (Sebastian's request, to keep each context short). Replaces decision 1's "one piece, no tasks" and, for M3, the no-subagents-for-Execute default. Pure rules (T1) and rollup (T2) in parallel; then fixture, Influx layer, CLI and e2e (T3); then real data (T4); then the write-up (T5). T1 keeps the names and signatures `scripts/clean.py` and `pipeline/cleaning_influx.py` import from `pipeline/cleaning.py`. A rule bug found by T3 or T4 is reported back, not patched outside the owner's files. T4 stops without changing thresholds if any spike or flatline appears outside S3.29. S3.26 is reworded so T2 proves it without the fixture.
+- M4, made while planning (2026-11-24); plan approved by Sebastian (`C:\Users\sebas\.claude\plans\nested-twirling-book-of-20e84ac6-0afe-4726-bfcc-f29c4a1074b7.md`). Full reasoning goes into ADR-0016 at execute.
+
+  1. **Mode standard, judge verify, 5 tasks run by agents** (Sebastian asked for tasks run in parallel where possible). Pure metric functions (T1) and storage (T2) in parallel; then fixture, CLI and e2e (T3); real data (T4); write-up (T5). A bug found by a later task is reported back to the owner, not patched outside the finder's files. Rejected: one piece (Sebastian's request); full mode (no new risk class; the formulas are pinned by hand-computed fixtures and an independent recompute).
+  2. **M3 accepted as done for starting M4.** Its newest Findings block is `@ 1dcd428`; HEAD `a7bade1` is the approved merge of `f020fc0`, which only renamed one test file (verify correction block). Accepted by Sebastian with this plan.
+  3. **Metrics are a Python batch job after cleaning** (`python -m scripts.metrics`), like the rollup. Rejected: query-time SQL in Grafana (formulas become untested dashboard text; the gap rule and the energy-per-kg overlap are not plain SQL); a Processing Engine plugin (same reason as U-04).
+  4. **Inputs are accepted readings only; a derived value exists at an instant only when every input is accepted there.** Nothing is filled, clamped or smoothed; small negative currents stay (M3 decision 4), so power may be slightly negative. Missing inputs lower coverage.
+  5. **Join on the exact same instant** for signals that share instants (voltage, current, power; co2_in, co2_out, air_flow at the 0.5 Hz instants — profile `instants_unmatched` 0). Ambient temperature and pressure (1/60 Hz) are taken as-of: the latest accepted reading at or before the instant, used when its age is at most `AMBIENT_MAX_AGE_S = 120` (2 × nominal; 120 s used, 120 s + 1 ns not). Rejected: resampling onto a grid (invents values); linear interpolation of ambient (filling).
+  6. **Integration is the trapezoid rule over consecutive derived points; a spacing above `2 × nominal` of the derived series is a gap and is not bridged.** Power series (1 Hz): `POWER_MAX_SPACING_S = 2`. Capture series (0.5 Hz): `CAPTURE_MAX_SPACING_S = 4`. A spacing equal to the limit is bridged. Covered seconds = sum of bridged spacings. Sums with `math.fsum`. Rejected: scaling an integral up to the full duration.
+  7. **Power: `power_computed = voltage × current` at instants where both are accepted. `power_residual = power − voltage × current` at instants where all three are accepted.** An instant agrees when `|residual| ≤ POWER_TOL_REL × |voltage × current| + POWER_TOL_W` (0.01, 10 W). The summary reports compared instants, residual median, p95 of |residual|, max |residual|, count and fraction within tolerance.
+  8. **Energy twice:** `energy_kwh` from `power_computed`, `energy_logged_kwh` from the accepted logged `power`, each over its own covered time. `energy_relative_difference = (E_logged − E_computed) / E_computed`, both integrated over the overlap of their covered intervals (decision 11's overlap integration), so a one-reading difference in coverage does not show as disagreement. `mean_power_kw = energy_kwh / covered hours`.
+  9. **Capture rate (kg/h) = air_flow [m³/h] × (co2_in − co2_out) [ppm] × 1e-6 × p·M / (R·T)**, p = ambient_pressure × 100 Pa, T = ambient_temperature + 273.15 K, M = 0.04401 kg/mol, R = 8.314462618 J/(mol·K). Inlet CO2 rate likewise with co2_in alone. `co2_captured_kg` and `co2_inlet_kg` are integrals of those series (decision 6); `capture_rate_mean_kg_h = co2_captured_kg / covered hours`. Assumes air flow in actual m³/h at ambient conditions, ppm by volume, humidity ignored, outlet volume = inlet volume (new assumption A-08). Rejected: a fixed standard density (12 % off across −5…30 °C). Known cost: EXP_005's first 30 ambient-pressure readings are UNCERTAIN (06:00Z–06:29Z), so its capture coverage is about 0.75; filling the barometer (under 0.1 % effect) was rejected as filling.
+  10. **Capture efficiency series = (co2_in − co2_out) / co2_in at instants where both are accepted; `capture_efficiency_mean` = plain mean of that series** (`math.fsum`). Values ≤ 0 are kept and counted (`efficiency_check.at_or_below_zero`). Coverage uses the 4 s spacing rule on the efficiency series. Rejected: air-flow weighting (ties efficiency to the air-flow sensor; flow is near constant within a run).
+  11. **Energy per kg CO2 (`sec_kwh_per_kg`) = energy of `power_computed` over the overlap of the power and capture covered intervals ÷ CO2 captured over the same overlap.** Each series is integrated over the overlap exactly: its piecewise-linear interpolant on each covered interval, clipped to the overlap (interpolated endpoints). Coverage = overlap seconds / duration. Value null when the overlap is empty or captured CO2 over it is ≤ 0. Rejected: total energy ÷ total CO2 over different covered times.
+  12. **Every metric object is `{value, unit, coverage, status}`.** Coverage = covered seconds / `duration_s`. Status `complete` when coverage ≥ `COMPLETE_COVERAGE = 0.95`, `partial` when below, `none` exactly when value is null. Values are always reported when computable; M5 decides comparability. Quality shares have coverage and status null.
+  13. **Data quality per signal**, for all 25 declared pairs of every experiment (a pair with no readings is listed with present 0): `present` = processed rows (`readings_processed` or `state_intervals`, any verdict), `accepted`, `bad` and `uncertain` (acquisition `quality`), `expected = floor(duration_s / nominal_s)` for polled signals, null for on-change state signals (C-01). `completeness = present / expected`, `valid_fraction = accepted / present`, `bad_fraction`, `uncertain_fraction` (null when the denominator is 0). Experiment level: `completeness = Σpresent / Σexpected` over polled pairs; the three fractions over all 25 pairs. Counts come from a SQL `GROUP BY` (no `FILTER`).
+  14. **Storage.** InfluxDB `metrics_series` in the target raw database (expires with raw, like M3 decision 2): tags `experiment_id`, `metric` (`power_computed` W, `power_residual` W, `capture_efficiency` fraction, `capture_rate` kg/h), `metrics_version`, `policy_version`; field `value` float; time = the instant. Postgres (migration `0003_experiment_metrics.sql`): `experiment_metrics` (PK `experiment_id, metrics_version, metric`; FK to `experiment`) and `signal_quality` (PK `experiment_id, metrics_version, source, signal`; FK). Both upserted in one transaction per run, so a rerun overwrites identical rows and a failure leaves nothing partial. They outlive raw retention on purpose (small summaries). Rejected: one InfluxDB point per experiment at a made-up time (no join to metadata).
+  15. **Policy table and version.** All constants of decisions 5–12 and 16 sit in one declared mapping in `pipeline/metrics.py` with `METRICS_VERSION = "m4-v1"`; a unit test pins `METRICS_FINGERPRINT` (SHA-256 of its canonical JSON). A changed constant is a new version.
+  16. **Plausibility checks per experiment, in the summary:** `efficiency_in_unit_interval` (0 ≤ `capture_efficiency_mean` ≤ 1), `capture_below_inlet` (`co2_captured_kg` ≤ `co2_inlet_kg`), `sec_above_floor` (`sec_kwh_per_kg` ≥ `SEC_FLOOR_KWH_PER_KG = 0.10`, below the minimum work of separating CO2 from air), `energy_agreement` (|`energy_relative_difference`| ≤ `ENERGY_AGREEMENT_REL = 0.01`). `passed` is null when the metric is null. Any `false` → exit 1, outputs still written. Raw-data estimates give 9–43 kWh/kg; the report states the numbers, not a finding.
+  17. **Exit codes:** 0 written and read back; 1 written and read back, a plausibility check failed; 2 refused, nothing written (database missing — never created —, `readings_processed` missing or holding no rows for the policy version, experiments file unreadable, Postgres unreachable, migration 0003 not applied, an experiment missing from Postgres `experiment`); 3 a query or write failed; 4 written but read-back counts differ. Outputs written on 0, 1, 4; none on 2, 3. Order: compute everything, write InfluxDB, write Postgres (one transaction), read back, write outputs.
+  18. **Expected real-data labels pinned before the real run** (S4.24). A different label stops T4 and comes back as a narrow question; constants are not tuned silently.
+  19. **Calibrate before scaling:** EXP_001 first, compared with an independent plain-Python recompute from SELECT pulls (no pipeline imports), then EXP_004 (air-flow hour), then all six.
+  20. **Branch `m4-metrics`, cut from `master`.** Commit and push at the end of M4; merge waits for approval.
 
 ### Assumptions and open questions
 - Partial accept on 3.11.2 behaves as documented — a real test in M2 decides (Claude).
@@ -140,6 +172,9 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M3: the thresholds (5 × robust sd, floor 10 × step, flatline 0.2 × step, windows) are a first calibration on six 2-hour runs; a longer or noisier data set may need them re-set, which is a policy-version change (Claude).
 - M3: EXP_004 air flow 09:00–10:00 is treated as a sensor fault (fan speed, pressure drop and outlet CO2 unchanged while the reading drops 60×). That is a cleaning call, not an M5 finding; M5 may revisit it (Claude decides; Sebastian reviews in the M3 report).
 - M3: `FLAT_MIN_RUN = 5` and the solar exact-repeat rule (decisions 24, 25) are a first calibration on the same six runs; a changed value is a policy-version change (Claude).
+- M4: air flow is actual m³/h at ambient conditions, ppm is by volume, humidity is ignored, outlet volume equals inlet volume (new A-08; Claude decides, Sebastian reviews in the M4 report). Wrong if the meter reports normal m³/h: capture rate would then be off by the ambient-to-standard density ratio (up to about 12 %).
+- M4: the expected labels in S4.24 come from the M3 cleaning summary and the raw ambient file (EXP_005 ambient pressure UNCERTAIN 06:00Z–06:29Z, contiguous). Coverages are approximate (±0.01) until T4 measures them (Claude).
+- M4: `SEC_FLOOR_KWH_PER_KG = 0.10` is a lower bound below the minimum work to separate CO2 from 400 ppm air (about 0.12 kWh/kg at 25 °C, RT·ln(1/x) in the small-capture limit). It catches unit errors, not inefficiency (Claude).
 - M3: EXP_004 pressure −3.1 bar: its acquisition flag decides whether the reason is `flag_uncertain` or `outside_physical_limits`; either way it is excluded (Claude, at execute).
 
 ### Next steps (not in this budget)
@@ -159,6 +194,15 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - Rollup end-to-end test shares one database (M3): `tests/e2e/test_clean_cli.py` writes the rollup into the same throwaway database as the cleaning, because Core allows 5 databases and 4 exist while it runs. A second throwaway would fail the 5-database limit. Fine until a test needs two at once — small, found 2026-11-23.
 - Old policy versions pile up (M3): bumping `POLICY_VERSION` writes new rows beside the old ones in `dac_raw`, and nothing removes the old version's rows (they expire with raw). A cleanup command, or a note in the operations story for deliverable H — small, found 2026-11-23 while writing ADR-0015.
 - No test validates the committed `reports/cleaning_summary.json` against `contracts/cleaning_summary.schema.json` (the profile has one in `tests/unit/test_profiling.py`); only the fixture run's output and the example are validated. Checked by hand at write-up — small, found 2026-11-23.
+- Rolling up `metrics_series` into `dac_rollup` (M4 non-goal): not needed for 7,200 points per experiment; needed once runs are long — small.
+- Filling short ambient gaps for the gas density (M4 decision 9's rejected option): would raise EXP_005 capture coverage from about 0.75 to 1.0 at under 0.1 % error; a policy-version change if wanted — small.
+- A commanded-vs-measured current check (current against current_setpoint with the measured 23–24 s lag) as a metric: belongs with M5's analysis if needed — small.
+- Old metrics versions pile up in `metrics_series` and the Postgres tables, like M3's old policy versions — note for H — small.
+- S4.9 pins 268 `capture_rate` rows for the fixture; the construction gives 269 (297 efficiency instants minus the 28 even seconds from +362 to +418 other than +400, which is already outside the 297; the pinned coverage 532/600 fits 269). The scenario text and the contract example's `series_written` say 268. Fix both at the next `/flow:plan M4` — small, found 2026-11-24 in M4 T3, hand-checked by the lead.
+- **Sebastian's decision, 2026-11-24 (given to execute, not via `/flow:plan`):** S4.25's 0.99 stays unchanged. EXP_001's 0.983158 (120 s of logged power about 6 kW above voltage x current, 09:23:20 to 09:25:19 on 2026-05-04, all three accepted by cleaning) is reported in `reports/M4.md` as a cross-check result, not a failure of the build and not hidden; no cleaning rule is added and M3 is not reopened. The judge should read S4.25 as: every other experiment is at least 0.99, and EXP_001's shortfall is explained and reported. Reword S4.25 at the next `/flow:plan M4` — small.
+- `.gitattributes` now has `migrations/*.sql -text`, so Windows checkouts keep the LF bytes whose checksums `schema_migrations` recorded (M4 execute, Sebastian agreed 2026-11-24). Without it the runner refused 0001 on any CRLF checkout.
+- S4.24 pins `sec_kwh_per_kg` complete for EXP_002; the real run gives partial (coverage 0.9329), because the value's coverage is the overlap of power and capture and EXP_002's power coverage is 0.9331. The other pinned labels match. Not a constant change; the plan's prediction missed the overlap. Reword S4.24 at the next `/flow:plan M4`; Sebastian reviews it in the M4 report — small, found 2026-11-24 by the lead after T4.
+- `plausibility[].limit` is required to be a number in the contract, so `capture_below_inlet` writes limit 0.0 (with `passed` null) when the inlet total is null. Allow null in the schema at the next contract change — small, found 2026-11-24 in M4 T1.
 
 ### Checks
 Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes the worktree
@@ -178,6 +222,9 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 | e2e | `python -m scripts.clean --report-dir .flow-tmp/clean` | . | stack up; `python -m scripts.ingest` ran on the real CSV first | new in M3 |
 | e2e | `python -m scripts.rollup` | . | stack up; `python -m scripts.clean` ran first | new in M3 |
 | contract | `check-jsonschema --schemafile contracts/cleaning_summary.schema.json contracts/examples/cleaning_summary.example.json` | . | requirements installed | new in M3 |
+| integration | `python -m pytest -v` | . | stack up; the whole suite in one session (catches basename clashes, M3 verify correction); any skip counts as a failure | ci.yml (new row in M4) |
+| e2e | `python -m scripts.metrics --report-dir .flow-tmp/metrics` | . | stack up; `python -m scripts.ingest` then `python -m scripts.clean --report-dir .flow-tmp/clean` ran first on the real CSV; Postgres migrated (0003) and experiments loaded (`verify_stack.py up` does both) | new in M4 |
+| contract | `check-jsonschema --schemafile contracts/metrics_summary.schema.json contracts/examples/metrics_summary.example.json` | . | requirements installed | new in M4 |
 
 `.workflow/verify-env.json`:
 ```json
@@ -894,7 +941,228 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 - After the judge: commit, push `m3-cleaning`, CI green, open `reports/M3.md` in the doc viewer. Merge waits for approval.
 
 #### M4: Derived metrics (E)
-- Not yet detailed. Scope: `docs/ROADMAP.md` § M4.
+- Depends on: M3 (accepted as done, M4 decision 2)
+- Judge: verify · Touches: data (writes `metrics_series` in `dac_raw` and two new Postgres tables; every other table read-only)
+- Gates: —
+- Contract: `contracts/metrics_summary.schema.json` (shape of `metrics_summary.json`), example `contracts/examples/metrics_summary.example.json` (shaped like the fixture run; its counts and coverages follow the fixture construction, its metric values are illustrative and are not the expected test values). `parameters` keys are exactly the keys of `POLICY` in `pipeline/metrics.py`. The InfluxDB table and the Postgres tables are pinned below and in `docs/schema.md`; their shape is checked by the integration and e2e tests, not by a schema file.
+- Order of work: T1 ∥ T2 → T3 → T4 (calibrate EXP_001, EXP_004, then all six; decision 19) → T5.
+- Command: `python -m scripts.metrics [--database NAME] [--experiments PATH] [--report-dir DIR] [--policy-version V] [--pg-schema NAME]`. Defaults `dac_raw`, `data/raw/experiments.json`, `reports/`, `pipeline.cleaning_policy.POLICY_VERSION`, `public`. InfluxDB host/token and `POSTGRES_*` from `.env`. `--pg-schema` sets the Postgres `search_path` (tests use a throwaway schema, like `tests/integration/test_metadata_loader.py`). Exit codes: decision 17. Outputs in `--report-dir`: `metrics_summary.json` (contract) and `metrics_report.md` (rendered from the summary: one table of metrics per experiment with value, unit, coverage, status; the power check; plausibility; per-signal quality).
+- Stores (decision 14):
+  - InfluxDB `metrics_series` (target raw database): tags `experiment_id`, `metric`, `metrics_version`, `policy_version`; field `value` float; time = the instant. Metrics and units: `power_computed` W, `power_residual` W, `capture_efficiency` fraction, `capture_rate` kg/h. Only instants where the value exists are written.
+  - Postgres `experiment_metrics`: `experiment_id text REFERENCES experiment`, `metrics_version text`, `policy_version text NOT NULL`, `metric text`, `value double precision NULL`, `unit text NOT NULL`, `coverage double precision NULL`, `status text NULL CHECK (status IN ('complete','partial','none'))`; PK `(experiment_id, metrics_version, metric)`.
+  - Postgres `signal_quality`: `experiment_id text REFERENCES experiment`, `metrics_version text`, `policy_version text NOT NULL`, `source text`, `signal text`, `nominal_interval_s double precision NULL`, `present integer`, `expected integer NULL`, `accepted integer`, `bad integer`, `uncertain integer`, `completeness`, `valid_fraction`, `bad_fraction`, `uncertain_fraction` (double precision NULL); PK `(experiment_id, metrics_version, source, signal)`.
+- Metric names (fixed set of 13, every experiment has all of them): `energy_kwh` kWh, `energy_logged_kwh` kWh, `energy_relative_difference` fraction, `mean_power_kw` kW, `capture_efficiency_mean` fraction, `co2_captured_kg` kg, `co2_inlet_kg` kg, `capture_rate_mean_kg_h` kg/h, `sec_kwh_per_kg` kWh/kg, `completeness`, `valid_fraction`, `bad_fraction`, `uncertain_fraction` (fraction). Coverage per metric: the energy and mean-power metrics use their own series' covered time; `energy_relative_difference` and `sec_kwh_per_kg` the overlap; the CO2 metrics the capture series; efficiency its own series; the four quality shares have null coverage and status.
+- Summary shape (the contract pins it): `schema_version` 1; `metrics_version`; `policy_version`; `source` {database, experiments_file, pg_schema}; `parameters` {the policy table of decision 15}; `experiments[]` {experiment_id, start, end, duration_s, `metrics` {name: {value, unit, coverage, status}}, `power_check` {instants_compared, within_tolerance, within_tolerance_fraction, residual_median_w, residual_p95_abs_w, residual_max_abs_w}, `efficiency_check` {instants, at_or_below_zero}, `series_written` {power_computed, power_residual, capture_efficiency, capture_rate}, `signals[]` (25 per experiment: source, signal, nominal_interval_s, present, expected, accepted, bad, uncertain, completeness, valid_fraction, bad_fraction, uncertain_fraction), `plausibility[]` {check, passed, value, limit}}; `plausibility_failed` (count of `passed = false`); `reconciliation` {balanced, influx_series_checked, postgres_rows_checked, mismatches[] {store, experiment_id, name, written, read_back}, inputs_unchanged}; `timing` {seconds, queries, points_written} — the only part allowed to differ between runs. Floats rounded to 9 significant digits; lists sorted (experiments by id, signals by source then signal, plausibility by check name).
+- Interfaces between tasks (pinned so T1 and T2 can run in parallel):
+  - T1, `pipeline/metrics.py` (pure; stdlib only): `METRICS_VERSION`, `METRICS_FINGERPRINT`, `POLICY` (the decision 15 mapping), `METRIC_UNITS` (name → unit, the 13 names), `SERIES_UNITS` (the 4 series names → unit). Series are `list[tuple[int, float]]` (ns, value), ascending. Functions: `power_series(voltage, current) -> list[tuple[int, float]]`; `residual_series(power, voltage, current)`; `within_tolerance(residual, ui) -> bool`; `efficiency_series(co2_in, co2_out)`; `capture_series(co2_in, co2_out, air_flow, temperature, pressure, *, inlet=False)`; `as_of(series, t_ns, max_age_ns) -> float | None`; `covered_intervals(series, max_spacing_s) -> list[tuple[int, int]]`; `integrate(series, max_spacing_s) -> tuple[float, float]` (integral in value·s, covered seconds); `overlap(a, b) -> list[tuple[int, int]]`; `integrate_over(series, intervals) -> float`; `status_for(value, coverage) -> str`; `experiment_metrics(inputs: ExperimentInputs, duration_s) -> ExperimentResult` (dataclasses defined in T1, holding the 13 metric objects, power_check, efficiency_check and the four series); `signal_quality(counts, duration_s) -> list[dict]` and `experiment_quality(rows) -> dict`; `plausibility(result) -> list[dict]`. T3 may rely only on these names.
+  - T2, `pipeline/metrics_store.py`: `MetricsGateway` (InfluxDB): `tables() -> set[str]`, `accepted_series(experiment_id, signal, start, end, policy_version) -> list[tuple[int, float]]`, `quality_counts(experiment_id, start, end, policy_version) -> list[dict]` (keys `source, signal, quality, verdict, count`; both processed tables), `has_policy_rows(policy_version) -> bool`, `input_counts(start, end) -> dict[str, int]` (row counts of the six input tables, for `inputs_unchanged`), `write_series(experiment_id, metric, metrics_version, policy_version, series)`, `count_series(experiment_id, metric, metrics_version, start, end) -> int`, `close()`. Postgres: `pg_connect(conninfo, schema) `, `pg_check(conn) -> str | None` (refusal detail when 0003 is not applied), `missing_experiments(conn, ids) -> list[str]`, `upsert_metrics(conn, rows: list[dict])` and `upsert_quality(conn, rows: list[dict])` in one transaction (`write_postgres(conn, metric_rows, quality_rows)`), `count_rows(conn, table, metrics_version) -> dict[str, int]` (by experiment). Row dict keys = the table columns above. T2 does not import `pipeline/metrics.py`.
+- Example map (rule → one example; boundaries included):
+
+  | Rule | Example |
+  |---|---|
+  | Power only where both accepted | BAD current at +100 s → no `power_computed` at +100 s |
+  | Residual tolerance | logged power +250 W at +200 s on 15,000 W → outside (limit 160 W); +150 W → inside (unit) |
+  | Spacing rule | 2 s spacing at 1 Hz bridged; 2 s + 1 ns not; 3 s not (unit); 4 s at 0.5 Hz bridged, 6 s not |
+  | No scaling | 600 s run with 16 s unbridged → energy over 584 s, coverage 0.9733 |
+  | Energy twice | logged power present where current is missing → difference taken over the overlap only |
+  | Ambient as-of | latest reading 120 s old → used; 122 s old → no capture value |
+  | Efficiency ≤ 0 kept | co2_out ≥ co2_in → value ≤ 0 stored, counted (unit) |
+  | Energy per kg over overlap | power covered 0–299 s, capture covered 0–360 s → only 0–299 s counts |
+  | Labels | coverage 0.95 → complete; 0.9499 → partial; no value → none (unit) |
+  | Quality shares | current 587 present of 600 expected, 586 accepted, 1 BAD |
+  | On-change | process_state → expected and completeness null |
+  | Plausibility | efficiency mean 1.2 → check false, exit 1, outputs written (fake) |
+  | Idempotent | second run → identical `metrics_series`, Postgres rows and summary except timing |
+  | Refusal | `dac_missing` → exit 2, not created, nothing written |
+  | Real data | six experiments, labels as pinned in S4.24 |
+
+- Fixture `tests/fixtures/metrics/` (`readings.csv`, `experiments.json`, `readings.sha256`, `make_fixture.py`, `README.md` with the hand computations): one experiment `EXP_001`, 2026-05-04T08:00:00Z–08:10:00Z (600 s), built by a deterministic stdlib script like the M3 fixture. Noise is a fixed alternation of ± half the signal's declared step size (`pipeline/cleaning_policy.py`), `+` at even seconds (or even reading index for slower signals), so cleaning accepts every normal reading. All timestamps `Z`, all `GOOD` unless stated. Instants relative to 08:00:00:
+  - voltage 1 Hz 100 ± 0.075 V; current 1 Hz 150 ± 0.15 A; power 1 Hz = voltage × current exactly (written with enough decimals), except +250 W at +200 s.
+  - No voltage, current or power rows from +300 to +310 s (points at +299 and +311). No current rows at +450 and +451 s. Current at +100 s is `BAD`.
+  - co2_in_ppm and co2_out_ppm 0.5 Hz at even seconds, 420 ± 0.55 and 105 ± 0.4; co2_out at +400 s `UNCERTAIN`; co2_in at +500 and +502 s `BAD`.
+  - air_flow 1 Hz 1200 ± 3.775 m³/h.
+  - ambient_temperature 15 ± 0.065 °C and ambient_pressure 1013.25 ± 0.03 hPa at whole minutes, except no rows at +300 and +360 s (8 readings each).
+  - process_state `STARTUP` at 0, `STEADY_STATE` at +60 s. No other signal has rows.
+  - T3 checks first that cleaning this fixture excludes exactly the four planted readings (current +100, co2_out +400, co2_in +500, +502) and nothing else; if not, the construction is changed, not the rules.
+- Scenarios:
+  ```gherkin
+  Scenario: S4.1 Computed power exists exactly where voltage and current are both accepted
+    Given the metrics fixture ingested and cleaned into a throwaway database
+    When python -m scripts.metrics runs on it with a throwaway Postgres schema
+    Then the exit code is 0
+    And metrics_series holds 586 power_computed rows for EXP_001, each equal to voltage × current at its instant
+    And there is no power_computed row at +100 s, +300 s to +310 s, +450 s or +451 s
+
+  Scenario: S4.2 The power cross-check counts disagreeing instants
+    Given the same run
+    Then metrics_series holds 586 power_residual rows, each equal to power − voltage × current
+    And power_check reports instants_compared 586, within_tolerance 585 and residual_max_abs_w 250
+
+  Scenario: S4.3 A spacing at the limit is bridged and one past it is not
+    Given a 1 Hz power series with spacings of 1 s, 2 s, 2 s + 1 ns and 3 s
+    When integrate runs with max spacing 2 s
+    Then only the 1 s and 2 s spacings count towards covered seconds and the integral
+    And a 0.5 Hz series with spacings 4 s and 6 s under max spacing 4 s counts only the 4 s spacing
+
+  Scenario: S4.4 Energy covers only bridged time and is not scaled up
+    Given the fixture run
+    Then energy_kwh equals the trapezoid sum of the power_computed rows over bridged spacings ÷ 3.6e6, hand-computed from the construction
+    And its coverage is 584 / 600 and its status is complete
+    And energy_logged_kwh has coverage 587 / 600
+
+  Scenario: S4.5 Energy from logged power is compared over the overlap only
+    Given the fixture run, where logged power exists at +450 s and +451 s but computed power does not
+    Then energy_relative_difference equals (E_logged − E_computed) / E_computed with both integrated over the overlap of their covered intervals, hand-computed
+    And the energy_agreement plausibility check passes
+
+  Scenario: S4.6 Efficiency at or below zero is kept and counted
+    Given co2_in 400 and co2_out 400 at one instant and co2_out 410 at another
+    When efficiency_series runs
+    Then the values 0.0 and −0.025 are in the series, unclamped
+    And efficiency_check.at_or_below_zero counts 2
+
+  Scenario: S4.7 Capture efficiency is the mean over instants with both CO2 readings accepted
+    Given the fixture run
+    Then metrics_series holds 297 capture_efficiency rows, none at +400, +500 or +502 s
+    And capture_efficiency_mean equals the hand-computed mean of (in − out) / in over those instants
+    And its coverage is 592 / 600 and its status is complete
+
+  Scenario: S4.8 Ambient readings are used up to 120 s old and not beyond
+    Given ambient readings at +240 s and +420 s and none between
+    When capture_series runs on CO2 instants +360 s, +362 s and +420 s
+    Then +360 s has a capture value (age 120 s), +362 s has none (age 122 s) and +420 s has one
+
+  Scenario: S4.9 Capture rate and captured CO2 match the hand computation
+    Given the fixture run
+    Then metrics_series holds 268 capture_rate rows, none from +362 s to +418 s and none at +400, +500, +502 s
+    And each row equals air_flow × (co2_in − co2_out) × 1e-6 × p·0.04401 / (8.314462618 · T) with p and T from the as-of ambient readings
+    And co2_captured_kg, co2_inlet_kg and capture_rate_mean_kg_h equal the hand computation, coverage 532 / 600, status partial
+
+  Scenario: S4.10 Energy per kg CO2 uses only the overlap of power and capture time
+    Given power covered on [0, 299], [311, 449], [452, 599] s and capture covered on [0, 360], [420, 498], [504, 598] s
+    When the energy per kg is computed
+    Then both integrals run over [0, 299], [311, 360], [420, 449], [452, 498], [504, 598] (517 s) with interpolated endpoints
+    And the value equals the hand computation and the coverage is 517 / 600
+    And with an empty overlap the value is null and the status is none
+
+  Scenario: S4.11 Labels follow the coverage at the 0.95 boundary
+    Given coverages 0.95, 0.9499999 and 0, and a null value
+    Then status_for gives complete, partial and partial for the values, and none for the null value
+
+  Scenario: S4.12 Data quality is reported for all 25 signals
+    Given the fixture run
+    Then signals lists 25 entries for EXP_001
+    And current shows present 587, expected 600, accepted 586, bad 1, completeness 587 / 600
+    And co2_out_ppm shows uncertain 1; ambient_pressure present 8 of 10 expected
+    And process_state shows present 2 with expected and completeness null
+    And flow shows present 0, expected 600, completeness 0 and the three fractions null
+
+  Scenario: S4.13 Experiment-level quality shares add up over the signals
+    Given the fixture run
+    Then completeness equals 2981 / 7360 and valid_fraction, bad_fraction, uncertain_fraction equal the signal sums (2979 accepted, 3 BAD, 1 UNCERTAIN of 2983 present)
+
+  Scenario: S4.14 Postgres holds one row per metric and per signal, joinable to the experiment
+    Given migration 0003 applied in a throwaway schema with the experiment rows loaded
+    When write_postgres writes 13 metric rows and 25 signal rows for one experiment, twice
+    Then experiment_metrics holds 13 rows and signal_quality 25 rows for that experiment and version, with the values written
+    And a join of experiment_metrics to experiment on experiment_id returns current_setpoint_nominal_a beside each metric
+    And a row for an experiment not in the experiment table is refused by the foreign key, and nothing of that call is kept
+
+  Scenario: S4.15 Reading and writing metrics_series round-trips and reads only accepted rows
+    Given a throwaway database with readings_processed rows of two policy versions, accepted and excluded
+    When accepted_series reads one signal for one policy version
+    Then it returns only the accepted rows of that version, in time order
+    And a series written with write_series reads back with count_series equal to its length
+
+  Scenario: S4.16 A rerun changes nothing
+    Given the fixture run done once
+    When it runs again
+    Then metrics_series, experiment_metrics and signal_quality are identical to the first run
+    And the summaries are equal except timing
+
+  Scenario: S4.17 The metrics run touches no input table
+    Given the fixture ingested and cleaned
+    Then the six input tables hold the same rows before and after the metrics run (full dumps equal)
+    And reconciliation.inputs_unchanged is true and the only new InfluxDB table is metrics_series
+
+  Scenario: S4.18 Refusals write nothing
+    When the command runs with --database dac_missing, or on a database cleaned under another policy version, or with an unreadable experiments file, or with a schema without migration 0003, or with an experiment missing from Postgres
+    Then the exit code is 2, the report directory is empty, no metrics_series or Postgres row is written, and dac_missing is not created
+
+  Scenario: S4.19 Failures and mismatches have their own exit codes
+    Given a fake gateway
+    When a query or write fails, the command exits 3 and writes no outputs
+    When the read-back count differs from what was written, the command exits 4, writes the outputs and lists the mismatch
+
+  Scenario: S4.20 A failed plausibility check exits 1 and still writes everything
+    Given a fake gateway whose inputs give a capture efficiency mean above 1
+    Then the exit code is 1, the outputs are written, plausibility_failed is 1 and efficiency_in_unit_interval has passed false
+
+  Scenario: S4.21 The summary matches the contract and the report matches the summary
+    Given the fixture run
+    Then metrics_summary.json validates against contracts/metrics_summary.schema.json
+    And metrics_report.md equals the report rendered from that summary
+
+  Scenario: S4.22 The metrics policy is pinned by a fingerprint
+    Given pipeline/metrics.py
+    Then METRICS_FINGERPRINT equals the SHA-256 of the canonical JSON of POLICY and METRICS_VERSION is m4-v1
+
+  Scenario: S4.23 The metrics document matches the code
+    Given docs/metrics.md
+    Then it has one entry per metric name and per series name, with the unit and the constants equal to METRIC_UNITS, SERIES_UNITS and POLICY
+
+  Scenario: S4.24 The real run gives the pinned labels
+    Given the real CSV ingested and cleaned on a private stack
+    When python -m scripts.metrics runs
+    Then the exit code is 0, six experiments are reported, each with all 13 metrics
+    And energy_kwh is partial only for EXP_002 (coverage about 0.93), complete for the other five
+    And co2_captured_kg, capture_rate_mean_kg_h and sec_kwh_per_kg are partial for EXP_004 (about 0.50), EXP_005 (about 0.75) and EXP_006 (about 0.36), complete for EXP_001–EXP_003
+    And capture_efficiency_mean is partial only for EXP_006 (about 0.36)
+
+  Scenario: S4.25 Computed and logged power agree on real accepted data
+    Given the real run
+    Then within_tolerance_fraction is at least 0.99 for every experiment
+    And every energy_agreement check passes
+
+  Scenario: S4.26 An independent recompute gives the same numbers
+    Given plain SELECT pulls of the accepted inputs and a script that imports no pipeline code
+    When it recomputes every metric, coverage, power_check and efficiency_check of all six experiments
+    Then all equal the summary to 9 significant digits
+
+  Scenario: S4.27 Real quality counts equal the cleaning summary
+    Given the real run and reports/cleaning_summary.json
+    Then for every series present equals raw_points and accepted equals accepted
+    And bad and uncertain equal the acquisition-flag counts in readings_processed and state_intervals
+
+  Scenario: S4.28 Real plausibility holds and the run reproduces
+    Given the real run
+    Then every plausibility check passes
+    And a second run on a fresh private stack gives a summary equal to the committed reports/metrics_summary.json except timing
+  ```
+  Note on S4.24: the labels are the plan's prediction from the M3 summary and the raw ambient file (decision 18). A different label stops T4 and comes back as a narrow question to `/flow:plan M4`.
+- QA procedure:
+  1. Private stack up (`.workflow/verify-env.json`; it migrates Postgres including 0003 and loads the six experiments). Create throwaway database `qa_m4` (`POST /api/v3/configure/database`) and Postgres schema `qa_m4` (run `pipeline.pg_migrate.run_migrations` and `pipeline.metadata_loader.load_experiments` with `tests/fixtures/metrics/experiments.json` against it, `search_path=qa_m4`). `python -m scripts.ingest --csv tests/fixtures/metrics/readings.csv --experiments tests/fixtures/metrics/experiments.json --sha256 tests/fixtures/metrics/readings.sha256 --database qa_m4 --report-dir <tmp1>` → exit 0. `python -m scripts.clean --database qa_m4 --experiments tests/fixtures/metrics/experiments.json --report-dir <tmp2>` → exit 0; its summary excludes exactly the four planted readings.
+  2. Dump the six input tables of `qa_m4` to files A. `python -m scripts.metrics --database qa_m4 --experiments tests/fixtures/metrics/experiments.json --pg-schema qa_m4 --report-dir <tmp3>` → exit 0. Query `metrics_series` of `qa_m4` and check S4.1, S4.2, S4.7, S4.9; check `<tmp3>/metrics_summary.json` for S4.4, S4.5, S4.9, S4.12, S4.13; `SELECT … FROM qa_m4.experiment_metrics JOIN qa_m4.experiment USING (experiment_id)` returns 13 rows (S4.14); `check-jsonschema --schemafile contracts/metrics_summary.schema.json <tmp3>/metrics_summary.json` → ok (S4.21).
+  3. Dump the input tables again → equal to A (S4.17). Run step 2 again into `<tmp4>`; `metrics_series` and both Postgres tables identical; summaries equal without `timing` (S4.16).
+  4. `--database dac_missing` → exit 2, `<tmp5>` empty, not in `GET /api/v3/configure/database?format=json`; `--policy-version m3-none` → exit 2; `--pg-schema` of a schema without 0003 → exit 2 (S4.18). `python -m pytest tests/unit -k "metrics"` → pass (S4.3, S4.6, S4.8, S4.10, S4.11, S4.19, S4.20, S4.22, S4.23). Drop `qa_m4` and the schema.
+  5. Real CSV (copied in by verify-env): `python -m scripts.ingest` → exit 0; `python -m scripts.clean --report-dir <tmp6>` → exit 0; `python -m scripts.metrics --report-dir <tmp7>` → exit 0; check S4.24, S4.25, S4.28's plausibility in `<tmp7>/metrics_summary.json`; compare quality counts with `<tmp6>/cleaning_summary.json` (S4.27).
+  6. Independent recompute from plain `SELECT time, value FROM readings_processed WHERE verdict = 'accepted' …` pulls, no pipeline imports (S4.26). Compare `<tmp7>/metrics_summary.json` with the committed `reports/metrics_summary.json` without `timing` (S4.28).
+- Expected changes:
+  - `pipeline/metrics.py` (new, pure, stdlib): policy table, version, fingerprint, the formulas, coverage, overlap integration, labels, quality shares, plausibility, summary shaping helpers.
+  - `pipeline/metrics_store.py` (new): InfluxDB reads (reuse `pipeline/cleaning_influx.py` patterns: `window_params`, `_WritingGateway`, `send_with_retry`, `list_databases` from `pipeline/ingest_influx.py`, line-protocol escaping from `pipeline/ingest.py`), `metrics_series` writes and counts, Postgres connect/check/upsert/count (psycopg, like `pipeline/metadata_loader.py`).
+  - `migrations/0003_experiment_metrics.sql` (new): the two tables.
+  - `pipeline/metrics_run.py` + `scripts/metrics.py` (new): orchestration, refusals, exit codes, summary, report rendering; mirror `scripts/clean.py` (Config, Deps, refuse, run, write at end).
+  - `contracts/metrics_summary.schema.json` + example (written at plan time). CI lint job: contract step.
+  - Committed real outputs: `reports/metrics_summary.json`, `reports/metrics_report.md`; `reports/M4.md` (two-layer milestone report).
+  - Docs: `docs/metrics.md` (each metric: formula, inputs, unit, alignment, gap rule, label; why an integrated energy value is treated differently from pH and states), ADR-0016, `docs/schema.md` (`metrics_series`, the Postgres tables), `docs/ASSUMPTIONS.md` (A-08; U-06 note), `docs/decisions/README.md`, `docs/ROADMAP.md` (M4 phase, results, deliverable E row).
+- Tests: `tests/unit/test_metrics.py` (every formula on hand-built series; the boundaries of S4.3, S4.8, S4.11; S4.6; S4.10 including empty overlap and clipped endpoints; fingerprint S4.22; quality shares with zero denominators; plausibility with null values), `tests/integration/test_metrics_store.py` (S4.14, S4.15; throwaway InfluxDB database and Postgres schema), `tests/integration/test_migrations.py` (expects `0001, 0002, 0003`), `tests/unit/test_metrics_exit_codes.py` (fake gateway: S4.19, S4.20, refusal paths), `tests/e2e/test_metrics_cli.py` (fixture ingest + clean + metrics as subprocesses, marked `influx` and `postgres`: S4.1, S4.2, S4.4, S4.5, S4.7, S4.9, S4.12, S4.13, S4.16, S4.17, S4.18, S4.21, plus a recompute of every fixture metric from plain pulls), `tests/unit/test_metrics_doc.py` (S4.23). S4.24–S4.28 run on the real data (Checks rows, QA steps 5–6).
+- Tasks (decision 1; checked with `lane.js tasks`):
+  - T1 [W1] Pure metric functions, policy table, version and fingerprint, with unit tests for every formula and boundary. Owns: `pipeline/metrics.py`, `tests/unit/test_metrics.py`. Scenarios: S4.3, S4.6, S4.8, S4.10, S4.11, S4.22.
+  - T2 [W1] Storage: migration 0003, InfluxDB reads and `metrics_series` writes and counts, Postgres connect, check, upsert and counts, integration tests. Owns: `migrations/0003_experiment_metrics.sql`, `pipeline/metrics_store.py`, `tests/integration/test_metrics_store.py`, `tests/integration/test_migrations.py`. Scenarios: S4.14, S4.15.
+  - T3 [W2] Fixture, `scripts.metrics` CLI and orchestration, summary and report, exit codes, end-to-end tests on the fixture, fake-gateway tests. Owns: `pipeline/metrics_run.py`, `scripts/metrics.py`, `tests/fixtures/metrics/**`, `tests/e2e/test_metrics_cli.py`, `tests/unit/test_metrics_exit_codes.py`. Scenarios: S4.1, S4.2, S4.4, S4.5, S4.7, S4.9, S4.12, S4.13, S4.16, S4.17, S4.18, S4.19, S4.20, S4.21. After: T1, T2.
+  - T4 [W3] Real data: calibrate EXP_001, EXP_004, then all six against an independent plain-Python recompute (decision 19); stop on any label outside S4.24; full run into `reports/`; reproduce on a fresh private stack. Owns: `reports/metrics_summary.json`, `reports/metrics_report.md`, `.flow-tmp/**`. Scenarios: S4.24, S4.25, S4.26, S4.27, S4.28. After: T3.
+  - T5 [W4] Write-up: `docs/metrics.md`, ADR-0016, `docs/schema.md`, `docs/ASSUMPTIONS.md`, `docs/decisions/README.md`, `docs/ROADMAP.md`, `reports/M4.md`, CI contract step, doc-vs-code test. Owns: `docs/**`, `reports/M4.md`, `.github/workflows/ci.yml`, `tests/unit/test_metrics_doc.py`. Scenarios: S4.23. After: T4.
+- After the judge: commit, push `m4-metrics`, CI green, open `reports/M4.md` in the doc viewer. Merge waits for approval.
 
 #### M5: Comparison and findings (F)
 - Not yet detailed. Scope: `docs/ROADMAP.md` § M5. Headline findings need Sebastian's approval.
@@ -1014,3 +1282,46 @@ Fix: renamed the unit file to `tests/unit/test_clean_exit_codes.py` (content unc
 Optional:
 - [low] Add a Checks row `python -m pytest -v` (whole suite, stack up) so a basename clash is caught by verify, not only by CI.
 Checks run after the fix: `python -m pytest --collect-only -q` → 424 collected, 0 errors; no duplicate test basenames under `tests/`; `ruff check .` and `ruff format --check .` pass; `python -m pytest tests/unit -q` → 319 passed. CI result: see the next block if recorded.
+
+### M4 — verify 2026-11-24 @ a7bade1 (+ uncommitted) — INCOMPLETE, stopped at the usage limit
+Defects:        none raised (no check finished, so this is not a clean result)
+Open questions:
+- Nothing of M4 is committed yet: `m4-metrics` HEAD is still the baseline `a7bade1`; all M4 work is uncommitted or untracked.
+- `capture_series(..., inlet=True)` uses only instants where co2_out is also accepted (`pipeline/metrics.py:212`). Decision 9 says "likewise with co2_in alone"; this reads it as "ppm = co2_in" on the captured series' instants. Probably intended (keeps `capture_below_inlet` like for like), but the Spec doesn't say so.
+- `count_series` counts every policy version under one metrics version (`pipeline/metrics_store.py:187-192`). Reading the code, after a run under a second policy version the read-back would count both sets and report a mismatch (exit 4). Not probed.
+Optional:       none yet
+Scenarios:      S4.1–S4.28 → Blocked (not exercised; see Blocked)
+Blocked:
+- Every Spec → Checks row, the contract runner, the QA procedure and the probes. The verify stopped at the usage limit. Code read so far: `pipeline/metrics.py`, `pipeline/metrics_store.py`, `pipeline/metrics_run.py`, `migrations/0003_experiment_metrics.sql`. Not read yet: `scripts/metrics.py`, every test file, the fixture, the contract, the docs, the committed reports.
+Checks run:
+- `verify-env.js up` → env b6d3da2d, ports 34340-34341, healthy
+- Real ingest → clean → metrics run in the worktree: no usable result. `scripts.ingest` exited 3 after 35 s with `PermissionError [WinError 32]` while deleting a temp file (`tmp…\run_1.csv`) in the external-sort cleanup on Windows (not investigated: it may be an M2 issue, or the file may have been held by my own concurrent calls). `clean` and `metrics` then exited 2 (`influx_not_configured`) because the stack's `.env` was gone after the failed teardown. Treat as Blocked, not as a defect.
+- `verify-env.js down b6d3da2d` → run at the end of this session
+
+### M4 — verify 2026-11-24 @ a7bade1 (+ uncommitted)
+Supersedes the INCOMPLETE block above. All M4 work is still uncommitted or untracked on `m4-metrics`; this block reviews the working tree (the verify-env worktree copies it).
+Defects:        none
+Open questions:
+- Three scenario texts disagree with the build, all already listed under Next steps for the next `/flow:plan M4`, so not defects here: S4.9 says 268 `capture_rate` rows, the construction gives 269 (I re-derived it: 297 − 28 = 269, consistent with the pinned 532 s coverage); S4.24 pins `sec_kwh_per_kg` complete for EXP_002, the run gives partial at 0.932916667, because its value covers the power ∩ capture overlap and EXP_002 power coverage is 0.933; S4.25's 0.99 fails for EXP_001 (0.983157895), read as Sebastian decided (Next steps): the other five are 1.0 and the 120 s shortfall is explained in `reports/M4.md`.
+- Inlet CO2 on the captured series' instants (open question of the incomplete block): ADR-0016 item 24 records it; the Spec's decision 9 still says "co2_in alone". Add one line to Spec → Decisions at the next plan.
+- Nothing is committed or pushed, so CI has not run on M4. The Spec's "After the judge" step covers it.
+Optional:
+- [medium] Read-back counts ignore the cleaning policy version. `count_series` filters on experiment, metric and metrics version only (`pipeline/metrics_store.py:187-192`), while `write_series` tags each point with `policy_version` too. Once `metrics_series` holds a second policy version, every later run exits 4. Probe on the real run: wrote one point `policy_version=m3-probe` for EXP_001 `power_computed` at 08:00:00Z, reran `python -m scripts.metrics` → exit 4, mismatch `{influx, EXP_001, power_computed, written 7125, read_back 7126}`. Same cause: if a cleaning rerun under the same policy version accepts fewer readings, the old points stay and the read-back exceeds the write. Fix: add `policy_version` to `count_series` (and its call in `pipeline/metrics_run.py:558`). Proposed test `test_count_series_counts_only_the_given_policy_version` (integration, `tests/integration/test_metrics_store.py`): write 3 points under `pv-a` and 2 at other instants under `pv-b`, same experiment, metric and metrics version; assert `count_series(..., policy_version="pv-a") == 3`. Note also that the Postgres key `(experiment_id, metrics_version, metric)` has no policy version, so a run under a second policy overwrites the first one's Postgres rows while both stay in InfluxDB. That is a design point for `/flow:plan`, not a bug in this milestone.
+- [low] `has_policy_rows` runs over the whole table with no time bound (`pipeline/metrics_store.py:158-160`). It worked on the real data (six 2 h windows). Over long continuous data it may run into Core's file limit (ADR-0004, U-05). Bound it to the experiments' span when U-06 is taken up.
+- [info] Test changes since baseline: `tests/integration/test_migrations.py` expects `0001, 0002, 0003` (was `0001, 0002`), checks the two new tables exist, and adds `test_migration_0003_pins_the_keys_foreign_keys_and_status_check`. The Spec's Tests line asks for this. No test deleted, skipped or loosened.
+- [info] Contract files are new in M4 (untracked, written at plan time). With nothing committed there is no baseline to diff against. Their content matches the Spec's summary shape (13 metric names, 4 series, 25 signals, 4 checks, `parameters` = `POLICY` keys, which a unit test checks).
+Scenarios:      S4.1, S4.2, S4.4, S4.5, S4.7, S4.9 (at 269), S4.12, S4.13, S4.16, S4.17, S4.18 (all five refusals), S4.21 → pass (e2e `tests/e2e/test_metrics_cli.py`, every test passed, including the plain-pull recompute of every fixture metric and series) · S4.3, S4.6, S4.8, S4.10, S4.11, S4.22 → pass (unit `tests/unit/test_metrics.py`; plus my own probe: 3,000 random series, `overlap`, `covered_intervals`, `integrate` and `integrate_over` against brute force, 0 mismatches; `as_of` at 120 s used and at 120 s + 1 ns not) · S4.14, S4.15 → pass (integration `tests/integration/test_metrics_store.py`; on the real run, the Postgres `public` join gives 13 rows per experiment with `current_setpoint_nominal_a` 150/250/150/150/150/150, and `signal_quality` has 25 rows per experiment) · S4.19, S4.20 → pass (unit `tests/unit/test_metrics_exit_codes.py`) · S4.23 → pass (unit `tests/unit/test_metrics_doc.py`) · S4.24 → pass apart from the recorded EXP_002 `sec_kwh_per_kg` label (Open questions): exit 0, six experiments with 13 metrics each; `energy_kwh` partial only for EXP_002 (0.933055556); capture metrics partial for EXP_004 0.4997, EXP_005 0.7497, EXP_006 0.3575, complete for EXP_001–003; `capture_efficiency_mean` partial only for EXP_006 (0.3575) · S4.25 → pass as Sebastian ruled: EXP_002–006 1.0; EXP_001 0.983157895 = 7,005 of 7,125. I queried the 120 out-of-tolerance instants: one run from 09:23:20 to 09:25:19, residual 5,997–6,063 W, as `reports/M4.md` states; all six `energy_agreement` checks pass · S4.26 → pass (scratch script `recompute_m4.py`, imports no pipeline code, plain `SELECT` pulls of accepted rows: all 9 computed metrics with their coverage, `power_check`, `efficiency_check` and `series_written` of all six experiments equal the summary at 9 significant digits, and every stored `metrics_series` instant and value matches; 0 mismatches) · S4.27 → pass (150 of 150 series: `present` = `raw_points` and `accepted` = `accepted` of the fresh `cleaning_summary.json`; `bad` and `uncertain` equal a `GROUP BY quality` on `readings_processed` and `state_intervals`; pairs with no series have present 0) · S4.28 → pass (24 of 24 plausibility checks pass; the fresh-stack summary equals the committed `reports/metrics_summary.json` except `timing`; the fresh report equals the committed one byte for byte; the committed report equals `render_report` of the committed summary)
+Blocked:        none
+Checks run:
+- `verify-env.js up` → env 8b9b6be9, ports 36280-36281, healthy
+- `ruff check .` → All checks passed; `ruff format --check .` → 108 files already formatted
+- `python -m pytest -v -rs` (whole suite, stack up) → 607 passed, 0 skipped (unit 462, integration 54, e2e 91). This one session covers the separate unit, integration and e2e rows.
+- `python -m pytest tests/unit -q` (before the stack runs) → 462 passed
+- `python -m scripts.ingest --report-dir .flow-tmp/ingest` (real CSV, run alone) → exit 0: 520,005 rows = 519,980 saved + 15 copies + 10 losers + 0 rejected (the Windows temp-file error of the last attempt did not recur)
+- `python -m scripts.clean --report-dir .flow-tmp/clean` → exit 0: 150 series, 519,980 raw, 514,443 accepted, 5,537 excluded, balanced
+- `python -m scripts.metrics --report-dir .flow-tmp/metrics` → exit 0: 6 experiments, 121,167 points, 228 Postgres rows, balanced, 0 plausibility failures; `check-jsonschema` on it → ok; rerun into `.flow-tmp/metrics2` → exit 0, summary equal except timing
+- `check-jsonschema` metrics example and committed `reports/metrics_summary.json` → ok
+- `contract.js --task .workflow/dac.md --root <WORKTREE>` → exit 0, 4 of 4 PASS
+- Database list after the runs: `_internal, dac_pinned, dac_raw, dac_rollup` (nothing created); `dac_raw` tables: the six inputs plus `metrics_series`
+- Raw CSV SHA-256 in repo and worktree = `9f791b42…553f` = committed
+- `verify-env.js down 8b9b6be9` → removed; no worktree changes reported; `docker ps -a` and `docker volume ls` show no verify containers or volumes left (the earlier env b6d3da2d is gone too)

@@ -1,0 +1,519 @@
+{
+  "schema_version": 1,
+  "metrics_version": "m4-v1",
+  "policy_version": "m3-v1",
+  "source": {
+    "database": "qa_m4",
+    "experiments_file": "tests/fixtures/metrics/experiments.json",
+    "pg_schema": "qa_m4"
+  },
+  "parameters": {
+    "power_max_spacing_s": 2,
+    "capture_max_spacing_s": 4,
+    "ambient_max_age_s": 120,
+    "power_tol_rel": 0.01,
+    "power_tol_w": 10,
+    "complete_coverage": 0.95,
+    "co2_molar_mass_kg_per_mol": 0.04401,
+    "gas_constant_j_per_mol_k": 8.314462618,
+    "sec_floor_kwh_per_kg": 0.1,
+    "energy_agreement_rel": 0.01
+  },
+  "experiments": [
+    {
+      "experiment_id": "EXP_001",
+      "start": "2026-05-04T08:00:00Z",
+      "end": "2026-05-04T08:10:00Z",
+      "duration_s": 600,
+      "metrics": {
+        "energy_kwh": {
+          "value": 2.43333516,
+          "unit": "kWh",
+          "coverage": 0.973333333,
+          "status": "complete"
+        },
+        "energy_logged_kwh": {
+          "value": 2.44583517,
+          "unit": "kWh",
+          "coverage": 0.978333333,
+          "status": "complete"
+        },
+        "energy_relative_difference": {
+          "value": 1.18e-05,
+          "unit": "fraction",
+          "coverage": 0.973333333,
+          "status": "complete"
+        },
+        "mean_power_kw": {
+          "value": 15.0000113,
+          "unit": "kW",
+          "coverage": 0.973333333,
+          "status": "complete"
+        },
+        "capture_efficiency_mean": {
+          "value": 0.750323,
+          "unit": "fraction",
+          "coverage": 0.986666667,
+          "status": "complete"
+        },
+        "co2_captured_kg": {
+          "value": 0.0963,
+          "unit": "kg",
+          "coverage": 0.886666667,
+          "status": "partial"
+        },
+        "co2_inlet_kg": {
+          "value": 0.1285,
+          "unit": "kg",
+          "coverage": 0.886666667,
+          "status": "partial"
+        },
+        "capture_rate_mean_kg_h": {
+          "value": 0.6517,
+          "unit": "kg/h",
+          "coverage": 0.886666667,
+          "status": "partial"
+        },
+        "sec_kwh_per_kg": {
+          "value": 23.02,
+          "unit": "kWh/kg",
+          "coverage": 0.861666667,
+          "status": "partial"
+        },
+        "completeness": {
+          "value": 0.405027174,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "valid_fraction": {
+          "value": 0.998659068,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "bad_fraction": {
+          "value": 0.00100569896,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        },
+        "uncertain_fraction": {
+          "value": 0.000335232987,
+          "unit": "fraction",
+          "coverage": null,
+          "status": null
+        }
+      },
+      "power_check": {
+        "instants_compared": 586,
+        "within_tolerance": 585,
+        "within_tolerance_fraction": 0.998293515,
+        "residual_median_w": 0.0,
+        "residual_p95_abs_w": 0.0,
+        "residual_max_abs_w": 250.0
+      },
+      "efficiency_check": {
+        "instants": 297,
+        "at_or_below_zero": 0
+      },
+      "series_written": {
+        "power_computed": 586,
+        "power_residual": 586,
+        "capture_efficiency": 297,
+        "capture_rate": 268
+      },
+      "signals": [
+        {
+          "source": "absorber",
+          "signal": "air_flow",
+          "nominal_interval_s": 1.0,
+          "present": 600,
+          "expected": 600,
+          "accepted": 600,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 1.0,
+          "valid_fraction": 1.0,
+          "bad_fraction": 0.0,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "absorber",
+          "signal": "co2_in_ppm",
+          "nominal_interval_s": 2.0,
+          "present": 300,
+          "expected": 300,
+          "accepted": 298,
+          "bad": 2,
+          "uncertain": 0,
+          "completeness": 1.0,
+          "valid_fraction": 0.993333333,
+          "bad_fraction": 0.00666666667,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "absorber",
+          "signal": "co2_out_ppm",
+          "nominal_interval_s": 2.0,
+          "present": 300,
+          "expected": 300,
+          "accepted": 299,
+          "bad": 0,
+          "uncertain": 1,
+          "completeness": 1.0,
+          "valid_fraction": 0.996666667,
+          "bad_fraction": 0.0,
+          "uncertain_fraction": 0.00333333333
+        },
+        {
+          "source": "absorber",
+          "signal": "pressure_drop",
+          "nominal_interval_s": 2.0,
+          "present": 0,
+          "expected": 300,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "absorber",
+          "signal": "solvent_flow",
+          "nominal_interval_s": 2.0,
+          "present": 0,
+          "expected": 300,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "absorber",
+          "signal": "solvent_pH",
+          "nominal_interval_s": 5.0,
+          "present": 0,
+          "expected": 120,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "absorber",
+          "signal": "solvent_temperature",
+          "nominal_interval_s": 5.0,
+          "present": 0,
+          "expected": 120,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "ambient",
+          "signal": "ambient_pressure",
+          "nominal_interval_s": 60.0,
+          "present": 8,
+          "expected": 10,
+          "accepted": 8,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.8,
+          "valid_fraction": 1.0,
+          "bad_fraction": 0.0,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "ambient",
+          "signal": "ambient_temperature",
+          "nominal_interval_s": 60.0,
+          "present": 8,
+          "expected": 10,
+          "accepted": 8,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.8,
+          "valid_fraction": 1.0,
+          "bad_fraction": 0.0,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "ambient",
+          "signal": "available_solar_power",
+          "nominal_interval_s": 60.0,
+          "present": 0,
+          "expected": 10,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "ambient",
+          "signal": "relative_humidity",
+          "nominal_interval_s": 60.0,
+          "present": 0,
+          "expected": 10,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "acid_pH",
+          "nominal_interval_s": 5.0,
+          "present": 0,
+          "expected": 120,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "base_pH",
+          "nominal_interval_s": 5.0,
+          "present": 0,
+          "expected": 120,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "conductivity",
+          "nominal_interval_s": 5.0,
+          "present": 0,
+          "expected": 120,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "current",
+          "nominal_interval_s": 1.0,
+          "present": 587,
+          "expected": 600,
+          "accepted": 586,
+          "bad": 1,
+          "uncertain": 0,
+          "completeness": 0.978333333,
+          "valid_fraction": 0.998296422,
+          "bad_fraction": 0.00170357751,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "current_setpoint",
+          "nominal_interval_s": 1.0,
+          "present": 0,
+          "expected": 600,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "electrolyte_temperature",
+          "nominal_interval_s": 5.0,
+          "present": 0,
+          "expected": 120,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "flow",
+          "nominal_interval_s": 1.0,
+          "present": 0,
+          "expected": 600,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "power",
+          "nominal_interval_s": 1.0,
+          "present": 589,
+          "expected": 600,
+          "accepted": 589,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.981666667,
+          "valid_fraction": 1.0,
+          "bad_fraction": 0.0,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "pressure",
+          "nominal_interval_s": 1.0,
+          "present": 0,
+          "expected": 600,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "hydrolyzer",
+          "signal": "voltage",
+          "nominal_interval_s": 1.0,
+          "present": 589,
+          "expected": 600,
+          "accepted": 589,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.981666667,
+          "valid_fraction": 1.0,
+          "bad_fraction": 0.0,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "plant",
+          "signal": "fan_speed",
+          "nominal_interval_s": 1.0,
+          "present": 0,
+          "expected": 600,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "plant",
+          "signal": "process_state",
+          "nominal_interval_s": null,
+          "present": 2,
+          "expected": null,
+          "accepted": 2,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": null,
+          "valid_fraction": 1.0,
+          "bad_fraction": 0.0,
+          "uncertain_fraction": 0.0
+        },
+        {
+          "source": "plant",
+          "signal": "pump_speed",
+          "nominal_interval_s": 1.0,
+          "present": 0,
+          "expected": 600,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": 0.0,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        },
+        {
+          "source": "plant",
+          "signal": "valve_state",
+          "nominal_interval_s": null,
+          "present": 0,
+          "expected": null,
+          "accepted": 0,
+          "bad": 0,
+          "uncertain": 0,
+          "completeness": null,
+          "valid_fraction": null,
+          "bad_fraction": null,
+          "uncertain_fraction": null
+        }
+      ],
+      "plausibility": [
+        {
+          "check": "capture_below_inlet",
+          "passed": true,
+          "value": 0.0963,
+          "limit": 0.1285
+        },
+        {
+          "check": "efficiency_in_unit_interval",
+          "passed": true,
+          "value": 0.750323,
+          "limit": 1
+        },
+        {
+          "check": "energy_agreement",
+          "passed": true,
+          "value": 1.18e-05,
+          "limit": 0.01
+        },
+        {
+          "check": "sec_above_floor",
+          "passed": true,
+          "value": 23.02,
+          "limit": 0.1
+        }
+      ]
+    }
+  ],
+  "plausibility_failed": 0,
+  "reconciliation": {
+    "balanced": true,
+    "influx_series_checked": 4,
+    "postgres_rows_checked": 38,
+    "mismatches": [],
+    "inputs_unchanged": true
+  },
+  "timing": {
+    "seconds": 3.2,
+    "queries": 17,
+    "points_written": 1736
+  }
+}

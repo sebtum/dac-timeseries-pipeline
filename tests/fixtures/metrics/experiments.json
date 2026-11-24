@@ -1,0 +1,14 @@
+[
+  {
+    "experiment_id": "EXP_001",
+    "start_time": "2026-05-04T08:00:00Z",
+    "end_time": "2026-05-04T08:10:00Z",
+    "duration_s": 600,
+    "current_setpoint_nominal_A": 150.0,
+    "air_flow_nominal_m3h": 1200.0,
+    "solvent_flow_nominal_Lmin": 8.0,
+    "operator": "Fixture",
+    "sorbent_batch": "SB-FIXTURE",
+    "notes": "Metrics fixture: hand-computable series, see README.md."
+  }
+]

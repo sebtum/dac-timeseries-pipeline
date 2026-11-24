@@ -37,6 +37,13 @@ jobs:
           check-jsonschema
           --schemafile contracts/cleaning_summary.schema.json
           contracts/examples/cleaning_summary.example.json
+      # Same for the metrics summary (M4); the fixture run's output is validated in
+      # tests/e2e/test_metrics_cli.py. The real-data metrics run is not run in CI.
+      - name: Validate the metrics summary contract example
+        run: >-
+          check-jsonschema
+          --schemafile contracts/metrics_summary.schema.json
+          contracts/examples/metrics_summary.example.json
 
   integration:
     runs-on: ubuntu-latest
@@ -96,9 +103,10 @@ jobs:
       - name: Initialize InfluxDB databases
         run: python scripts/init_influx.py
 
-      # `pytest` from the repo root also runs tests/e2e: the real ingest, profile and clean CLIs
-      # (and the rollup) against this InfluxDB, on the committed fixtures (tests/fixtures/ingest,
-      # tests/fixtures/profile, tests/fixtures/clean), into throwaway databases. The clean tests
+      # `pytest` from the repo root also runs tests/e2e: the real ingest, profile, clean and
+      # metrics CLIs (and the rollup) against this InfluxDB and Postgres, on the committed fixtures
+      # (tests/fixtures/ingest, profile, clean, metrics), into throwaway databases and a throwaway
+      # Postgres schema. The clean tests
       # use one throwaway database and the rollup shares it, so the 5-database limit of Core
       # holds next to dac_raw, dac_rollup and dac_pinned.
       # A skip is a failure here: with both services live, every influx/postgres-marked

@@ -63,9 +63,11 @@ def _table_exists(pg_schema, table_name: str) -> bool:
 def test_real_migrations_apply_clean_and_rerun_is_noop(pg_schema):
     """V10: the project's actual migrations/ directory, run against an empty schema."""
     first = run_migrations(pg_schema)
-    assert first == ["0001", "0002"]
+    assert first == ["0001", "0002", "0003"]
     assert _table_exists(pg_schema, "experiment")
     assert _table_exists(pg_schema, "experiment_field_source")
+    assert _table_exists(pg_schema, "experiment_metrics")
+    assert _table_exists(pg_schema, "signal_quality")
 
     second = run_migrations(pg_schema)
     assert second == []
@@ -155,3 +157,70 @@ def test_concurrent_runner_is_rejected_not_raced(pg_schema, tmp_path):
     # Lock released — the same call now succeeds.
     applied = run_migrations(pg_schema, directory=directory)
     assert applied == ["0001"]
+
+
+def _primary_key(pg_schema, table_name: str) -> list[str]:
+    with psycopg.connect(**pg_schema, autocommit=True) as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT a.attname FROM pg_index i "
+            "JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) "
+            "WHERE i.indrelid = to_regclass(%s) AND i.indisprimary "
+            "ORDER BY array_position(i.indkey::int2[], a.attnum)",
+            (table_name,),
+        )
+        return [row[0] for row in cur.fetchall()]
+
+
+def test_migration_0003_pins_the_keys_foreign_keys_and_status_check(pg_schema):
+    """M4: the two summary tables have the pinned primary keys, reference `experiment`, and
+    refuse a status outside complete/partial/none."""
+    run_migrations(pg_schema)
+
+    assert _primary_key(pg_schema, "experiment_metrics") == [
+        "experiment_id",
+        "metrics_version",
+        "metric",
+    ]
+    assert _primary_key(pg_schema, "signal_quality") == [
+        "experiment_id",
+        "metrics_version",
+        "source",
+        "signal",
+    ]
+
+    with psycopg.connect(**pg_schema, autocommit=True) as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT conrelid::regclass::text, confrelid::regclass::text FROM pg_constraint "
+            "WHERE contype = 'f' AND conrelid IN "
+            "(to_regclass('experiment_metrics'), to_regclass('signal_quality')) ORDER BY 1"
+        )
+        references = [tuple(name.rpartition(".")[2] for name in row) for row in cur.fetchall()]
+        assert references == [
+            ("experiment_metrics", "experiment"),
+            ("signal_quality", "experiment"),
+        ]
+
+        cur.execute(
+            "INSERT INTO experiment (experiment_id, start_time, end_time, duration_s) "
+            "VALUES ('E1', now(), now(), 1)"
+        )
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute(
+                "INSERT INTO experiment_metrics (experiment_id, metrics_version, policy_version, "
+                "metric, unit, status) VALUES ('E1', 'v', 'p', 'm', 'kg', 'bogus')"
+            )
+        with pytest.raises(psycopg.errors.NotNullViolation):
+            cur.execute(
+                "INSERT INTO experiment_metrics (experiment_id, metrics_version, policy_version, "
+                "metric, unit) VALUES ('E1', 'v', NULL, 'm', 'kg')"
+            )
+        with pytest.raises(psycopg.errors.ForeignKeyViolation):
+            cur.execute(
+                "INSERT INTO experiment_metrics (experiment_id, metrics_version, policy_version, "
+                "metric, unit) VALUES ('NOPE', 'v', 'p', 'm', 'kg')"
+            )
+        # A null value, coverage and status is allowed (a share, or a metric with no value).
+        cur.execute(
+            "INSERT INTO experiment_metrics (experiment_id, metrics_version, policy_version, "
+            "metric, unit) VALUES ('E1', 'v', 'p', 'm', 'kg')"
+        )
