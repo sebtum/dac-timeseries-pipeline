@@ -1,0 +1,397 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contracts/comparison_summary.schema.json",
+  "title": "comparison_summary.json",
+  "description": "Shape of the summary that `python -m scripts.compare` writes (exit 0 only). Pins names and types, not behaviour. Times are UTC RFC 3339 strings ending in Z; experiment times, durations and lags are seconds; fractions are 0..1. Floats are rounded to 9 significant digits. The rules are M5 decisions 5-21 in .workflow/dac.md. Owned by /flow:plan; changes are recorded under Decisions in .workflow/dac.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "compare_version", "policy_version", "metrics_version", "source", "parameters", "experiments", "voltage_models", "voltage_evidence", "comparisons", "pressure_drop_check", "airflow_check", "timing"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "compare_version": { "type": "string", "minLength": 1 },
+    "policy_version": { "type": "string", "minLength": 1, "description": "The cleaning policy version whose accepted readings and state intervals were read." },
+    "metrics_version": { "type": "string", "minLength": 1, "description": "The metrics version whose metrics_series and experiment_metrics rows were read." },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["database", "experiments_file", "pg_schema"],
+      "properties": {
+        "database": { "type": "string" },
+        "experiments_file": { "type": "string" },
+        "pg_schema": { "type": "string" }
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "description": "The declared policy table (POLICY in pipeline/compare.py); its keys are exactly these.",
+      "additionalProperties": false,
+      "required": ["settle_s", "bootstrap_block_s", "bootstrap_resamples", "bootstrap_seed", "interval_level", "lag_max_s", "temp_max_age_s", "min_instants", "vif_limit", "condition_tol_rel", "ambient_tol_c", "humidity_tol_pct", "airflow_check_experiment", "airflow_check_boundary"],
+      "properties": {
+        "settle_s": { "type": "number", "minimum": 0 },
+        "bootstrap_block_s": { "type": "number", "exclusiveMinimum": 0 },
+        "bootstrap_resamples": { "type": "integer", "minimum": 1 },
+        "bootstrap_seed": { "type": "integer" },
+        "interval_level": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+        "lag_max_s": { "type": "integer", "minimum": 0 },
+        "temp_max_age_s": { "type": "number", "exclusiveMinimum": 0 },
+        "min_instants": { "type": "integer", "minimum": 1 },
+        "vif_limit": { "type": "number", "exclusiveMinimum": 1 },
+        "condition_tol_rel": { "type": "number", "minimum": 0 },
+        "ambient_tol_c": { "type": "number", "minimum": 0 },
+        "humidity_tol_pct": { "type": "number", "minimum": 0 },
+        "airflow_check_experiment": { "type": "string" },
+        "airflow_check_boundary": { "$ref": "#/$defs/instant" }
+      }
+    },
+    "experiments": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Sorted by experiment_id.",
+      "items": { "$ref": "#/$defs/experiment" }
+    },
+    "voltage_models": {
+      "type": "array",
+      "description": "Sorted by model, window, scope (experiment ids, then pooled).",
+      "items": { "$ref": "#/$defs/voltage_model" }
+    },
+    "voltage_evidence": {
+      "type": "array",
+      "description": "Sorted by model, window, term. Only the X1 and X2 terms of each model.",
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "comparisons": {
+      "type": "array",
+      "description": "Every pair a < b by experiment_id, sorted by (a, b).",
+      "items": { "$ref": "#/$defs/comparison" }
+    },
+    "pressure_drop_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["per_experiment", "across"],
+      "properties": {
+        "per_experiment": {
+          "type": "array",
+          "description": "Sorted by experiment_id.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["experiment_id", "instants", "slope_air_flow", "intercept_air_flow", "r2_air_flow", "slope_air_flow_sq", "intercept_air_flow_sq", "r2_air_flow_sq", "best_lag_s", "corr_at_best_lag", "corr_at_zero"],
+            "properties": {
+              "experiment_id": { "type": "string" },
+              "instants": { "type": "integer", "minimum": 0 },
+              "slope_air_flow": { "$ref": "#/$defs/num_or_null" },
+              "intercept_air_flow": { "$ref": "#/$defs/num_or_null" },
+              "r2_air_flow": { "$ref": "#/$defs/num_or_null" },
+              "slope_air_flow_sq": { "$ref": "#/$defs/num_or_null" },
+              "intercept_air_flow_sq": { "$ref": "#/$defs/num_or_null" },
+              "r2_air_flow_sq": { "$ref": "#/$defs/num_or_null" },
+              "best_lag_s": { "type": ["integer", "null"], "minimum": 0 },
+              "corr_at_best_lag": { "$ref": "#/$defs/num_or_null" },
+              "corr_at_zero": { "$ref": "#/$defs/num_or_null" }
+            }
+          }
+        },
+        "across": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["points", "slope", "intercept", "r2"],
+          "properties": {
+            "points": {
+              "type": "array",
+              "description": "Sorted by experiment_id; steady-window medians.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["experiment_id", "air_flow_median", "pressure_drop_median"],
+                "properties": {
+                  "experiment_id": { "type": "string" },
+                  "air_flow_median": { "$ref": "#/$defs/num_or_null" },
+                  "pressure_drop_median": { "$ref": "#/$defs/num_or_null" }
+                }
+              }
+            },
+            "slope": { "$ref": "#/$defs/num_or_null" },
+            "intercept": { "$ref": "#/$defs/num_or_null" },
+            "r2": { "$ref": "#/$defs/num_or_null" }
+          }
+        }
+      }
+    },
+    "airflow_check": {
+      "description": "Null when parameters.airflow_check_experiment is not in the run.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["experiment_id", "boundary", "signals"],
+          "properties": {
+            "experiment_id": { "type": "string" },
+            "boundary": { "$ref": "#/$defs/instant" },
+            "signals": {
+              "type": "array",
+              "description": "In the order air_flow, fan_speed, pressure_drop, co2_in_ppm, co2_out_ppm, capture_efficiency.",
+              "minItems": 6,
+              "maxItems": 6,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["signal", "source", "before_points", "before_median", "after_points", "after_median", "relative_change"],
+                "properties": {
+                  "signal": { "enum": ["air_flow", "fan_speed", "pressure_drop", "co2_in_ppm", "co2_out_ppm", "capture_efficiency"] },
+                  "source": { "enum": ["raw", "accepted", "metrics_series"] },
+                  "before_points": { "type": "integer", "minimum": 0 },
+                  "before_median": { "$ref": "#/$defs/num_or_null" },
+                  "after_points": { "type": "integer", "minimum": 0 },
+                  "after_median": { "$ref": "#/$defs/num_or_null" },
+                  "relative_change": { "$ref": "#/$defs/num_or_null" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["seconds", "queries"],
+      "description": "The only part allowed to differ between runs.",
+      "properties": {
+        "seconds": { "type": "number", "minimum": 0 },
+        "queries": { "type": "integer", "minimum": 0 }
+      }
+    }
+  },
+  "$defs": {
+    "instant": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$" },
+    "num_or_null": { "type": ["number", "null"] },
+    "status": { "enum": ["complete", "partial", "none"] },
+    "kpi_name": { "enum": ["voltage_mean_v", "mean_power_kw", "capture_rate_mean_kg_h", "capture_efficiency_mean", "sec_kwh_per_kg"] },
+    "factor_name": { "enum": ["current_setpoint", "current_setpoint_profile", "air_flow", "solvent_flow", "ambient_temperature", "relative_humidity", "sorbent_batch"] },
+    "kpi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "coverage", "status", "interval_low", "interval_high"],
+      "properties": {
+        "value": { "$ref": "#/$defs/num_or_null" },
+        "unit": { "type": "string" },
+        "coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "interval_low": { "$ref": "#/$defs/num_or_null" },
+        "interval_high": { "$ref": "#/$defs/num_or_null" }
+      }
+    },
+    "whole_run_metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "coverage", "status"],
+      "properties": {
+        "value": { "$ref": "#/$defs/num_or_null" },
+        "unit": { "type": "string" },
+        "coverage": { "$ref": "#/$defs/num_or_null" },
+        "status": { "oneOf": [{ "$ref": "#/$defs/status" }, { "type": "null" }] }
+      }
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["experiment_id", "start", "end", "duration_s", "metadata", "conditions", "phases", "steady_seconds", "kpis", "whole_run_metrics"],
+      "properties": {
+        "experiment_id": { "type": "string" },
+        "start": { "$ref": "#/$defs/instant" },
+        "end": { "$ref": "#/$defs/instant" },
+        "duration_s": { "type": "number", "exclusiveMinimum": 0 },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["current_setpoint_nominal_a", "air_flow_nominal_m3h", "solvent_flow_nominal_lmin", "operator", "sorbent_batch", "notes"],
+          "properties": {
+            "current_setpoint_nominal_a": { "$ref": "#/$defs/num_or_null" },
+            "air_flow_nominal_m3h": { "$ref": "#/$defs/num_or_null" },
+            "solvent_flow_nominal_lmin": { "$ref": "#/$defs/num_or_null" },
+            "operator": { "type": ["string", "null"] },
+            "sorbent_batch": { "type": ["string", "null"] },
+            "notes": { "type": ["string", "null"] }
+          }
+        },
+        "conditions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["current_setpoint_a", "current_setpoint_profile", "air_flow_m3h", "solvent_flow_lmin", "ambient_temperature_c", "relative_humidity_pct"],
+          "properties": {
+            "current_setpoint_a": { "$ref": "#/$defs/num_or_null" },
+            "current_setpoint_profile": { "enum": ["constant", "varying", null] },
+            "air_flow_m3h": { "$ref": "#/$defs/num_or_null" },
+            "solvent_flow_lmin": { "$ref": "#/$defs/num_or_null" },
+            "ambient_temperature_c": { "$ref": "#/$defs/num_or_null" },
+            "relative_humidity_pct": { "$ref": "#/$defs/num_or_null" }
+          }
+        },
+        "phases": {
+          "type": "array",
+          "description": "In time order; experiment time in seconds.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["index", "state", "start_s", "end_s", "window_start_s", "window_end_s"],
+            "properties": {
+              "index": { "type": "integer", "minimum": 0 },
+              "state": { "type": "string" },
+              "start_s": { "type": "number" },
+              "end_s": { "type": "number" },
+              "window_start_s": { "$ref": "#/$defs/num_or_null" },
+              "window_end_s": { "$ref": "#/$defs/num_or_null" }
+            }
+          }
+        },
+        "steady_seconds": { "type": "number", "minimum": 0 },
+        "kpis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["voltage_mean_v", "mean_power_kw", "capture_rate_mean_kg_h", "capture_efficiency_mean", "sec_kwh_per_kg"],
+          "properties": {
+            "voltage_mean_v": { "$ref": "#/$defs/kpi" },
+            "mean_power_kw": { "$ref": "#/$defs/kpi" },
+            "capture_rate_mean_kg_h": { "$ref": "#/$defs/kpi" },
+            "capture_efficiency_mean": { "$ref": "#/$defs/kpi" },
+            "sec_kwh_per_kg": { "$ref": "#/$defs/kpi" }
+          }
+        },
+        "whole_run_metrics": {
+          "type": "object",
+          "description": "The 13 experiment_metrics rows of the metrics version, copied unchanged.",
+          "minProperties": 13,
+          "maxProperties": 13,
+          "additionalProperties": { "$ref": "#/$defs/whole_run_metric" }
+        }
+      }
+    },
+    "term": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "unit", "coefficient", "interval_low", "interval_high", "r2_drop", "vif", "plain_corr", "best_lag_s", "corr_at_best_lag", "corr_at_zero"],
+      "properties": {
+        "name": { "enum": ["current", "electrolyte_temperature", "flow", "pressure", "air_flow", "pressure_drop"] },
+        "unit": { "type": "string", "description": "V per <predictor unit>." },
+        "coefficient": { "$ref": "#/$defs/num_or_null" },
+        "interval_low": { "$ref": "#/$defs/num_or_null" },
+        "interval_high": { "$ref": "#/$defs/num_or_null" },
+        "r2_drop": { "$ref": "#/$defs/num_or_null" },
+        "vif": { "$ref": "#/$defs/num_or_null" },
+        "plain_corr": { "$ref": "#/$defs/num_or_null" },
+        "best_lag_s": { "type": ["integer", "null"], "minimum": 0 },
+        "corr_at_best_lag": { "$ref": "#/$defs/num_or_null" },
+        "corr_at_zero": { "$ref": "#/$defs/num_or_null" }
+      }
+    },
+    "voltage_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "window", "scope", "testable", "instants", "r2", "resamples_used", "resamples_singular", "terms", "joint"],
+      "properties": {
+        "model": { "enum": ["hydrolyzer", "absorber"] },
+        "window": { "enum": ["steady", "whole_run"] },
+        "scope": { "type": "string", "description": "An experiment_id or pooled." },
+        "testable": { "type": "boolean" },
+        "instants": { "type": "integer", "minimum": 0 },
+        "r2": { "$ref": "#/$defs/num_or_null" },
+        "resamples_used": { "type": "integer", "minimum": 0 },
+        "resamples_singular": { "type": "integer", "minimum": 0 },
+        "terms": {
+          "type": "array",
+          "description": "In predictor order: current, electrolyte_temperature, then X1, X2 of the model.",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/term" }
+        },
+        "joint": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["terms", "r2_drop", "separable"],
+          "properties": {
+            "terms": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "string" } },
+            "r2_drop": { "$ref": "#/$defs/num_or_null" },
+            "separable": { "type": ["boolean", "null"] }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "window", "term", "status", "sign", "experiments_testable", "experiments_excluding_zero", "pooled_coefficient", "pooled_interval_low", "pooled_interval_high"],
+      "properties": {
+        "model": { "enum": ["hydrolyzer", "absorber"] },
+        "window": { "enum": ["steady", "whole_run"] },
+        "term": { "enum": ["flow", "pressure", "air_flow", "pressure_drop"] },
+        "status": { "enum": ["supported", "single_run", "not_resolved", "inconsistent", "not_testable"] },
+        "sign": { "enum": ["positive", "negative", null] },
+        "experiments_testable": { "type": "integer", "minimum": 0 },
+        "experiments_excluding_zero": { "type": "integer", "minimum": 0 },
+        "pooled_coefficient": { "$ref": "#/$defs/num_or_null" },
+        "pooled_interval_low": { "$ref": "#/$defs/num_or_null" },
+        "pooled_interval_high": { "$ref": "#/$defs/num_or_null" }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["a", "b", "conditions_status", "differing", "factors", "recorded_differences", "kpis"],
+      "properties": {
+        "a": { "type": "string" },
+        "b": { "type": "string" },
+        "conditions_status": { "enum": ["same_conditions", "supported", "confounded"] },
+        "differing": { "type": "array", "items": { "$ref": "#/$defs/factor_name" } },
+        "factors": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["factor", "a", "b", "differs"],
+            "properties": {
+              "factor": { "$ref": "#/$defs/factor_name" },
+              "a": { "type": ["number", "string", "null"] },
+              "b": { "type": ["number", "string", "null"] },
+              "differs": { "type": ["boolean", "null"] }
+            }
+          }
+        },
+        "recorded_differences": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field", "a", "b"],
+            "properties": {
+              "field": { "const": "operator" },
+              "a": { "type": ["string", "null"] },
+              "b": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "kpis": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "unit", "difference", "interval_low", "interval_high", "excludes_zero", "coverage_status"],
+            "properties": {
+              "name": { "$ref": "#/$defs/kpi_name" },
+              "unit": { "type": "string" },
+              "difference": { "$ref": "#/$defs/num_or_null" },
+              "interval_low": { "$ref": "#/$defs/num_or_null" },
+              "interval_high": { "$ref": "#/$defs/num_or_null" },
+              "excludes_zero": { "type": ["boolean", "null"] },
+              "coverage_status": { "enum": ["both_complete", "partial_coverage", "not_available"] }
+            }
+          }
+        }
+      }
+    }
+  }
+}
