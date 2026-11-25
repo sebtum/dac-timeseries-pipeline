@@ -5,6 +5,6 @@
   "health": "python scripts/verify_stack.py health",
   "down": "python scripts/verify_stack.py down",
   "copy": ["data/raw/dac_raw_timeseries.csv"],
-  "ports": 2,
+  "ports": 3,
   "timeoutSeconds": 900
 }

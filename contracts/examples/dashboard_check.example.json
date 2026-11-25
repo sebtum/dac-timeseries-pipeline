@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "grafana_version": "12.0.0",
+  "source": {
+    "dashboards": [
+      "grafana/dashboards/compare.json",
+      "grafana/dashboards/experiment.json"
+    ],
+    "overrides": {},
+    "sweep": [
+      "signal"
+    ],
+    "time_range": "window",
+    "allow_empty": [
+      "Gaps and stuck stretches"
+    ]
+  },
+  "runs": [
+    {
+      "dashboard_uid": "dac-compare",
+      "dashboard_title": "Compare experiments",
+      "selection": [
+        "EXP_001",
+        "EXP_005"
+      ],
+      "sweep": {
+        "signal": "voltage"
+      },
+      "time_from": "2026-05-04T08:00:00Z",
+      "time_to": "2026-06-15T08:00:00Z",
+      "panels": [
+        {
+          "panel_id": 1,
+          "title": "Experiments",
+          "type": "table",
+          "empty_allowed": false,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "pg",
+              "rows": 2,
+              "fields": [
+                "experiment_id",
+                "start_time",
+                "end_time"
+              ],
+              "error": null
+            }
+          ]
+        },
+        {
+          "panel_id": 6,
+          "title": "Overlay: ${signal} in minutes since start",
+          "type": "xychart",
+          "empty_allowed": false,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "influx",
+              "rows": 14400,
+              "fields": [
+                "experiment_id",
+                "experiment_time_min",
+                "value"
+              ],
+              "error": null
+            }
+          ]
+        }
+      ],
+      "annotations": []
+    },
+    {
+      "dashboard_uid": "dac-experiment",
+      "dashboard_title": "Experiment detail",
+      "selection": [
+        "EXP_001"
+      ],
+      "sweep": {
+        "signal": "voltage"
+      },
+      "time_from": "2026-05-04T08:00:00Z",
+      "time_to": "2026-05-04T10:00:00Z",
+      "panels": [
+        {
+          "panel_id": 1,
+          "title": "Experiment",
+          "type": "table",
+          "empty_allowed": false,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "pg",
+              "rows": 1,
+              "fields": [
+                "experiment_id",
+                "start_time",
+                "end_time"
+              ],
+              "error": null
+            }
+          ]
+        },
+        {
+          "panel_id": 3,
+          "title": "${signal}: accepted and excluded",
+          "type": "timeseries",
+          "empty_allowed": false,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "influx",
+              "rows": 7200,
+              "fields": [
+                "time",
+                "accepted",
+                "excluded (raw value)"
+              ],
+              "error": null
+            }
+          ]
+        },
+        {
+          "panel_id": 9,
+          "title": "Gaps and stuck stretches",
+          "type": "table",
+          "empty_allowed": true,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "influx",
+              "rows": 13,
+              "fields": [
+                "signal",
+                "kind",
+                "start",
+                "seconds",
+                "points"
+              ],
+              "error": null
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Gaps and stuck stretches",
+          "datasource": "influx",
+          "rows": 2,
+          "error": null
+        }
+      ]
+    },
+    {
+      "dashboard_uid": "dac-experiment",
+      "dashboard_title": "Experiment detail",
+      "selection": [
+        "EXP_005"
+      ],
+      "sweep": {
+        "signal": "voltage"
+      },
+      "time_from": "2026-06-15T06:00:00Z",
+      "time_to": "2026-06-15T08:00:00Z",
+      "panels": [
+        {
+          "panel_id": 1,
+          "title": "Experiment",
+          "type": "table",
+          "empty_allowed": false,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "pg",
+              "rows": 1,
+              "fields": [
+                "experiment_id",
+                "start_time",
+                "end_time"
+              ],
+              "error": null
+            }
+          ]
+        },
+        {
+          "panel_id": 3,
+          "title": "${signal}: accepted and excluded",
+          "type": "timeseries",
+          "empty_allowed": false,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "influx",
+              "rows": 7200,
+              "fields": [
+                "time",
+                "accepted",
+                "excluded (raw value)"
+              ],
+              "error": null
+            }
+          ]
+        },
+        {
+          "panel_id": 9,
+          "title": "Gaps and stuck stretches",
+          "type": "table",
+          "empty_allowed": true,
+          "targets": [
+            {
+              "ref_id": "A",
+              "datasource": "influx",
+              "rows": 0,
+              "fields": [],
+              "error": null
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "name": "Gaps and stuck stretches",
+          "datasource": "influx",
+          "rows": 0,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "runs": 3,
+    "panel_targets": 8,
+    "with_rows": 7,
+    "empty": 0,
+    "empty_allowed": 1,
+    "errors": 0,
+    "annotation_errors": 0
+  },
+  "timing": {
+    "seconds": 1.5,
+    "queries": 24
+  }
+}
