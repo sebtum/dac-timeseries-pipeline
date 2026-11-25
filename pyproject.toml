@@ -9,7 +9,11 @@ extend-exclude = ["generator"]
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.pytest.ini_options]
+# Two test modules share a basename (unit and integration test_comparison_loader.py).
+addopts = "--import-mode=importlib"
+pythonpath = ["."]
 markers = [
     "influx: needs a reachable InfluxDB container (skipped, not failed, if unreachable)",
     "postgres: needs a reachable PostgreSQL container (skipped, not failed, if unreachable)",
+    "grafana: needs a reachable Grafana with the provisioned datasources (skipped, not failed, if unreachable)",
 ]

@@ -110,6 +110,28 @@ Real run (metrics `m4-v1`): 121,167 points in `metrics_series` (24 series: 6 exp
 write and checked against what was written. The summary is `reports/metrics_summary.json`
 (contract `contracts/metrics_summary.schema.json`).
 
+### The comparison tables (M6, ADR-0018)
+
+Three Postgres tables, created by migration `0004_comparison.sql` and written by
+`python -m scripts.load_comparison` from the committed `reports/comparison_summary.json` (M5), so
+Grafana can read the steady KPIs and the pair comparability. Values are copied from the summary
+unchanged; nothing is computed in the database. The loader replaces all rows of one
+`compare_version` in one transaction and reads the counts back, so a rerun writes identical rows and
+rows of other versions are untouched. They are not in InfluxDB and do not expire with raw. The
+statuses are explained in [`comparison.md`](comparison.md).
+
+| | `comparison_kpi` | `comparison_pair` | `comparison_pair_kpi` |
+|---|---|---|---|
+| **what a row is** | one steady-state KPI of one experiment | one pair of experiments, `a` before `b` | one KPI of one pair |
+| **primary key** | `experiment_id, compare_version, kpi` | `a, b, compare_version` | `a, b, compare_version, kpi` |
+| **references** | `experiment_id` references `experiment` | `a` and `b` reference `experiment`; `CHECK (a < b)` | `(a, b, compare_version)` references `comparison_pair`, `ON DELETE CASCADE` |
+| **columns** | `policy_version`, `metrics_version`, `value`, `unit`, `coverage`, `status` (`complete`, `partial` or `none`), `interval_low`, `interval_high` | `conditions_status` (`same_conditions`, `supported` or `confounded`), `differing` (factor names in factor order, comma-separated; empty when none differ) | `unit`, `difference` (b minus a), `interval_low`, `interval_high`, `excludes_zero`, `coverage_status` (`both_complete`, `partial_coverage` or `not_available`) |
+
+Real run (compare `m5-v1`): 30 rows in `comparison_kpi` (6 experiments x 5), 15 in `comparison_pair`
+and 75 in `comparison_pair_kpi` (15 pairs x 5). The loader's contract is
+`contracts/comparison_summary.schema.json`. The dashboards read these tables with the other
+Postgres tables of this section and `experiment`; see [`dashboard.md`](dashboard.md).
+
 ## 2. Cardinality — 150 series, measured
 
 **150 series**, measured directly against the raw CSV by the pre-ingest census
@@ -243,6 +265,8 @@ must therefore be *monitored*, not merely scheduled (ADR-0011, Consequences).
 - ADR-0013 — Ingestion (the conflicts table)
 - ADR-0015 — Cleaning and quality pipeline (the three processed tables, the rollup over the verdict)
 - ADR-0016 — Derived metrics (`metrics_series`, `experiment_metrics`, `signal_quality`)
+- ADR-0017 — Comparison and findings (the summary the comparison tables copy)
+- ADR-0018 — Grafana dashboards (the three comparison tables, migration `0004`)
 - `reports/pre_ingest_census.md` — measured row/series counts, quality distribution
 - `task/DATA_DICTIONARY.md` — per-signal nominal sample rates
 - `docs/plans/M1.md` — local retention values (T2 scope, "Three calls made in this phase")

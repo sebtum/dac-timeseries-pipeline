@@ -15,9 +15,16 @@
 - M3: `docs/ROADMAP.md` § M3; `task/TASK.md` C, D; ADR-0006 (U-09, U-10), ADR-0011 (rollup over the verdict, UNCERTAIN as BAD, U-04), ADR-0013 (conflicts table, empty values), ADR-0014 and `reports/post_ingest_profile.json` (the measured facts the rules are calibrated on); U-06, U-12; MISTAKES.md C-01, C-02, C-03; approved plan `C:\Users\sebas\.claude\plans\glittery-splashing-nebula-of-6edcf82e-3517-4393-95bf-5335ed2e2c92.md`
 - M4: `docs/ROADMAP.md` § M4; `task/TASK.md` E; `task/DATA_DICTIONARY.md` (units, nominal rates, the power note); ADR-0005 (Postgres for metadata, Grafana reaches it by variable), ADR-0011 (tiers), ADR-0015 and `docs/cleaning_policy.md` (the verdict M4 consumes, the alignment rule it promised: polled signals as-of within 2 × nominal); `reports/cleaning_summary.json` and `reports/post_ingest_profile.json` (measured gaps, exclusions, shared instants); MISTAKES.md C-01, E-04, E-06; approved plan `C:\Users\sebas\.claude\plans\nested-twirling-book-of-20e84ac6-0afe-4726-bfcc-f29c4a1074b7.md`
 - M5: `docs/ROADMAP.md` § M5; `task/TASK.md` F; `task/DATA_DICTIONARY.md` (process phases, the flow/solvent_flow note); ADR-0005 (metadata in Postgres), ADR-0012 (corrections live in Postgres), ADR-0015 and `docs/cleaning_policy.md` (accepted readings, state intervals with no expiry), ADR-0016 and `docs/metrics.md` (`metrics_series`, `experiment_metrics`, the integration and coverage rules M5 reuses); `reports/post_ingest_profile.json` (current lags setpoint by 23–24 s; pressure drop vs air flow R² < 0.17), `reports/metrics_summary.json`; A-07, U-05; MISTAKES.md E-09; approved plan `C:\Users\sebas\.claude\plans\frolicking-gliding-mango-of-945a74fa-e04e-4ece-aa19-1bfea04e10ae.md`
+- M6: `docs/ROADMAP.md` § M6 (verify criteria) and § Cross-cutting CI (M6 increment); `task/TASK.md` G; ADR-0002 (Grafana, the overlay cost), ADR-0004 (SQL, U-05), ADR-0005 (metadata reaches Grafana by variable), ADR-0006 (no metadata as Influx tags), ADR-0009 (provisioning as code, exception 2 replaced by M6 decision 1), ADR-0015/`docs/cleaning_policy.md` (verdict, reasons, quality_intervals), ADR-0016/`docs/metrics.md`, ADR-0017/`docs/comparison.md` (experiment time, steady KPIs, comparability); `docs/schema.md`; `contracts/comparison_summary.schema.json`; U-05; MISTAKES E-06, E-08, E-09; approved plan `C:\Users\sebas\.claude\plans\agile-toasting-acorn-of-96e178f0-7ad1-45b2-99ba-c2de4fbb4708.md`
 
 ### Goal
-Build everything in `task/TASK.md` A–J, one roadmap milestone at a time. Current milestone, M5:
+Build everything in `task/TASK.md` A–J, one roadmap milestone at a time. Current milestone, M6:
+add a pinned Grafana to the stack with provisioned datasources, and two provisioned dashboards a
+scientist can use — "Compare experiments" (selector, KPIs, which pairs are comparable, overlay in
+minutes since start, quality per experiment) and "Experiment detail" (one run on the wall clock with
+excluded readings, gaps and stuck stretches drawn) — plus a loader that puts the M5 steady KPIs and
+comparability into Postgres, and a checker that runs every panel query through Grafana.
+M5 (built, merged; findings still a draft):
 put the six experiments on a shared clock (seconds since start), split each into its process
 phases, answer with evidence how hydrolyzer flow and pressure relate to cell voltage at fixed
 current and temperature, say which experiment pairs can fairly be compared and which cannot, and
@@ -31,6 +38,8 @@ decision and reason side by side, record gaps and stuck stretches as intervals, 
 over that decision, and prove by counts that nothing was dropped or quietly changed.
 M2.5 (built): measure the stored data and write the numbers to a file, without judging any reading.
 M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing anything, and prove it with counts.
+- Scope (M6): Grafana service (pinned) in compose, the private verify stack and CI; datasource and dashboard provisioning files; dashboards `grafana/dashboards/compare.json` and `experiment.json`; migration 0004 and `scripts.load_comparison`; `scripts.check_dashboards` (lint + live panel check, JSON output with contract); image-renderer screenshots; real-data check with committed `reports/dashboard_check.json`; U-05 wide-picker measurement; `docs/dashboard.md`, ADR-0018, ADR-0009 addendum, README run steps, M6 report.
+- Non-goals (M6): any InfluxDB write; changing an existing table, cleaning rule, metric formula or the compare analysis; showing a headline finding (the M5 findings are a draft); alerting and pipeline health (H, M7); read-only database logins for Grafana; rollup-backed panels for long ranges (Next steps).
 - Scope (M5): comparison command `scripts.compare`, pure analysis functions with a versioned policy table, read layer over InfluxDB and Postgres, summary contract, hand-built three-experiment fixture with a planted voltage relationship, real run with committed outputs, independent recompute, draft findings with a findings-vs-summary regression test, `docs/comparison.md`, ADR-0017, M5 report.
 - Non-goals (M5): writing any InfluxDB or Postgres row (aligned series or results for Grafana are M6's call); new cleaning rules or metric formulas; filling any input; causal claims (one run per condition); the dashboard (M6); fixing the M4 read-back count (Next steps).
 - Scope (M4): metrics command `scripts.metrics`, pure metric functions with a versioned policy table, InfluxDB table `metrics_series` in `dac_raw`, Postgres migration 0003 (`experiment_metrics`, `signal_quality`), summary contract, hand-built fixture with hand-computed answers, real run with committed outputs, `docs/metrics.md`, ADR-0016, M4 report.
@@ -57,6 +66,7 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M3 baseline (planning, 2026-11-23): `77b851678fc9b1cc901df21ad0cb1277c7e4f30e` on branch `m2.5-profiling`, with all of M2.5 uncommitted: ` M .github/workflows/ci.yml`, ` M .gitignore`, ` M .workflow/dac.log.md`, ` M .workflow/dac.md`, ` M docs/ASSUMPTIONS.md`, ` M docs/ROADMAP.md`, ` M docs/decisions/README.md`, ` M pipeline/signals.py`, `?? contracts/examples/post_ingest_profile.example.json`, `?? contracts/post_ingest_profile.schema.json`, `?? docs/decisions/ADR-0014-post-ingest-profiling.md`, `?? pipeline/profiling.py`, `?? pipeline/profiling_sql.py`, `?? reports/M2.5.md`, `?? reports/post_ingest_profile.json`, `?? reports/post_ingest_profile.md`, `?? scripts/post_ingest_profile.py`, `?? tests/e2e/test_profile_cli.py`, `?? tests/fixtures/profile/`, `?? tests/unit/test_profiling.py`. M3 execute starts from the M2.5 commit, on a new branch `m3-cleaning`.
 - M4 baseline (planning, 2026-11-24): `a7bade12486f58fabf3ee5fede4fd67d6b22cee7` on `master` (the M3 merge), clean. M4 execute starts on a new branch `m4-metrics` cut from it; the first commit carries this record and the M4 contract files.
 - M5 baseline (planning, 2026-11-24): `262fb1fd0124e4da1d158933139f23aca781911c` on `master` (the M4 merge). Pre-existing: `?? docs/project-overview.html` (not M5's; leave it uncommitted). M5 execute starts on a new branch `m5-comparison` cut from it; the first commit carries this record and the M5 contract files.
+- M6 baseline (planning, 2026-11-24): `c4b599d0728a77eec2289812e7cc4357e7075164` on `master` (the M5 merge). Pre-existing: `?? docs/project-overview.html` (not M6's; leave it uncommitted). M6 execute starts on a new branch `m6-dashboard` cut from it; the first commit carries this record, `.workflow/verify-env.json` and the M6 contract files.
 
 ### Constraints
 - Milestone ids follow `docs/ROADMAP.md`. Only `/flow:plan <id>` details a milestone.
@@ -76,6 +86,11 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M5 writes nothing to InfluxDB or Postgres and creates no database or schema. It reads `readings_processed` (accepted rows, plus `value_raw` for the air-flow check), `state_intervals` and `metrics_series` of one cleaning `policy_version` (and, for `metrics_series`, one `metrics_version`), and Postgres `experiment` and `experiment_metrics`. Every InfluxDB query is bounded to one experiment window (U-05).
 - M5 analysis is stdlib Python (`math.fsum`, `random.Random`, no numpy), like M3 and M4; it may import `pipeline.metrics` for `as_of`, `covered_intervals`, `overlap`, `integrate_over`, `status_for` and `POLICY`, and must not change that module.
 - M5 findings are a draft until Sebastian approves them (CLAUDE.md, headline claims). `reports/findings.md` says so in its status line; the merge to `master` waits for that approval.
+- M6 writes no InfluxDB row and creates no InfluxDB database outside tests. In Postgres it writes only the three tables of migration 0004 (loader). Grafana's own state lives in its named volume `grafana-data`; the committed JSON is the only source of the dashboards (provisioned with `allowUiUpdates: false`).
+- Every InfluxDB panel query filters `policy_version` (and `metrics_version` for `metrics_series`) through the constant variables and is bounded by the selected experiments' windows from Postgres, as well as by the time picker on the detail dashboard. Every Postgres query names its tables as `${pg_schema}.<table>`.
+- No dashboard panel states an M5 finding or a voltage-evidence status (findings are a draft; CLAUDE.md headline claims). The comparability table and steady KPIs are numbers from the committed summary, not findings.
+- Images pinned to exact tags (`grafana/grafana`, `grafana/grafana-image-renderer`), chosen and pulled at execute, tag and digest recorded in ADR-0018; no `latest` (ADR-0008). Secrets reach Grafana only as environment variables from `.env`.
+- Grafana SQL against Core avoids the 3.11.2 quirks in ADR-0014 (no `COUNT(*) FILTER` after a window function, no `PERCENTILE_CONT`, no equality on `-0.0`).
 
 ### Decisions
 - M0, M1 accepted as done under the old method (Sebastian, 2026-11-23).
@@ -197,6 +212,26 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
   22. **Calibrate before scaling:** EXP_001 first against an independent plain-Python recompute from SELECT pulls (no pipeline imports, the bootstrap re-implemented from decision 10's text), then all six.
   23. **Branch `m5-comparison`, cut from `master` at `262fb1f`.** The first commit carries this record and the M5 contract files. Commit and push at the end of M5; merge waits for Sebastian's approval of the findings.
   24. **Housekeeping:** S4.9, S4.24 and S4.25 reworded to what the build gives and Sebastian ruled (Next steps entries of 2026-11-24, judge block `@ a7bade1`); M4 decision 21 added; the M4 contract example's `series_written.capture_rate` changed from 268 to 269 (example only; the schema is unchanged and no caller reads the example's numbers). No code change.
+- M6, made while planning (2026-11-24); plan approved by Sebastian (`C:\Users\sebas\.claude\plans\agile-toasting-acorn-of-96e178f0-7ad1-45b2-99ba-c2de4fbb4708.md`). Full reasoning goes into ADR-0018 at execute.
+
+  1. **Approved major decision: dashboards are committed JSON, provisioned read-only from the start** (`allowUiUpdates: false`). Replaces ADR-0009 exception 2 ("build in the UI, export at the end"): agents build the dashboards and nobody clicks in the UI, so its premise no longer holds; the checker (decision 8) and rendered screenshots (decision 10) replace the UI check. ADR-0009 gets an addendum (T6). Rejected: UI first, export last.
+  2. **Approved: M5 counts as done for starting M6.** Newest M5 Findings block `@ fdb427d`, no defects; HEAD `c4b599d` is the approved merge of it plus `165b8be`, which only adds that block. Findings stay a draft.
+  3. **Mode standard, judge verify, 6 tasks run by agents** (Sebastian asked for parallel agents). W1: stack and checker (T1) ∥ loader (T2); W2: compare dashboard (T3) ∥ detail dashboard (T4); W3: real data (T5); W4: write-up (T6). A bug found by a later task is reported back to the owner, not patched outside the finder's files. Rejected: full mode (no new risk class; dashboards are checked by query and screenshot).
+  4. **Grafana in compose**, service `grafana`, image `grafana/grafana:<exact tag>` (newest stable 12.x or later that passes the spike; tag and digest in ADR-0018), container name `${GRAFANA_CONTAINER_NAME:-dac-grafana}`, port `${GRAFANA_PORT:-3000}:3000`, named volume `grafana-data`, read-only bind mounts `./grafana/provisioning:/etc/grafana/provisioning:ro` and `./grafana/dashboards:/var/lib/grafana/dashboards:ro` (config files, not data, so ADR-0008's bind-mount concern does not apply). Environment: `GF_SECURITY_ADMIN_USER`/`GF_SECURITY_ADMIN_PASSWORD` from `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD`, `GF_AUTH_ANONYMOUS_ENABLED=false`, `GF_USERS_ALLOW_SIGN_UP=false`, `INFLUX_TOKEN`, `POSTGRES_USER`/`POSTGRES_PASSWORD`/`POSTGRES_DB`, `DAC_INFLUX_URL` (default `http://influxdb:8181`), `DAC_POSTGRES_HOST` (default `postgres:5432`), rendering URLs for decision 10. `depends_on` both stores healthy. Rejected: anonymous viewer access (auth stays on locally, ADR-0009).
+  5. **Datasources provisioned** in `grafana/provisioning/datasources/datasources.yaml` with fixed uids: `influx-dac` (built-in `influxdb` type, SQL mode over Flight, database `dac_raw`, token `$INFLUX_TOKEN`, URL `$DAC_INFLUX_URL`, insecure gRPC since the local server has no TLS) and `pg-dac` (built-in Postgres type, `$DAC_POSTGRES_HOST`, database `$POSTGRES_DB`, user `$POSTGRES_USER`, password `$POSTGRES_PASSWORD`, `sslmode=disable`). Dashboards provider in `grafana/provisioning/dashboards/dashboards.yaml` (folder "DAC", path `/var/lib/grafana/dashboards`, `allowUiUpdates: false`, `disableDeletion: true`). Rejected: the FlightSQL plugin (ADR-0002).
+  6. **Start order.** Grafana reads the token at start, so `scripts/verify_stack.py up` starts `influxdb postgres`, bootstraps the token, migrates, inits, loads experiments, then starts `grafana` and waits for `/api/health` and both datasource health checks. A second `up` keeps everything usable (E-08). `health` also checks Grafana. Private Grafana on `FLOW_PORT_BASE + 2`; `.workflow/verify-env.json` `ports` 3. Dev: README gives the same order (`docker compose up -d influxdb postgres` → bootstrap → `docker compose up -d grafana`).
+  7. **Overlay = query-time experiment time, start from Postgres.** A hidden Postgres variable `windows` renders the selected experiments as a SQL list `('EXP_001', <start_ns>, <end_ns>), …`; the InfluxDB query joins on it and returns `experiment_time_min = (time_ns − start_ns) / 6e10`, drawn by the XY chart after a "partition by values" transformation on `experiment_id`. Full resolution (at most 6 × 7,200 points). Rejected: a stored aligned table (copies data; metadata into Influx, against ADR-0006); a time-series panel on fake 1970 timestamps (wrong dates in tooltips); start = first reading (shifts silently when it is missing); the Mixed datasource with join transformations (ADR-0005's fallback; kept as the fallback if the spike fails, via decision 11).
+  8. **Checker** `python -m scripts.check_dashboards` (module `pipeline/grafana_check.py`): a static lint with no services (every panel and annotation datasource is `${influx}` or `${pg}` or a provisioned uid; every `$name` / `${name}` / `${name:fmt}` used is a declared variable or a Grafana macro `$__…`; panel ids and dashboard uids unique; formats limited to none, `raw`, `sqlstring`, `csv`), and a live run that resolves variables itself (overrides first, then constants, custom, and query variables run through Grafana in templating order) and posts every panel target and annotation query to `/api/ds/query`. Output `dashboard_check.json` (contract `contracts/dashboard_check.schema.json`). Exit 0: every panel target returned at least one row without error (allow-empty targets exempt); 1: a panel target empty or failed, or an annotation query failed (empty annotations are fine); 2: refused, nothing written (Grafana unreachable or login refused, dashboard file unreadable or failing the lint, unknown experiment, bad argument). Grafana from `.env`: `GRAFANA_URL`, `GRAFANA_ADMIN_USER`, `GRAFANA_ADMIN_PASSWORD`.
+  9. **Tests never touch `dac_raw`:** e2e tests create a throwaway InfluxDB database, a temporary Grafana datasource pointing at it (Grafana API, deleted on teardown) and a throwaway Postgres schema, and pass `--var influx=<temp uid> --var pg_schema=<schema>` to the checker.
+  10. **Screenshots** by the Grafana image renderer: compose service `renderer` (`grafana/grafana-image-renderer:<exact tag>`) under compose profile `render`; Grafana's `GF_RENDERING_SERVER_URL=http://renderer:8081/render`, `GF_RENDERING_CALLBACK_URL=http://grafana:3000/`. `python -m scripts.screenshot_dashboards` saves PNGs from `/render/d/<uid>` into `docs/screenshots/m6/`. Rejected: a browser driver (Playwright not installed; one more toolchain).
+  11. **Spike first (T1), stop rule.** Before any panel exists, on the pinned images against Core 3.11.2: (a) the SQL-mode datasource health and a `SELECT` through `/api/ds/query`; (b) the `WITH w(experiment_id, t0, t1) AS (VALUES …)` join and the time-to-integer arithmetic of decision 7; (c) a SQL annotation query returning a region (start and end) from `quality_intervals`; (d) `$__timeFilter(time)` expansion. Result per item in the execute log and ADR-0018. If one fails and no syntax variant in the same mechanism works, T1 stops and it comes back to `/flow:plan M6` as a narrow question; no mechanism is swapped silently.
+  12. **Quality made visible** (display conventions, ADR-0018): accepted values as lines; excluded readings as red points at `value_raw` (series name "excluded (raw value)"); gap rows as grey and flatline rows as orange region annotations; status colours complete green, partial amber, none red; fractions (completeness, valid) green at ≥ 0.95, amber at ≥ 0.5, red below — display only, the 0.95 is M4's `COMPLETE_COVERAGE`; comparability `same_conditions`/`supported` green, `confounded` amber with the differing factors shown.
+  13. **Steady KPIs and comparability to Postgres** through `python -m scripts.load_comparison [--summary PATH] [--pg-schema NAME]` (defaults `reports/comparison_summary.json`, `public`; `POSTGRES_*` from `.env`) and migration `0004_comparison.sql` (DDL in the milestone). The loader validates the summary against `contracts/comparison_summary.schema.json`, then in one transaction deletes that `compare_version`'s rows and inserts the summary's, then reads the counts back. Exit 0 written and read back; 2 refused, nothing written (file unreadable, contract failure, Postgres unreachable, 0004 not applied, an experiment id missing from `experiment`); 3 write failed, rolled back; 4 read-back counts differ. Prints one line `load_comparison: <compare_version> kpis=<n> pairs=<n> pair_kpis=<n>`. `scripts.compare` stays read-only (M5 decision 4). Rejected: Grafana reading the JSON file; compare writing Postgres.
+  14. **U-05 measured:** the checker's `--time-range span` runs the detail dashboard with the picker from the earliest start to the latest end of all experiments; rows must equal the window run for every target. A difference or error stops T5 and comes back as a narrow question. U-05 is then closed for this data set (T6), with the plant-scale caveat in Next steps.
+  15. **No finding is pinned in a scenario** (E-09). Real-data scenarios pin completeness, equality with plain pulls and reproducibility; fixture scenarios pin what the fixture construction gives. One exception, checked on committed data while planning: `reports/cleaning_summary.json` has no gap and no stuck stretch for EXP_005, so D9 is correctly empty there and is the only allow-empty title (S6.21).
+  16. **PyYAML pinned** in `requirements.txt` (exact version with Python 3.14 wheels, checked by `pip install` at execute) so the lint can read the provisioned uids from the YAML.
+  17. **CI increment:** the lint runs in the unit suite; the integration job starts Grafana by `docker run --network host` with the provisioning and dashboard directories mounted, `DAC_INFLUX_URL=http://localhost:8181`, `DAC_POSTGRES_HOST=localhost:5432` and the token from `.env`, after the token bootstrap, so the `grafana`-marked tests run (a skip is a failure there).
+  18. **Branch `m6-dashboard`, cut from `master` at `c4b599d`.** The first commit carries this record, `.workflow/verify-env.json` and the M6 contract files. Commit and push at the end of M6; merge waits for approval.
 
 ### Assumptions and open questions
 - Partial accept on 3.11.2 behaves as documented — a real test in M2 decides (Claude).
@@ -218,6 +253,9 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - M5: the comparability tolerances (5 % on setpoints and flows, 5 °C ambient, 15 %RH humidity) are judgement, not calibration; the measured condition values are reported beside each factor so a reader can disagree (Claude).
 - M5: the block length (120 s) is longer than the measured current lag (23–24 s) and short enough for about 60 blocks per whole run and 7 per steady window on the fixture; a much longer correlation time in the real residuals would make the intervals too narrow. T5 reports the lag-1 block correlation of the residuals for EXP_001 in the execute log so the judge can see it (Claude).
 - M5: the fixture's planted coefficients (T3) must be recoverable by OLS: flow and pressure patterns independent (VIF well under 10), voltage generated from the exact values the join pairs (temperature as-of), and every planted reading accepted by cleaning; if cleaning excludes anything unplanned, T3 changes the construction, not the rules (Claude).
+- M6: Grafana's built-in InfluxDB datasource in SQL mode works against Core 3.11.2 over plain (non-TLS) Flight, supports the VALUES join and annotations with an end time — not verified; the T1 spike decides (decision 11, E-06) (Claude).
+- M6: the XY chart's "partition by values" transformation is frontend-only, so the checker cannot see it; the screenshots (S6.24) and Sebastian's click-through are its only check (Claude).
+- M6: the display thresholds (decision 12) are display choices, not policy; a reader can disagree without any number changing (Claude).
 - M3: EXP_004 pressure −3.1 bar: its acquisition flag decides whether the reason is `flag_uncertain` or `outside_physical_limits`; either way it is excluded (Claude, at execute).
 
 ### Next steps (not in this budget)
@@ -253,6 +291,9 @@ M2 (built): copy the raw CSV into InfluxDB without losing or quietly changing an
 - Residual autocorrelation is not in `comparison_summary.json` (M5 execute): T5 measured the lag-1 correlation of 120 s block means of the hydrolyzer steady residuals (EXP_005 0.87, the others -0.15 to 0.12) in a scratch script; the findings cite it from the log, outside the reference test. Add it to the summary and contract so the finding can carry a reference, and measure it for the absorber model too — small, found 2026-11-24.
 - The compare fixture cannot test the absorber voltage model (M5 execute): the "+ at even reading index" noise makes current and air flow constant at the 0.5 Hz pressure-drop instants, so the normal matrix is singular and absorber fits are `not_testable` there. T1's unit tests cover the testable path. Change the fixture noise phase for 0.5 Hz joins at the next `/flow:plan M5` if an end-to-end absorber fit is wanted — small, found 2026-11-24.
 - M5 decision 13 text vs build (M5 execute): steady KPI series are restricted to instants inside the steady windows before covered intervals are taken (fixture coverage 838/840), where the literal text (covered intervals of the whole series, then clipped) gives 840/840. The build matches the fixture README and S5.15; reword decision 13 at the next `/flow:plan M5` (ADR-0017 records it) — small, found 2026-11-24.
+- Read-only database logins for Grafana (M6): it uses the InfluxDB admin token and the main Postgres user; a read-only Postgres role and, where Core allows it, a read-only token — small.
+- Rollup-backed panels for long ranges (M6): at plant scale a months-wide picker should read `dac_rollup`, not 1 Hz rows; not needed for six 2-hour runs (U-05 caveat) — medium.
+- A voltage-against-flow panel (M6): once Sebastian approves the M5 findings — small.
 - Partial-sum blocks split covered pairs at the 120 s block edges (M5 execute, matches the independent recompute); decision 13's text says "each block contributing its partial sums" without saying how a pair that straddles an edge is split. Reword at the next plan — small.
 
 ### Checks
@@ -278,6 +319,12 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 | contract | `check-jsonschema --schemafile contracts/metrics_summary.schema.json contracts/examples/metrics_summary.example.json` | . | requirements installed | new in M4 |
 | e2e | `python -m scripts.compare --report-dir .flow-tmp/compare` | . | stack up; `python -m scripts.ingest`, `python -m scripts.clean --report-dir .flow-tmp/clean` and `python -m scripts.metrics --report-dir .flow-tmp/metrics` ran first on the real CSV | new in M5 |
 | contract | `check-jsonschema --schemafile contracts/comparison_summary.schema.json contracts/examples/comparison_summary.example.json` | . | requirements installed | new in M5 |
+| e2e | `python -m scripts.load_comparison --summary .flow-tmp/compare/comparison_summary.json` | . | stack up; the M5 row `python -m scripts.compare --report-dir .flow-tmp/compare` ran first; migration 0004 applied (`verify_stack.py up` migrates) | new in M6 |
+| e2e | `python -m scripts.check_dashboards --sweep signal --allow-empty "Gaps and stuck stretches" --report-dir .flow-tmp/dashboards` | . | stack up with Grafana (M6 `verify_stack.py up`); ingest, clean, metrics, compare and load_comparison ran first on the real CSV | new in M6 |
+| e2e | `python -m scripts.check_dashboards --dashboard grafana/dashboards/experiment.json --time-range span --allow-empty "Gaps and stuck stretches" --report-dir .flow-tmp/dashboards-span` | . | same as the row above | new in M6 (U-05) |
+| contract | `check-jsonschema --schemafile contracts/dashboard_check.schema.json contracts/examples/dashboard_check.example.json` | . | requirements installed | new in M6 |
+
+Since M6 the whole-suite and e2e rows also need Grafana up (`grafana`-marked tests; a skip is a failure), which the M6 `verify_stack.py up` provides. Grafana is reached at `GRAFANA_URL=http://localhost:$((FLOW_PORT_BASE+2))`, written into the private `.env` by `up`.
 
 `.workflow/verify-env.json`:
 ```json
@@ -286,7 +333,7 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
   "health": "python scripts/verify_stack.py health",
   "down": "python scripts/verify_stack.py down",
   "copy": ["data/raw/dac_raw_timeseries.csv"],
-  "ports": 2, "timeoutSeconds": 900 }
+  "ports": 3, "timeoutSeconds": 900 }
 ```
 
 ### Milestones
@@ -1449,7 +1496,279 @@ Services: `.workflow/verify-env.json` (private InfluxDB + Postgres; `up` writes 
 - After the judge: commit, push `m5-comparison`, CI green, open `reports/M5.md` in the doc viewer. The findings stay a draft and the merge waits until Sebastian approves them.
 
 #### M6: Grafana dashboard (G)
-- Not yet detailed. Scope: `docs/ROADMAP.md` § M6.
+- Depends on: M5 (accepted as done, M6 decision 2)
+- Judge: verify · Touches: migration (0004), auth config (Grafana admin login, datasource secrets). Optional after the judge: `/security-review` (secrets handling in compose and provisioning).
+- Gates: —
+- Contract: `contracts/dashboard_check.schema.json` (shape of the checker's `dashboard_check.json`), example `contracts/examples/dashboard_check.example.json` (illustrative counts, not expected test values). Migration 0004's DDL below is pinned in this record (the migration file is its own contract, checked by the migration test).
+- Order of work: T1 ∥ T2 → T3 ∥ T4 → T5 → T6. T1 runs the spike (decision 11) before writing anything else.
+- Commands:
+  - `python -m scripts.check_dashboards [--dashboard PATH ...] [--experiment ID ...] [--var NAME=VALUE ...] [--sweep NAME ...] [--time-range window|span|FROM,TO] [--allow-empty TITLE ...] [--report-dir DIR]`. Defaults: every `grafana/dashboards/*.json` in name order; every value of the dashboard's `experiment` variable; no overrides; no sweep; `window`; `reports/`. Selections: each experiment alone, plus all requested experiments together when the `experiment` variable is multi-value. `--sweep NAME` runs each selection once per value of variable NAME (every other variable at its default). `window` = from the earliest start to the latest end of the selection (Postgres `experiment`, read through the `${pg}` datasource); `span` = from the earliest start to the latest end of all experiments in `${pg_schema}.experiment`; `FROM,TO` = two RFC 3339 instants. `--allow-empty TITLE` exempts the panel with exactly that title (as written in the JSON) from the "has rows" rule; its targets are still run and an error still counts. Exit codes: decision 8. Output `<report-dir>/dashboard_check.json`, written only on 0 and 1.
+  - `python -m scripts.load_comparison [--summary PATH] [--pg-schema NAME]` (decision 13).
+  - `python -m scripts.screenshot_dashboards [--out DIR] [--width PX] [--height PX]` (defaults `docs/screenshots/m6`, 1600, 1000): renders the four pinned views of S6.24 through `/render/d/<uid>`; exit 0 all saved, 2 renderer unreachable, nothing saved.
+- `dashboard_check.json` shape (the contract pins it): `schema_version` 1; `grafana_version`; `source` {dashboards (repo-relative paths), overrides {name: value}, sweep (names), time_range (`window` \| `span` \| `fixed`), allow_empty (titles)}; `runs[]` sorted by dashboard_uid, selection, sweep values, time_from: {dashboard_uid, dashboard_title, selection (experiment ids, sorted), sweep {name: value}, time_from, time_to (RFC 3339 UTC, `Z`), `panels[]` by panel id {panel_id, title, type, empty_allowed, `targets[]` by ref_id {ref_id, datasource (`influx` \| `pg`), rows (int), fields (names in frame order), error (string \| null)}}, `annotations[]` by name {name, datasource, rows, error}}; `totals` {runs, panel_targets, with_rows, empty, empty_allowed, errors, annotation_errors}; `timing` {seconds, queries} — the only part allowed to differ between runs. Rows = total rows over all frames a target returns. `panel_targets` = `with_rows` + `empty` + `empty_allowed` + `errors`; a target with an error counts only under `errors`. `annotation_errors` is separate.
+- Dashboard variables (same names on both dashboards unless noted; `hide` 2 = hidden):
+
+  | Name | Type | Shown | Value |
+  |---|---|---|---|
+  | `influx` | datasource (`influxdb`) | hidden | default `influx-dac` |
+  | `pg` | datasource (Postgres) | hidden | default `pg-dac` |
+  | `pg_schema` | constant | hidden | `public` |
+  | `policy_version`, `metrics_version`, `compare_version` | constant | hidden | `m3-v1`, `m4-v1`, `m5-v1` |
+  | `experiment` | query `${pg}`: `SELECT experiment_id FROM ${pg_schema}.experiment ORDER BY 1` | shown | compare: multi-value, include All, default All; detail: single value, default `EXP_001` |
+  | `windows` | query `${pg}`, one row: the selected experiments as `('<id>', <start_ns>, <end_ns>)` joined by `, ` in id order | hidden | — |
+  | `span_from`, `span_to` | query `${pg}`: earliest start / latest end of the selection, RFC 3339 UTC | hidden | — |
+  | `signal` | query `${pg}`: distinct `signal` of `${pg_schema}.signal_quality` with `nominal_interval_s IS NOT NULL` for `${metrics_version}`, ordered (the 23 numeric signals; names are unique across sources) | shown | default `voltage` |
+  | `metric` (compare only) | custom: `power_computed, power_residual, capture_efficiency, capture_rate` | shown | default `capture_efficiency` |
+  | `from_ms`, `to_ms` (detail only) | query `${pg}`: the selected experiment's start / end in epoch milliseconds | hidden | — |
+
+- Overlay query shape (decision 7; T1's spike fixes the exact syntax, the meaning is pinned): `WITH w(experiment_id, t0, t1) AS (VALUES ${windows:raw}) SELECT r.experiment_id, (<time as ns> - w.t0) / 60000000000.0 AS experiment_time_min, r.value FROM readings_processed r JOIN w ON r.experiment_id = w.experiment_id WHERE r.signal = '${signal}' AND r.policy_version = '${policy_version}' AND r.verdict = 'accepted' AND r.time >= '${span_from}' AND r.time < '${span_to}' AND <time as ns> >= w.t0 AND <time as ns> < w.t1 ORDER BY r.experiment_id, r.time`. The metric overlay is the same over `metrics_series` with `metric = '${metric}'` and both versions.
+- Panel inventory (titles exact; the checker, the doc test and the screenshots use them):
+  - Compare experiments, uid `dac-compare`, folder "DAC":
+    - C1 `Experiments` (table, `${pg}` `experiment`): id, start, end, duration, nominal setpoint, air flow, solvent flow, operator, sorbent batch, notes; a data link "Open detail" to `/d/dac-experiment?var-experiment=<id>&from=<start ms>&to=<end ms>`.
+    - C2 `Whole-run KPIs` (table, `${pg}` `experiment_metrics` for `${metrics_version}`): per experiment and metric the value, unit, coverage and status, status coloured (decision 12).
+    - C3 `Steady-state KPIs (95 % interval)` (table, `${pg}` `comparison_kpi` for `${compare_version}`): value, interval, coverage, status coloured.
+    - C4 `Which pairs can be compared` (table, `${pg}` `comparison_pair`): a, b, conditions status coloured, differing factors. Pairs with at least one end selected, so one experiment alone shows what it can be compared with.
+    - C5 `Steady KPI differences by pair` (table, `${pg}` `comparison_pair_kpi`): difference b − a, interval, excludes zero, coverage status. Same pairs as C4.
+    - C6 `Overlay: ${signal} in minutes since start` (XY chart, `${influx}` `readings_processed`, accepted only; one series per experiment).
+    - C7 `Overlay: ${metric} in minutes since start` (XY chart, `${influx}` `metrics_series`).
+    - C8 `Data quality per experiment` (table, `${pg}` `signal_quality`): per experiment completeness (Σpresent / Σexpected over polled signals), valid, bad and uncertain fractions, coloured.
+    - C9 `Excluded readings by reason` (bar chart, `${influx}` `readings_processed`, `verdict = 'excluded'`, count by experiment and reason).
+  - Experiment detail, uid `dac-experiment`, folder "DAC"; default time range = EXP_001's window:
+    - D1 `Experiment` (table, `${pg}` `experiment`, the selected row) with a link "Jump to this experiment's window" to `/d/dac-experiment?var-experiment=${experiment}&from=${from_ms}&to=${to_ms}` (also as a dashboard link).
+    - D2 `Process phases` (state timeline, `${influx}` `state_intervals`, `process_state` and `valve_state`, every row with its `value_raw`).
+    - D3 `${signal}: accepted and excluded` (time series, `${influx}` `readings_processed`): series `accepted` (`value`, verdict accepted) as a line, series `excluded (raw value)` (`value_raw`, verdict excluded) as red points. One target with both as columns (null where the reading is the other verdict), so a signal with no exclusions is not an empty target. Dashboard annotation `Gaps and stuck stretches` (`${influx}` `quality_intervals` for the selected experiment and `${signal}`: region from `time` to `end_ns`, text = kind and seconds; gap grey, flatline orange).
+    - D4 `Electrical: voltage, current, power` (time series): accepted voltage and current, `power_computed` (`metrics_series`) and accepted logged `power`.
+    - D5 `Power residual (logged − computed)` (time series, `metrics_series` `power_residual`).
+    - D6 `Capture: CO2 in and out` (time series, accepted `co2_in_ppm`, `co2_out_ppm`).
+    - D7 `Capture efficiency and rate` (time series, `metrics_series` `capture_efficiency`, `capture_rate`).
+    - D8 `Signal quality` (table, `${pg}` `signal_quality`, the 25 signals of the experiment, coloured).
+    - D9 `Gaps and stuck stretches` (table, `${influx}` `quality_intervals`, all signals: signal, kind, start, seconds, points).
+    - D10 `Excluded readings` (table, `${influx}` `readings_processed`, excluded: time, signal, value_raw, quality, reason, flags; at most 1,000 rows, newest last).
+  - Every detail InfluxDB query: `experiment_id = '${experiment}'`, the window of `${windows}` (or `span_from`/`span_to`, which equal it for one experiment) and `$__timeFilter(time)`.
+- Migration `0004_comparison.sql` (pinned DDL; `-text` in `.gitattributes` already covers it):
+  ```sql
+  CREATE TABLE comparison_kpi (
+    experiment_id text NOT NULL REFERENCES experiment (experiment_id),
+    compare_version text NOT NULL, kpi text NOT NULL,
+    policy_version text NOT NULL, metrics_version text NOT NULL,
+    value double precision, unit text NOT NULL, coverage double precision,
+    status text NOT NULL CHECK (status IN ('complete', 'partial', 'none')),
+    interval_low double precision, interval_high double precision,
+    PRIMARY KEY (experiment_id, compare_version, kpi));
+  CREATE TABLE comparison_pair (
+    a text NOT NULL REFERENCES experiment (experiment_id),
+    b text NOT NULL REFERENCES experiment (experiment_id),
+    compare_version text NOT NULL,
+    conditions_status text NOT NULL CHECK (conditions_status IN ('same_conditions', 'supported', 'confounded')),
+    differing text NOT NULL,  -- factor names in factor order, comma-separated; '' when none
+    PRIMARY KEY (a, b, compare_version), CHECK (a < b));
+  CREATE TABLE comparison_pair_kpi (
+    a text NOT NULL, b text NOT NULL, compare_version text NOT NULL, kpi text NOT NULL,
+    unit text NOT NULL, difference double precision,
+    interval_low double precision, interval_high double precision, excludes_zero boolean,
+    coverage_status text NOT NULL CHECK (coverage_status IN ('both_complete', 'partial_coverage', 'not_available')),
+    PRIMARY KEY (a, b, compare_version, kpi),
+    FOREIGN KEY (a, b, compare_version) REFERENCES comparison_pair (a, b, compare_version) ON DELETE CASCADE);
+  ```
+  Values are copied from the summary unchanged (`experiments[].kpis`, `comparisons[]`, `comparisons[].kpis[]`); policy and metrics versions from the summary's top level.
+- Interfaces between tasks (pinned so W1 and W2 tasks can run in parallel):
+  - T1, `pipeline/grafana_check.py`: `CheckError`; `load_dashboard(path) -> dict`; `provisioned_uids(datasources_yaml_path) -> set[str]`; `lint(doc, uids: set[str]) -> list[str]` (empty = clean); `variables_used(text) -> set[tuple[str, str | None]]`; `interpolate(text, values: dict[str, str | list[str]]) -> str` (`$name` and `${name}` → the value, a list joined by `,`; `:raw` → as is; `:sqlstring` → each value single-quoted with `'` doubled, joined by `,`; `:csv` → joined by `,`; `$__…` left as is; an unknown name or format raises `CheckError` naming it); `panel_targets(doc) -> list[tuple[dict, dict]]` (panels inside rows included, in panel-id order); `GrafanaClient(url, user, password)` with `health() -> dict`, `version() -> str`, `query(datasource_uid, target: dict, time_from, time_to) -> QueryResult` (rows, fields, error), `create_influx_datasource(name, database) -> str` (uid), `delete_datasource(uid)`; `run_check(...) -> dict` (the summary). `scripts/check_dashboards.py` is the CLI over it.
+  - T1, `tests/e2e/grafana_helpers.py` (for T3, T4, T5): `grafana_client() -> GrafanaClient` from `.env`; context manager `temp_influx_datasource(database) -> uid`; `prepare_pg_schema(schema, experiments_file)` (migrations 0001–0004 via `pipeline.pg_migrate.run_migrations` and `pipeline.metadata_loader.load_experiments` under `search_path=<schema>`), `drop_pg_schema(schema)`; `run_pipeline(fixture_dir, database, schema, work_dir, steps)` (subprocess runs of `scripts.ingest`, `scripts.clean`, `scripts.metrics`, `scripts.compare` and `scripts.load_comparison` with the fixture's CSV, experiments and checksum, in the order given); `run_checker(*args) -> tuple[int, dict | None]`. Pytest marker `grafana` (skip when Grafana is unreachable) in `pyproject.toml` and a `grafana` fixture in `tests/e2e/conftest.py`.
+  - T2, `pipeline/comparison_loader.py`: `rows_from_summary(summary) -> ComparisonRows` (dataclass: `compare_version`, `kpis`, `pairs`, `pair_kpis` as lists of dicts with the DDL's column names), `load(conn, rows) -> dict` (counts written), `read_back(conn, compare_version) -> dict` (counts); `scripts/load_comparison.py` is the CLI.
+  - T3 and T4 own only their JSON and tests; they use the variable names, uids and titles above and the T1 helpers. A missing helper or a checker bug is reported to T1's owner (lead), not patched.
+- Fixtures: `tests/fixtures/compare/` (M5: EXP_001 2026-05-04T08:00:00Z, EXP_002 2026-05-11T09:00:00Z, EXP_003 2026-05-18T07:30:00Z, 1,200 s each; cleaning excludes exactly EXP_001 voltage at +300 s) for coverage and overlay; `tests/fixtures/clean/` (M3: one experiment EXP_001 08:00–08:10Z; voltage spike at +120 s and BAD at +500 s, one gap +399 → +410 s, air_flow flatline of 240 readings from +360 s, solvent_temperature flatline of 40 readings from +100 s; expected verdicts in `tests/e2e/test_clean_cli.py`) for quality visibility; `tests/fixtures/grafana/` (T1: a minimal test dashboard and its tiny data) for the checker itself. One throwaway InfluxDB database at a time (Core's 5-database limit).
+- Example map (rule → one example; boundaries included):
+
+  | Rule | Example |
+  |---|---|
+  | sqlstring format | `["EXP_001", "EXP_002"]` → `'EXP_001','EXP_002'`; `O'Brien` → `'O''Brien'` |
+  | Unknown variable | `${nope}` → `CheckError` naming `nope`; `$__timeFilter(time)` untouched |
+  | Unknown format | `${experiment:json}` → `CheckError` naming the format |
+  | Lint, datasource | panel datasource uid `other` → problem; `${influx}` → fine |
+  | Exit 1 | one panel target with 0 rows → exit 1, panel named; same panel under `--allow-empty` → exit 0 |
+  | Exit 2 | Grafana URL with nothing listening → exit 2, no output file |
+  | Overlay x | reading at 08:05:00Z of an experiment starting 08:00:00Z → 5.0; the same offset on another date → 5.0 |
+  | Loader rerun | a second load of the same summary → table dumps identical |
+  | Loader stale rows | load a summary with 3 pairs, then the same version with 2 → 2 rows of that version, other versions untouched |
+  | Loader refusal | summary missing `comparisons` → exit 2, tables unchanged |
+  | Span mode | detail panels over 2026-03-02T08:00Z..2026-06-15T08:00Z → same rows per target as each experiment's window |
+
+- Scenarios:
+  ```gherkin
+  Scenario: S6.1 The private stack serves Grafana with both datasources healthy
+    Given a fresh private stack started by python scripts/verify_stack.py up
+    When a client calls GET /api/health and the health endpoint of datasources influx-dac and pg-dac with the admin login from .env
+    Then Grafana reports ok and both datasources report OK
+    And GET /api/datasources lists exactly the uids influx-dac and pg-dac
+
+  Scenario: S6.2 Running up twice keeps Grafana usable
+    Given a private stack that is up
+    When python scripts/verify_stack.py up runs again for the same run id
+    Then both datasource health checks still report OK
+    And python scripts/verify_stack.py health exits 0
+
+  Scenario: S6.3 Grafana belongs to the private project and leaves the dev stack alone
+    Given a private stack for run id abc and port base B
+    Then Grafana answers on port B+2 and its container carries the project name dac-verify-abc
+    And no container named dac-grafana is created, restarted or removed (same list, ids and start times before and after up and down)
+    And python scripts/verify_stack.py down removes the Grafana container and its volume
+
+  Scenario: S6.4 Variables are interpolated in the Grafana formats the dashboards use
+    Given values experiment = [EXP_001, EXP_002] and windows = "('EXP_001', 1, 2)"
+    When interpolate runs on "IN (${experiment:sqlstring})", "VALUES ${windows:raw}" and "$__timeFilter(time)"
+    Then it gives "IN ('EXP_001','EXP_002')", "VALUES ('EXP_001', 1, 2)" and "$__timeFilter(time)"
+    And an unknown variable or an unknown format raises an error naming it
+
+  Scenario: S6.5 The lint catches unresolved references and passes the committed dashboards
+    Given a dashboard with a panel on datasource uid "other", a query using ${undeclared} and two panels with the same id
+    When lint runs with the provisioned uids
+    Then it reports all three problems
+    And lint of every file in grafana/dashboards reports none
+
+  Scenario: S6.6 The checker reports rows per panel and fails on an empty panel
+    Given the test dashboard in tests/fixtures/grafana against a throwaway database holding its data
+    When python -m scripts.check_dashboards runs on it
+    Then it exits 0 and every target's rows equal the rows of the same SQL run directly against InfluxDB
+    And with one panel's data removed it exits 1 and names that panel
+    And with --allow-empty and that panel's title it exits 0
+    And a panel whose query fails gives exit 1 with the server's error text recorded
+
+  Scenario: S6.7 The checker refuses when Grafana is unreachable, and its output is stable
+    Given GRAFANA_URL pointing at a port with nothing listening
+    When python -m scripts.check_dashboards runs
+    Then it exits 2 and writes no file
+    And two runs against the same data give dashboard_check.json files equal except timing, each valid against contracts/dashboard_check.schema.json
+
+  Scenario: S6.8 Migration 0004 applies clean and a rerun is a no-op
+    Given an empty throwaway Postgres schema
+    When the migrations run twice
+    Then 0001 to 0004 are applied once, the second run applies nothing
+    And comparison_kpi, comparison_pair and comparison_pair_kpi exist with the pinned keys, checks and foreign keys
+
+  Scenario: S6.9 The loader copies the comparison summary into Postgres unchanged
+    Given a throwaway schema migrated to 0004 with the experiments of the summary loaded
+    When python -m scripts.load_comparison runs with contracts/examples/comparison_summary.example.json
+    Then it exits 0 and every row equals its summary entry (values, intervals, statuses, differing factors in factor order)
+    And with reports/comparison_summary.json and the six real experiments it writes 30 kpi rows, 15 pairs and 75 pair kpis
+    And a second run leaves all three tables identical
+
+  Scenario: S6.10 The loader replaces one version's rows and refuses bad input
+    Given rows of compare_version m5-v1 and of another version
+    When a summary of m5-v1 with fewer pairs is loaded
+    Then m5-v1 holds exactly that summary's rows and the other version's rows are unchanged
+    And a summary failing the comparison contract, an unknown experiment id or a schema without 0004 gives exit 2 with all tables unchanged
+
+  Scenario: S6.11 The compare dashboard is provisioned with its variables and panels
+    Given a private stack with Grafana up
+    When a client calls GET /api/dashboards/uid/dac-compare
+    Then the dashboard is in folder DAC, marked provisioned, with the variables of the table above and panels C1 to C9 with their exact titles
+
+  Scenario: S6.12 Every compare panel returns data for every fixture experiment
+    Given the compare fixture run through ingest, clean, metrics, compare and load_comparison into a throwaway database and schema
+    When the checker runs on dac-compare with the temporary datasource and schema
+    Then each experiment alone and all three together return rows for every panel target, with only C9 allowed empty for EXP_002 and EXP_003 alone (no exclusions there)
+
+  Scenario: S6.13 The overlay puts experiments with different wall-clock starts on one axis
+    Given the same fixture run
+    When the C6 target runs for EXP_001, EXP_002 and EXP_003 with signal voltage
+    Then every row's experiment_time_min equals (reading time - the experiment's Postgres start) / 60 s
+    And each experiment's smallest value is 0.0
+    And each experiment has as many rows as accepted voltage readings in the fixture's clean summary, EXP_001 one fewer than the others
+
+  Scenario: S6.14 KPI and comparability panels show the stored numbers with their status
+    Given the same fixture run
+    Then the C2, C3, C4 and C5 targets return the rows of experiment_metrics, comparison_kpi, comparison_pair and comparison_pair_kpi for the selected experiments (pairs with at least one end selected), values equal
+    And the status and conditions columns carry the colour mappings of decision 12 in the JSON
+
+  Scenario: S6.15 The overlay of a metric uses the metrics series on the same axis
+    Given the same fixture run
+    When the C7 target runs with metric capture_efficiency for all three experiments
+    Then each experiment's rows equal its capture_efficiency points in metrics_series, with experiment_time_min computed as in S6.13
+
+  Scenario: S6.16 The detail dashboard is provisioned with its variables and panels
+    Given a private stack with Grafana up
+    When a client calls GET /api/dashboards/uid/dac-experiment
+    Then it is in folder DAC, marked provisioned, with a single-value experiment variable, the signal variable, panels D1 to D10 with their exact titles and the annotation "Gaps and stuck stretches"
+
+  Scenario: S6.17 Every detail panel returns data for every fixture experiment
+    Given the compare fixture run as in S6.12
+    When the checker runs on dac-experiment for each experiment over its window
+    Then every panel target returns rows, with only D9 and D10 allowed empty where the fixture has no interval or exclusion for that experiment
+
+  Scenario: S6.18 Excluded readings are drawn at their raw value beside the accepted line
+    Given the clean fixture run through ingest and clean into a throwaway database
+    When the D3 target runs for EXP_001 with signal voltage over its window
+    Then the accepted series has 588 non-null values and the excluded series exactly two, at +120 s (140.0) and +500 s (140.0)
+    And D10 lists every excluded reading of the experiment with its reason, equal to a plain query of readings_processed
+
+  Scenario: S6.19 Gaps and stuck stretches are drawn as regions
+    Given the same clean fixture run
+    When the annotation query runs for signal voltage, then for air_flow and solvent_temperature
+    Then voltage gives one gap region from +399 s to +410 s
+    And air_flow gives one flatline region starting at +360 s over 240 readings, solvent_temperature one over 40 readings from +100 s
+    And D9 lists every quality_intervals row of the experiment
+
+  Scenario: S6.20 Phases are shown as a state timeline
+    Given the compare fixture run
+    When the D2 target runs for EXP_001
+    Then it returns the process_state events STARTUP, STEADY_STATE, LOAD_CHANGE, STEADY_STATE, SHUTDOWN at +0, +120, +600, +660, +1140 s
+
+  Scenario: S6.21 Every panel returns data for every real experiment and every numeric signal
+    Given the real CSV run through ingest, clean, metrics, compare and load_comparison
+    When python -m scripts.check_dashboards --sweep signal --allow-empty "Gaps and stuck stretches" runs
+    Then it exits 0 over both dashboards, 6 experiments alone, the 6 together on dac-compare, and 23 signals (299 runs)
+    And the only empty panel targets are D9 of EXP_005, once per signal (23), where a plain COUNT on quality_intervals for EXP_005 is 0
+    And the summary is committed as reports/dashboard_check.json
+
+  Scenario: S6.22 The real overlay equals experiment time computed from plain pulls
+    Given the real run
+    Then for every experiment and the signals voltage and air_flow, every C6 row equals (time - Postgres start_time) / 60 s and the accepted value of a plain SELECT on readings_processed at that instant, with the same row count
+
+  Scenario: S6.23 The EXP_004 air-flow hour is visibly degraded
+    Given the real run
+    When D3 and the annotation query run for EXP_004 with signal air_flow
+    Then the excluded series holds exactly as many non-null values as a plain COUNT of excluded EXP_004 air_flow rows gives
+    And every excluded row with reason flatline lies inside a flatline region the annotation query returns
+    And the screenshot docs/screenshots/m6/experiment-exp004-air-flow.png shows it
+
+  Scenario: S6.24 Screenshots of the four pinned views are committed
+    Given the dev stack with the renderer profile up
+    When python -m scripts.screenshot_dashboards runs
+    Then it exits 0 and docs/screenshots/m6 holds compare-all.png (dac-compare, all six), compare-overlay-voltage.png (C6 alone, all six, voltage), experiment-exp001-voltage.png and experiment-exp004-air-flow.png, each a PNG 1600 px wide
+
+  Scenario: S6.25 The wide time picker gives the same rows as the experiment window (U-05)
+    Given the real run
+    When the checker runs dac-experiment with --time-range span --allow-empty "Gaps and stuck stretches"
+    Then every target of every experiment returns the same rows as in the window run, with no error
+    And a fresh private stack gives a dashboard_check.json equal to the committed one except timing
+
+  Scenario: S6.26 The dashboard document matches the dashboards
+    Given docs/dashboard.md and grafana/dashboards/*.json
+    Then the document lists every panel title, every variable and the quality conventions of decision 12, equal to the JSON
+  ```
+- QA procedure:
+  1. Private stack up (`.workflow/verify-env.json`; M6 `up` also starts Grafana). `GET <GRAFANA_URL>/api/health` → ok; datasource health of `influx-dac`, `pg-dac` → OK; `GET /api/datasources` → exactly those two uids (S6.1). Run `python scripts/verify_stack.py up` again → health still OK; `python scripts/verify_stack.py health` → 0 (S6.2). `docker ps -a --filter name=^/dac-grafana$ --format '{{.ID}} {{.CreatedAt}}'` plus `docker inspect -f '{{.State.StartedAt}}'` → the same before `up` and after it (nothing, or the dev Grafana untouched); the Grafana container's compose project label is `dac-verify-<run id>`, port base + 2 (S6.3).
+  2. `python -m pytest tests/unit -k "grafana or dashboard or comparison_loader"` → pass (S6.4, S6.5, loader unit cases). `GRAFANA_URL=http://localhost:1 python -m scripts.check_dashboards --report-dir <tmp0>` → exit 2, `<tmp0>` holds no file (S6.7). `python -m pytest tests/integration -k "grafana or comparison" -v` → pass (S6.6, S6.8–S6.10).
+  3. `GET /api/dashboards/uid/dac-compare` and `/uid/dac-experiment` → folder DAC, `meta.provisioned` true, variables and titles as in the inventory (S6.11, S6.16).
+  4. `python -m pytest tests/e2e -k "dashboard" -v -rs` → pass, 0 skipped (S6.12–S6.20): each module creates its throwaway database, temporary datasource and schema, runs the fixture pipeline, runs the checker with `--var influx=<uid> --var pg_schema=<schema>`, and compares the targets with plain queries.
+  5. Real CSV (copied in by verify-env): `python -m scripts.ingest` → 0; `python -m scripts.clean --report-dir .flow-tmp/clean` → 0; `python -m scripts.metrics --report-dir .flow-tmp/metrics` → 0; `python -m scripts.compare --report-dir .flow-tmp/compare` → 0; `python -m scripts.load_comparison --summary .flow-tmp/compare/comparison_summary.json` → 0, `kpis=30 pairs=15 pair_kpis=75`; `python -m scripts.check_dashboards --sweep signal --allow-empty "Gaps and stuck stretches" --report-dir .flow-tmp/dashboards` → 0, `totals.empty_allowed` 23, all D9 of EXP_005; compare with the committed `reports/dashboard_check.json` except timing (S6.21, S6.25 second half); `check-jsonschema --schemafile contracts/dashboard_check.schema.json .flow-tmp/dashboards/dashboard_check.json` → ok.
+  6. `python -m scripts.check_dashboards --dashboard grafana/dashboards/experiment.json --time-range span --allow-empty "Gaps and stuck stretches" --report-dir .flow-tmp/dashboards-span` → 0; rows per target equal the window run (S6.25). Independent recompute of S6.22 and S6.23 from plain `SELECT time, value FROM readings_processed …` and `SELECT … FROM quality_intervals …` pulls and the Postgres `experiment` start times, no pipeline imports.
+  7. Open `docs/screenshots/m6/*.png`: four PNGs 1600 px wide; the EXP_004 one shows red excluded points and an orange band over 09:00–10:00 (S6.24, S6.23). `python -m pytest tests/unit/test_dashboard_doc.py` → pass (S6.26). Click-through by hand (Sebastian, in review): Compare → select two runs → change signal → overlay → "Open detail" on EXP_004 → signal air_flow.
+- Expected changes:
+  - T1: `docker-compose.yml` (grafana, renderer under profile `render`, volume `grafana-data`), `grafana/provisioning/datasources/datasources.yaml`, `grafana/provisioning/dashboards/dashboards.yaml`, `scripts/verify_stack.py` (order, port base + 2, health), `.env.example` (`GRAFANA_PORT`, `GRAFANA_URL`, `GRAFANA_ADMIN_USER`, `GRAFANA_ADMIN_PASSWORD`, `GRAFANA_CONTAINER_NAME` comment), `pipeline/grafana_check.py`, `scripts/check_dashboards.py`, `pyproject.toml` (marker), `requirements.txt` (PyYAML), `.github/workflows/ci.yml` (contract step in lint; Grafana in integration), `tests/fixtures/grafana/`, `tests/e2e/grafana_helpers.py`, `tests/e2e/conftest.py`.
+  - T2: `migrations/0004_comparison.sql`, `pipeline/comparison_loader.py`, `scripts/load_comparison.py`.
+  - T3: `grafana/dashboards/compare.json`. T4: `grafana/dashboards/experiment.json`.
+  - T5: `scripts/screenshot_dashboards.py`, `reports/dashboard_check.json`, `docs/screenshots/m6/*.png`.
+  - T6: ADR-0018, ADR-0009 addendum, `docs/dashboard.md`, `docs/decisions/README.md`, `docs/ASSUMPTIONS.md` (U-05 closed for this data with the plant-scale caveat), `docs/ROADMAP.md` (M6 phase, deliverable G row, M6 CI row), `docs/schema.md` (the three 0004 tables), `README.md` (run steps, start order), `reports/M6.md`.
+- Tests: `tests/unit/test_grafana_check.py` (S6.4, every row of the example map for interpolation and lint, `panel_targets` with nested rows, summary sorting and contract validation on a fake client, exit codes with a fake client), `tests/unit/test_dashboards_lint.py` (S6.5: the lint over every committed dashboard file, looping, no parametrize, so it never skips), `tests/unit/test_verify_stack.py` (extended: Grafana port, start order, second `up` keeps the token), `tests/integration/test_grafana_stack.py` (S6.1, S6.2, S6.6, S6.7; marked `grafana`), `tests/unit/test_comparison_loader.py` (`rows_from_summary` on the example: counts, order, `differing` text), `tests/integration/test_comparison_loader.py` (S6.9, S6.10), `tests/integration/test_migrations.py` (expects 0001–0004; S6.8), `tests/e2e/test_dashboard_compare.py` (S6.11–S6.15), `tests/e2e/test_dashboard_experiment.py` (S6.16, S6.17, S6.20, compare fixture), `tests/e2e/test_dashboard_quality.py` (S6.18, S6.19, clean fixture), `tests/unit/test_dashboard_doc.py` (S6.26). S6.3 and S6.21–S6.25 run as QA steps 1 and 5–7 (T5 runs them and records the evidence in the execute log).
+- Tasks (decision 3; checked with `lane.js tasks`):
+  - T1 [W1] Spike (decision 11, stop rule), then Grafana and renderer in compose, provisioning, private-stack order and ports, checker module and CLI, e2e helpers and marker, CI. Owns: `./docker-compose.yml`, `grafana/provisioning/**`, `scripts/verify_stack.py`, `./.env.example`, `pipeline/grafana_check.py`, `scripts/check_dashboards.py`, `./pyproject.toml`, `./requirements.txt`, `.github/workflows/ci.yml`, `tests/fixtures/grafana/**`, `tests/e2e/grafana_helpers.py`, `tests/e2e/conftest.py`, `tests/unit/test_grafana_check.py`, `tests/unit/test_dashboards_lint.py`, `tests/unit/test_verify_stack.py`, `tests/integration/test_grafana_stack.py`. Scenarios: S6.1, S6.2, S6.3, S6.4, S6.5, S6.6, S6.7.
+  - T2 [W1] Migration 0004 and the comparison loader. Owns: `migrations/0004_comparison.sql`, `pipeline/comparison_loader.py`, `scripts/load_comparison.py`, `tests/unit/test_comparison_loader.py`, `tests/integration/test_comparison_loader.py`, `tests/integration/test_migrations.py`. Scenarios: S6.8, S6.9, S6.10.
+  - T3 [W2] Compare experiments dashboard. Owns: `grafana/dashboards/compare.json`, `tests/e2e/test_dashboard_compare.py`. Scenarios: S6.11, S6.12, S6.13, S6.14, S6.15. After: T1, T2.
+  - T4 [W2] Experiment detail dashboard. Owns: `grafana/dashboards/experiment.json`, `tests/e2e/test_dashboard_experiment.py`, `tests/e2e/test_dashboard_quality.py`. Scenarios: S6.16, S6.17, S6.18, S6.19, S6.20. After: T1, T2.
+  - T5 [W3] Real data: full pipeline and loader, checker with signal sweep into `reports/`, span run, independent recompute of S6.22 and S6.23, screenshots, fresh-stack rerun. Stops and reports back on any failing panel or any empty one beyond the EXP_005 D9 case of S6.21, or a span-run difference (decisions 14, 15); never edits a dashboard. Owns: `scripts/screenshot_dashboards.py`, `reports/dashboard_check.json`, `docs/screenshots/**`, `.flow-tmp/**`. Scenarios: S6.21, S6.22, S6.23, S6.24, S6.25. After: T3, T4.
+  - T6 [W4] Write-up. Owns: `docs/decisions/**`, `docs/dashboard.md`, `docs/ASSUMPTIONS.md`, `docs/ROADMAP.md`, `docs/schema.md`, `./README.md`, `reports/M6.md`, `tests/unit/test_dashboard_doc.py`. Scenarios: S6.26. After: T5.
+- After the judge: commit, push `m6-dashboard`, CI green, open `reports/M6.md` in the doc viewer. Merge waits for approval.
 
 #### M7: Edge, cloud, presentation (H, I, J)
 - Not yet detailed. Scope: `docs/ROADMAP.md` § M7.
@@ -1630,3 +1949,32 @@ Checks run:
 - `python -m scripts.compare --report-dir .flow-tmp/compare` → exit 0, 219 queries, 43 s
 - Database list after all runs: `_internal, dac_pinned, dac_raw, dac_rollup` (nothing created or left behind)
 - `verify-env.js down 42a90ddc` → removed; no worktree changes reported; no verify containers or volumes left
+
+### M6 — verify 2026-11-25 @ 3e61ff6 (+ uncommitted)
+Defects:        none
+Open questions:
+- `verify-env.js down` reported `Worktree changed: reports/ingest_rejects.csv, reports/ingest_report.md, reports/ingest_summary.json`. QA step 5 runs `python -m scripts.ingest` with its default report directory (`reports/`), so the real ingest rewrites the committed ingest reports in the worktree (its summary line matched M5's: 520,005 rows = 519,980 saved + 15 copies + 10 losers + 0 rejected). Likely only timing or line endings. Should the Checks row pass `--report-dir .flow-tmp/ingest` like the other rows? A question for `/flow:plan`.
+Optional:
+- [low] Decision 12 asks for grey gap regions and orange flatline regions on the plot. The detail dashboard has one annotation, "Gaps and stuck stretches", with `iconColor` orange, so gaps are drawn orange too. The colours show up only in the D9 table. ADR-0018 records this as deviation 1 ("Grafana 13 has no colour per annotation row"). Fix: two annotation entries over the same SQL, `AND kind = 'gap'` in grey and `AND kind = 'flatline'` in orange. S6.16 and S6.19 would then name two annotations; the checker needs no change (an empty annotation is already fine). Proposed test: `test_gap_and_flatline_annotations_have_their_own_colour` (unit, on `experiment.json`): two non-built-in annotations, gap entry colour grey with `kind = 'gap'` in its SQL, flatline entry orange with `kind = 'flatline'`.
+- [low] The C6/C7 overlays (XY chart, lines) draw a straight line across gaps in a series. Visible in `docs/screenshots/m6/compare-overlay-voltage.png`: EXP_002 voltage is joined by a line from about minute 66 to 74, where cleaning has no accepted readings. Someone reading the chart could take that line for data. Fix: draw points, or emit a null row at each gap over 2 × nominal, so the line breaks.
+- [low, security] Grafana is published on all interfaces (`"${GRAFANA_PORT:-3000}:3000"` binds 0.0.0.0 and ::; seen on the private stack: `HostIp 0.0.0.0`), with the default admin password `changeme_local_only` and the same default renderer token. This is the same pattern as the existing InfluxDB and Postgres ports, and `.env.example` warns about it. Binding `127.0.0.1:${GRAFANA_PORT:-3000}:3000` would keep the local-only intent. Auth itself holds: anonymous `GET /api/datasources` → 401, wrong password → 401, token not readable through `/api/datasources` (integration test).
+- [low] `pipeline/comparison_loader.py:373-378`: if `read_back` raises `psycopg.Error` after `load` has committed, the message says "write failed and was rolled back" and exits 3, though the rows are written. Proposed test: `test_a_read_back_query_error_after_commit_does_not_claim_a_rollback` (integration): monkeypatch `read_back` to raise `psycopg.OperationalError`; assert the rows of the version are present and the stderr text does not say "rolled back" (or that the exit code is a distinct one).
+- [info] S6.25 is run as the Checks row specifies (no sweep), so it compares only the default signal (voltage) between span and window. I compared all 78 targets and annotations of the 6 detail runs with the window run's `signal=voltage` runs: all equal, no errors. A `--sweep signal` span run would also cover D3 and the annotation for the other 22 signals.
+- [info] QA step 1's `docker ps -a --filter name=^/dac-grafana$` returns nothing under Git Bash, even though a dev `dac-grafana` exists, because MSYS path conversion rewrites the `^/` argument. I used `docker inspect dac-grafana` instead. Write the step as `MSYS_NO_PATHCONV=1 docker ps ...` or `docker inspect`.
+- [info] On the detail dashboard, choosing another experiment in the dropdown keeps the current time range (default EXP_001's window), so the panels are empty until "Jump to this experiment's window" is clicked. This is by design (D1 link) but worth a line in `docs/dashboard.md` for the click-through.
+- [info] Test changes since baseline: no test deleted, skipped or loosened. Modified: `tests/integration/test_compare_store.py`, `test_metrics_store.py`, `test_migrations.py` (expected migration lists extended by `0004`; justified by the pinned migration 0004; `test_migrations.py` also adds the S6.8 key/check/FK test); `tests/unit/test_verify_stack.py` (assertions added for Grafana names and ports and for start order; the dev-port set grew from {8181, 5432} to {8181, 5432, 3000}, which is stricter); `tests/e2e/conftest.py` (new `grafana` fixture). Contract files: only `contracts/dashboard_check.schema.json` and its example are new, in commit `3e61ff6` as Decisions item 18 says; no existing contract changed.
+- [info] Provisioning is read-only in practice. On a throwaway stack, `POST /api/dashboards/db` on `dac-compare` → "Cannot save provisioned dashboard"; `DELETE` → "provisioned dashboard cannot be deleted"; `DELETE` of datasource `influx-dac` → "Cannot delete read-only data source".
+Scenarios:      S6.1 → pass (`test_grafana_stack.py::test_s6_1_*`; and by hand on a second private stack `vfys62`: `/api/health` ok, version 13.3.2; `/api/datasources` = [influx-dac, pg-dac]; both health OK) · S6.2 → pass (second private stack: `up` exit 0 (29 s), `health` 0; second `up` exit 0 (3 s), `health` 0; Grafana container id and StartedAt unchanged; plus unit `test_a_second_up_runs_the_same_steps_*`) · S6.3 → pass (Grafana on base + 2 (36842 / 35832), compose project label `dac-verify-vfys62` / `dac-verify-33a64585`; dev `dac-grafana` id `c8b5fffefb0f`, StartedAt 2026-11-25T09:42:56Z, the same before and after both stacks' up and down; after `down` no `vfys62` container or volume remains) · S6.4, S6.5 → pass (`tests/unit/test_grafana_check.py`, `test_dashboards_lint.py`) · S6.6, S6.7 → pass (`test_grafana_stack.py`; by hand `GRAFANA_URL=http://localhost:1 python -m scripts.check_dashboards` → exit 2, no report dir created; `--experiment EXP_999` → exit 2, nothing written) · S6.8 → pass (`test_migrations.py`) · S6.9, S6.10 → pass (`tests/integration/test_comparison_loader.py`; real `load_comparison` → `m5-v1 kpis=30 pairs=15 pair_kpis=75`, exit 0; missing summary → exit 2) · S6.11–S6.15 → pass (`tests/e2e/test_dashboard_compare.py`) · S6.16, S6.17, S6.20 → pass (`test_dashboard_experiment.py`) · S6.18, S6.19 → pass (`test_dashboard_quality.py`) · S6.21 → pass (fresh private stack, real CSV: checker sweep exit 0, 299 runs, 3,105 targets, 3,082 with rows, 23 allowed empty, all D9 of EXP_005, 0 errors; plain `COUNT` of `quality_intervals` by experiment: EXP_005 absent (0), others 13/10/2/1/8; output valid against the contract and equal to committed `reports/dashboard_check.json` except `timing`) · S6.22 → pass (scratch `recompute_m6.py`, no pipeline imports: committed C6 SQL sent through `/api/ds/query`, compared with plain `SELECT time, value` on `readings_processed` and Postgres start times. All 12 series (6 experiments × voltage, air_flow) are equal row for row at 9 decimals, with the same counts (e.g. EXP_001 voltage 7,125, EXP_004 air_flow 3,600, EXP_006 air_flow 5,279), and the smallest x is 0 in each) · S6.23 → pass (D3 EXP_004 air_flow: 3,600 non-null excluded values = plain `COUNT` 3,600; annotation gives one flatline region 09:00:00–09:59:59Z; all 3,600 flatline-excluded rows lie inside it; screenshot shows red points and the band) · S6.24 → pass (renderer started in the private project; `python -m scripts.screenshot_dashboards --out <scratch>` exit 0; four PNGs 1600 px wide, byte-identical to the committed `docs/screenshots/m6/*.png`) · S6.25 → pass (span run exit 0, 2026-03-02T08:00Z..2026-06-15T08:00Z, rows of all 78 targets and annotations equal the window run, 0 errors; second half: see S6.21) · S6.26 → pass (`tests/unit/test_dashboard_doc.py`)
+Blocked:        none
+Checks run:
+- `verify-env.js up` → env 33a64585, ports 35830–35832, healthy
+- `ruff check .` → All checks passed; `ruff format --check .` → 144 files already formatted
+- `python -m pytest tests/unit` → 795 passed
+- `python -m pytest -v -rs` (whole suite, stack with Grafana up) → 1,053 passed, 0 skipped, 0 failed. Covers the unit, integration and e2e rows.
+- `contract.js --task .workflow/dac.md --root <WORKTREE>` → 6 of 6 PASS; `check-jsonschema` on committed `reports/dashboard_check.json`, fresh sweep and span outputs → ok
+- `python -m scripts.ingest` → exit 0 (520,005 = 519,980 + 15 + 10 + 0); `scripts.clean` → 0; `scripts.metrics` → 0; `scripts.compare` → 0; `scripts.load_comparison --summary .flow-tmp/compare/comparison_summary.json` → 0, `kpis=30 pairs=15 pair_kpis=75`
+- `python -m scripts.check_dashboards --sweep signal --allow-empty "Gaps and stuck stretches" --report-dir .flow-tmp/dashboards` → exit 0 (164 s)
+- `python -m scripts.check_dashboards --dashboard grafana/dashboards/experiment.json --time-range span --allow-empty "Gaps and stuck stretches" --report-dir .flow-tmp/dashboards-span` → exit 0
+- Second private stack `vfys62` (copy of the worktree in scratch): `verify_stack.py up` ×2, `health` ×2, `down` → all 0
+- Image digests: `docker image inspect` of `grafana/grafana:13.3.2` and `grafana/grafana-image-renderer:v5.12.11` match the digests in ADR-0018
+- `verify-env.js down 33a64585` → removed; worktree changed (see Open questions); no `33a64585` or `vfys62` containers or volumes left

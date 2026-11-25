@@ -1,0 +1,48 @@
+# Datasources of the DAC dashboards (M6 decision 5). Fixed uids: the dashboards and the checker
+# (pipeline/grafana_check.py) refer to them. Secrets and hosts come from environment variables
+# that docker-compose.yml passes in from `.env`; nothing secret is written here.
+apiVersion: 1
+
+deleteDatasources:
+  - name: influx-dac
+    orgId: 1
+  - name: pg-dac
+    orgId: 1
+
+datasources:
+  # InfluxDB 3 Core through the built-in InfluxDB data source in SQL mode (Flight SQL over
+  # gRPC). The local server has no TLS, hence insecureGrpc. The FlightSQL plugin is not used
+  # (ADR-0002). Database is the raw database; tests add a temporary datasource for a throwaway
+  # database through the Grafana API instead of touching this one.
+  - name: influx-dac
+    uid: influx-dac
+    type: influxdb
+    access: proxy
+    orgId: 1
+    url: $DAC_INFLUX_URL
+    isDefault: false
+    editable: false
+    jsonData:
+      version: SQL
+      dbName: dac_raw
+      httpMode: POST
+      insecureGrpc: true
+    secureJsonData:
+      token: $INFLUX_TOKEN
+
+  - name: pg-dac
+    uid: pg-dac
+    type: grafana-postgresql-datasource
+    access: proxy
+    orgId: 1
+    url: $DAC_POSTGRES_HOST
+    user: $POSTGRES_USER
+    isDefault: false
+    editable: false
+    jsonData:
+      database: $POSTGRES_DB
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+    secureJsonData:
+      password: $POSTGRES_PASSWORD

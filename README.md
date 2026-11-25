@@ -42,8 +42,11 @@ numbers they can trust, and why."*
   time-series store for sensor readings.
 - **PostgreSQL** — experiment metadata (operator, setpoints, sorbent batch), which is
   relational, low-cardinality, and needs migrations, not a time series.
-- **Grafana** — the comparison dashboard: experiment selector, KPI summary, aligned
-  time-series overlays, and a data-quality layer that's visible rather than hidden.
+- **Grafana** — two dashboards, committed as JSON and provisioned read-only: one compares the
+  experiments (selector, KPI tables, which pairs can be compared, overlays on minutes since start,
+  data quality), one looks inside a single experiment (phases, a signal with its excluded readings
+  drawn as red points, gaps and stuck stretches). Excluded data is shown, not hidden. See
+  [`docs/dashboard.md`](docs/dashboard.md).
 - **Docker Compose**, provisioned as code — no manual click-ops setup step; every
   database, token, and retention policy is created by a script, not a human following
   a runbook.
@@ -102,14 +105,42 @@ pip install -r requirements.txt
 
 python generator/generate_dataset.py             # writes data/raw/*.csv + experiments.json
 
-docker compose up -d                             # InfluxDB 3 Core + PostgreSQL
+# Start order matters: Grafana reads the InfluxDB token once, when it starts, so it comes last.
+docker compose up -d influxdb postgres           # InfluxDB 3 Core + PostgreSQL
 python scripts/bootstrap_influx_token.py         # mints INFLUX_TOKEN into .env
+python -m scripts.migrate                        # Postgres schema (migrations 0001-0004)
 python scripts/init_influx.py                    # creates raw/rollup/pinned databases
+python -m scripts.load_experiments               # experiment metadata into Postgres
+docker compose up -d grafana                     # Grafana, with both datasources and both dashboards
+
+python -m scripts.ingest                         # raw CSV -> InfluxDB
+python -m scripts.clean                          # a verdict per reading
+python -m scripts.metrics                        # derived metrics
+python -m scripts.compare                        # comparison summary (reports/)
+python -m scripts.load_comparison                # steady KPIs and pairs into Postgres
 
 pytest                                            # unit tests always run;
                                                    # integration tests skip (not fail)
                                                    # if a container isn't reachable
 ```
+
+### Look at the dashboards
+
+Open <http://localhost:3000> (`GRAFANA_PORT` in `.env`) and sign in with `GRAFANA_ADMIN_USER` and
+`GRAFANA_ADMIN_PASSWORD` from `.env`. The dashboards are in the folder "DAC": **Compare experiments**
+and **Experiment detail**. They are read-only in the browser by design; edit the JSON under
+`grafana/dashboards/` instead.
+
+```bash
+python -m scripts.check_dashboards --sweep signal --allow-empty "Gaps and stuck stretches"
+                                                  # runs every panel query for every experiment
+                                                  # and signal; writes reports/dashboard_check.json
+docker compose --profile render up -d renderer   # the image renderer, for screenshots only
+python -m scripts.screenshot_dashboards          # four PNGs in docs/screenshots/m6/
+```
+
+`python scripts/verify_stack.py up` starts a private copy of the same stack (own container names and
+ports) for verification runs; `down` removes it.
 
 ## Repository layout
 
@@ -120,7 +151,10 @@ data/raw/        Generated raw dataset. Immutable — never edited in place; onl
                  SHA-256 checksum is committed.
 pipeline/        Pure, I/O-free processing logic (rollup aggregation, collision
                  detection) — unit-testable without a database.
-scripts/         Operational scripts: provisioning, token bootstrap, census/profiling.
+scripts/         Operational scripts: provisioning, token bootstrap, census/profiling, the
+                 pipeline steps, the dashboard checker and screenshots.
+grafana/         Provisioning (datasources, dashboard provider) and the two dashboards as JSON.
+migrations/      Versioned Postgres migrations.
 docs/decisions/  ADRs — one per independent architectural decision, with alternatives
                  considered and rejected.
 docs/schema.md   Compact reference for the InfluxDB schema, cardinality, and retention
@@ -135,6 +169,8 @@ tests/           Unit tests (no dependencies) and integration tests (skip cleanl
 - [`task/TASK.md`](task/TASK.md) — the project brief this was built against.
 - [`docs/schema.md`](docs/schema.md) — the InfluxDB schema, measured cardinality, and
   retention tiers, with every figure traced to a source.
+- [`docs/dashboard.md`](docs/dashboard.md) — the two dashboards: panels, variables, and how
+  data quality is drawn (checked against the JSON by a test).
 - [`docs/decisions/`](docs/decisions/) — the full architecture decision log.
 - [`docs/ASSUMPTIONS.md`](docs/ASSUMPTIONS.md) — assumptions made where the brief was
   silent, kept current as the system evolves.

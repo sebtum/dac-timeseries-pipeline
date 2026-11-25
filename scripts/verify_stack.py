@@ -7,7 +7,13 @@ volume its own name; the container names come from the compose file's overridabl
 `POSTGRES_PORT`. The dev containers `dac-influxdb` / `dac-postgres` are never named here.
 
 Inputs (environment): `FLOW_RUN_ID` (default `local`) and `FLOW_PORT_BASE` (default 18100).
-InfluxDB listens on the base port, Postgres on base + 1.
+InfluxDB listens on the base port, Postgres on base + 1, Grafana on base + 2.
+
+Start order (M6 decision 6): Grafana reads the InfluxDB admin token once, at start, so `up`
+starts `influxdb` and `postgres` first, writes `.env`, mints the token, migrates, initialises and
+loads the experiments, and only then starts `grafana` and waits for its health and for both
+provisioned datasources to report OK. A second `up` for the same run keeps the token (E-08) and
+leaves Grafana as it is.
 
 `up` also writes a repo-root `.env` that points at the private stack, so every other script
 and the tests find it. A `.env` that was not written by this script (a dev one with a real
@@ -17,6 +23,8 @@ Python, not shell: this runs on Windows and on the Linux CI runner.
 
 from __future__ import annotations
 
+import base64
+import json
 import os
 import re
 import shutil
@@ -37,6 +45,8 @@ DEFAULT_RUN_ID = "local"
 DEFAULT_PORT_BASE = 18100
 HEALTH_TIMEOUT_S = 5
 UP_TIMEOUT_S = 240
+GRAFANA_READY_TIMEOUT_S = 120
+GRAFANA_DATASOURCES = ("influx-dac", "pg-dac")
 
 _RUN_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,40}$")
 
@@ -78,6 +88,9 @@ def stack_env(rid: str, base: int) -> dict[str, str]:
         "POSTGRES_PORT": str(base + 1),
         "INFLUX_CONTAINER_NAME": f"{name}-influxdb",
         "POSTGRES_CONTAINER_NAME": f"{name}-postgres",
+        "GRAFANA_PORT": str(base + 2),
+        "GRAFANA_CONTAINER_NAME": f"{name}-grafana",
+        "RENDERER_CONTAINER_NAME": f"{name}-renderer",
     }
 
 
@@ -124,6 +137,65 @@ def postgres_ready(container: str) -> bool:
     return result.returncode == 0
 
 
+def _basic_auth(user: str, password: str) -> str:
+    return "Basic " + base64.b64encode(f"{user}:{password}".encode()).decode()
+
+
+def read_env_values() -> dict[str, str]:
+    values: dict[str, str] = {}
+    if ENV_PATH.exists():
+        for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if stripped and not stripped.startswith("#") and "=" in stripped:
+                key, _, value = stripped.partition("=")
+                values[key.strip()] = value.strip()
+    return values
+
+
+def _grafana_get(base: int, path: str, auth: str | None = None):
+    request = urllib.request.Request(f"http://localhost:{base + 2}{path}")  # noqa: S310
+    if auth:
+        request.add_header("Authorization", auth)
+    with urllib.request.urlopen(request, timeout=HEALTH_TIMEOUT_S) as resp:  # noqa: S310
+        return json.loads(resp.read() or b"null")
+
+
+def grafana_problems(base: int) -> list[str]:
+    """Why Grafana is not usable: its health, and the health of both provisioned datasources."""
+    env = read_env_values()
+    auth = _basic_auth(
+        env.get("GRAFANA_ADMIN_USER", "admin"), env.get("GRAFANA_ADMIN_PASSWORD", "")
+    )
+    try:
+        health = _grafana_get(base, "/api/health")
+        if not isinstance(health, dict) or health.get("database") != "ok":
+            return [f"Grafana /api/health on port {base + 2} reports {health!r}"]
+    except urllib.error.URLError, TimeoutError, ConnectionError, OSError, ValueError:
+        return [f"Grafana did not answer /api/health on port {base + 2}"]
+    problems: list[str] = []
+    for uid in GRAFANA_DATASOURCES:
+        try:
+            result = _grafana_get(base, f"/api/datasources/uid/{uid}/health", auth)
+            status = result.get("status") if isinstance(result, dict) else None
+            if status != "OK":
+                problems.append(f"datasource {uid} reports {result!r}")
+        except urllib.error.HTTPError as exc:
+            problems.append(f"datasource {uid} health answered HTTP {exc.code}")
+        except (urllib.error.URLError, TimeoutError, ConnectionError, OSError, ValueError) as exc:
+            problems.append(f"datasource {uid} health failed: {exc}")
+    return problems
+
+
+def wait_for_grafana(base: int, timeout_s: float = GRAFANA_READY_TIMEOUT_S) -> None:
+    deadline = time.monotonic() + timeout_s
+    problems = grafana_problems(base)
+    while problems and time.monotonic() < deadline:
+        time.sleep(2)
+        problems = grafana_problems(base)
+    if problems:
+        raise StackError("Grafana did not become usable:" + chr(10) + chr(10).join(problems))
+
+
 def write_private_env(rid: str, base: int) -> None:
     """Write `.env` for the private stack, backing up a foreign one first."""
     token = ""
@@ -144,6 +216,8 @@ def write_private_env(rid: str, base: int) -> None:
         "INFLUX_PORT": str(base),
         "POSTGRES_HOST": "localhost",
         "POSTGRES_PORT": str(base + 1),
+        "GRAFANA_PORT": str(base + 2),
+        "GRAFANA_URL": f"http://localhost:{base + 2}",
         # A different run id means a different stack, so a token is never carried across ids.
         "INFLUX_TOKEN": token,
     }
@@ -200,6 +274,8 @@ def cmd_up() -> int:
         "--wait",
         "--wait-timeout",
         str(UP_TIMEOUT_S),
+        "influxdb",
+        "postgres",
         env=env,
         timeout=UP_TIMEOUT_S + 60,
     )
@@ -217,7 +293,26 @@ def cmd_up() -> int:
     run_step("postgres migrations", [py, "-m", "scripts.migrate"], step_env)
     run_step("create influx databases", [py, "scripts/init_influx.py"], step_env)
     run_step("load experiments", [py, "-m", "scripts.load_experiments"], step_env)
-    print(f"verify_stack: up (influx :{base}, postgres :{base + 1}, project {project_name(rid)})")
+
+    # Grafana last: compose reads the token from `.env` when it starts the container.
+    result = compose(
+        rid,
+        "up",
+        "-d",
+        "--wait",
+        "--wait-timeout",
+        str(UP_TIMEOUT_S),
+        "grafana",
+        env=env,
+        timeout=UP_TIMEOUT_S + 60,
+    )
+    if result.returncode != 0:
+        raise StackError(f"docker compose up grafana failed:\n{result.stdout}\n{result.stderr}")
+    wait_for_grafana(base)
+    print(
+        f"verify_stack: up (influx :{base}, postgres :{base + 1}, grafana :{base + 2}, "
+        f"project {project_name(rid)})"
+    )
     return 0
 
 
@@ -225,7 +320,7 @@ def cmd_health() -> int:
     rid, base = run_id(), port_base()
     env = stack_env(rid, base)
     problems: list[str] = []
-    for key in ("INFLUX_CONTAINER_NAME", "POSTGRES_CONTAINER_NAME"):
+    for key in ("INFLUX_CONTAINER_NAME", "POSTGRES_CONTAINER_NAME", "GRAFANA_CONTAINER_NAME"):
         if not container_running(env[key]):
             problems.append(f"container {env[key]} is not running")
     if not problems:
@@ -233,6 +328,7 @@ def cmd_health() -> int:
             problems.append(f"InfluxDB did not answer /health on port {base}")
         if not postgres_ready(env["POSTGRES_CONTAINER_NAME"]):
             problems.append("Postgres is not accepting connections")
+        problems.extend(grafana_problems(base))
     if problems:
         for problem in problems:
             print(f"verify_stack: unhealthy: {problem}", file=sys.stderr)
@@ -243,8 +339,16 @@ def cmd_health() -> int:
 
 def cmd_down() -> int:
     rid, base = run_id(), port_base()
+    # `--profile render` so a renderer started for screenshots goes too.
     result = compose(
-        rid, "down", "--volumes", "--remove-orphans", env=stack_env(rid, base), timeout=180
+        rid,
+        "--profile",
+        "render",
+        "down",
+        "--volumes",
+        "--remove-orphans",
+        env=stack_env(rid, base),
+        timeout=180,
     )
     if result.returncode != 0:
         raise StackError(f"docker compose down failed:\n{result.stdout}\n{result.stderr}")

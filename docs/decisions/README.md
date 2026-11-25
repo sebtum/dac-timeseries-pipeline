@@ -22,7 +22,7 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0006](ADR-0006-timeseries-data-model.md) | Tags, fields, and the numeric/state table split | M1 | A | Accepted |
 | [0007](ADR-0007-duplicate-resolution-idempotency.md) | Same-timestamp duplicate resolution and ingest idempotency | M2 | B, C | Accepted |
 | [0008](ADR-0008-local-runtime-docker-compose.md) | Docker Compose, pinned tags, services added progressively | M0 | A, B, G | Accepted ⚠ |
-| [0009](ADR-0009-provisioning-as-code.md) | Provisioning as code, per milestone, with three exceptions | M0 | — | Accepted ⚠ |
+| [0009](ADR-0009-provisioning-as-code.md) | Provisioning as code, per milestone, with three exceptions (addendum: M6 replaces exception 2) | M0 | — | Accepted ⚠ |
 | [0010](ADR-0010-profile-post-ingest-in-database.md) | Profile post-ingest in the database; pre-ingest only what the write destroys | M0 | C, D | Accepted |
 | [0011](ADR-0011-retention-tiering-rollup.md) | Retention, tiering, and the rollup schema (addendum: M3 rollup over the verdict) | M1 | A | Accepted |
 | [0012](ADR-0012-postgres-migrations-metadata-loader.md) | Postgres migrations, and a metadata loader with per-field provenance | M1 | A, F | Accepted |
@@ -31,6 +31,7 @@ pipeline. Trivia (variable naming, file layout) is not.
 | [0015](ADR-0015-cleaning-and-quality-pipeline.md) | Cleaning and quality pipeline: one verdict per reading beside the raw value, the rules, the rollup over the verdict | M3 | C, D | Accepted |
 | [0016](ADR-0016-derived-metrics.md) | Derived metrics: a batch job over accepted readings, labelled by coverage, never filled | M4 | E | Accepted |
 | [0017](ADR-0017-comparison-and-findings.md) | Comparison and findings: one clock, block-bootstrap intervals, an evidence rule that can say "not resolved" | M5 | F | Accepted |
+| [0018](ADR-0018-grafana-dashboards.md) | Grafana dashboards: committed JSON provisioned read-only, one clock in the query, quality drawn not hidden | M6 | G | Accepted |
 
 ⚠ ADR-0003 carries one unresolved item: the rebuttal to the memory-scaling challenge (U-06).
 The decision stands; the defence is incomplete.
@@ -79,7 +80,11 @@ turn: 0015 decides which readings are accepted, 0016 decides what is computed fr
 hole in them is labelled. 0017 is separable from 0016 again: 0016 decides what is
 computed per experiment, 0017 decides how experiments are put side by side, which pairs may be
 compared, and what evidence a claim needs. The metrics would be the same under any comparison
-rule, and the comparison rule would be the same under another metric formula.
+rule, and the comparison rule would be the same under another metric formula. 0018 is separable
+from 0017 in turn: 0017 decides what is claimed from the runs, 0018 decides how the numbers and the
+excluded readings are put in front of a reader. The dashboards would be the same under another
+comparison rule, and 0018 also changes one exception of 0009 (dashboards are committed JSON from
+the start), which is recorded as an addendum there and not as a new reversal here.
 
 ## Status values
 

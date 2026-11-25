@@ -172,3 +172,24 @@ means it silently stops applying the moment there's data — so schema changes g
 not the entrypoint directory. The rule underneath all three is: anything you'd otherwise have to
 remember to click gets committed, anything that's a milestone's creative output gets committed
 after it exists, and secrets are never committed but their generation is.
+
+## Addendum (2026-11-25) - M6 replaces exception 2
+
+ADR-0018 settled how the dashboards are made. It replaces exception 2 and nothing else in this
+record: the policy, exceptions 1 and 3, the per-milestone timing and the datasources row stand.
+Sebastian approved the change as a major decision when the M6 plan was approved.
+
+- **Exception 2 ("build in the UI, export JSON at the end") is replaced** by committed JSON,
+  provisioned read-only from the start (`allowUiUpdates: false`, `disableDeletion: true`). Its
+  premise was that a dashboard cannot usefully be hand-authored, so it must be built in the UI. In
+  M6 the dashboards are written and edited as files by agents and nobody clicks in the UI, so the
+  premise no longer holds. The cost the exception named, a slow edit loop on a read-only dashboard,
+  is moved to a checker (`python -m scripts.check_dashboards`) that runs every panel query, and to
+  rendered screenshots.
+- **The table row changes accordingly:** Grafana dashboards are committed JSON under
+  `grafana/dashboards/`, at M6 and from its first commit, not "exported JSON committed after M6
+  builds them". The datasources row is unchanged (M6).
+- **The round trip this ADR worried about** ("The dashboard round-trip has to actually happen") is
+  now a property of the setup: there is no export step to forget, because the file is the source.
+- The rejected option is the old exception: UI first, export last.
+

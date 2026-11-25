@@ -1,0 +1,1301 @@
+{
+  "uid": "dac-compare",
+  "title": "Compare experiments",
+  "description": "Experiments side by side: metadata, whole-run and steady-state KPIs, which pairs can be compared, an overlay on experiment time, and data quality.",
+  "tags": [
+    "dac"
+  ],
+  "editable": false,
+  "graphTooltip": 0,
+  "links": [],
+  "schemaVersion": 41,
+  "refresh": "",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true
+  },
+  "timezone": "utc",
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "influx",
+        "type": "datasource",
+        "query": "influxdb",
+        "hide": 2,
+        "current": {
+          "text": "influx-dac",
+          "value": "influx-dac"
+        },
+        "options": [],
+        "refresh": 1,
+        "regex": ""
+      },
+      {
+        "name": "pg",
+        "type": "datasource",
+        "query": "grafana-postgresql-datasource",
+        "hide": 2,
+        "current": {
+          "text": "pg-dac",
+          "value": "pg-dac"
+        },
+        "options": [],
+        "refresh": 1,
+        "regex": ""
+      },
+      {
+        "name": "pg_schema",
+        "type": "constant",
+        "hide": 2,
+        "query": "public",
+        "current": {
+          "text": "public",
+          "value": "public"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "public",
+            "value": "public"
+          }
+        ]
+      },
+      {
+        "name": "policy_version",
+        "type": "constant",
+        "hide": 2,
+        "query": "m3-v1",
+        "current": {
+          "text": "m3-v1",
+          "value": "m3-v1"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "m3-v1",
+            "value": "m3-v1"
+          }
+        ]
+      },
+      {
+        "name": "metrics_version",
+        "type": "constant",
+        "hide": 2,
+        "query": "m4-v1",
+        "current": {
+          "text": "m4-v1",
+          "value": "m4-v1"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "m4-v1",
+            "value": "m4-v1"
+          }
+        ]
+      },
+      {
+        "name": "compare_version",
+        "type": "constant",
+        "hide": 2,
+        "query": "m5-v1",
+        "current": {
+          "text": "m5-v1",
+          "value": "m5-v1"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "m5-v1",
+            "value": "m5-v1"
+          }
+        ]
+      },
+      {
+        "name": "experiment",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "definition": "SELECT experiment_id FROM ${pg_schema}.experiment ORDER BY 1",
+        "query": "SELECT experiment_id FROM ${pg_schema}.experiment ORDER BY 1",
+        "refresh": 1,
+        "sort": 0,
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "regex": "",
+        "options": [],
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "label": "Experiment"
+      },
+      {
+        "name": "windows",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "definition": "SELECT string_agg('(''' || experiment_id || ''', ' || ((extract(epoch FROM start_time) * 1000000)::bigint * 1000)::text || ', ' || ((extract(epoch FROM end_time) * 1000000)::bigint * 1000)::text || ')', ', ' ORDER BY experiment_id) AS windows FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "query": "SELECT string_agg('(''' || experiment_id || ''', ' || ((extract(epoch FROM start_time) * 1000000)::bigint * 1000)::text || ', ' || ((extract(epoch FROM end_time) * 1000000)::bigint * 1000)::text || ')', ', ' ORDER BY experiment_id) AS windows FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "refresh": 1,
+        "sort": 0,
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "regex": "",
+        "options": [],
+        "current": {}
+      },
+      {
+        "name": "span_from",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "definition": "SELECT to_char(MIN(start_time) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS span_from FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "query": "SELECT to_char(MIN(start_time) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS span_from FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "refresh": 1,
+        "sort": 0,
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "regex": "",
+        "options": [],
+        "current": {}
+      },
+      {
+        "name": "span_to",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "definition": "SELECT to_char(MAX(end_time) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS span_to FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "query": "SELECT to_char(MAX(end_time) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS span_to FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "refresh": 1,
+        "sort": 0,
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "regex": "",
+        "options": [],
+        "current": {}
+      },
+      {
+        "name": "signal",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "definition": "SELECT DISTINCT signal FROM ${pg_schema}.signal_quality WHERE nominal_interval_s IS NOT NULL AND metrics_version = '${metrics_version}' ORDER BY 1",
+        "query": "SELECT DISTINCT signal FROM ${pg_schema}.signal_quality WHERE nominal_interval_s IS NOT NULL AND metrics_version = '${metrics_version}' ORDER BY 1",
+        "refresh": 1,
+        "sort": 0,
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "regex": "",
+        "options": [],
+        "current": {
+          "text": "voltage",
+          "value": "voltage"
+        },
+        "label": "Signal"
+      },
+      {
+        "name": "metric",
+        "type": "custom",
+        "label": "Metric",
+        "hide": 0,
+        "query": "power_computed,power_residual,capture_efficiency,capture_rate",
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "capture_efficiency",
+          "value": "capture_efficiency"
+        },
+        "options": [
+          {
+            "selected": false,
+            "text": "power_computed",
+            "value": "power_computed"
+          },
+          {
+            "selected": false,
+            "text": "power_residual",
+            "value": "power_residual"
+          },
+          {
+            "selected": true,
+            "text": "capture_efficiency",
+            "value": "capture_efficiency"
+          },
+          {
+            "selected": false,
+            "text": "capture_rate",
+            "value": "capture_rate"
+          }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "table",
+      "title": "Experiments",
+      "description": "One row per selected experiment, from the Postgres experiment table. Click an id to open its detail dashboard over its own time window.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${pg}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT experiment_id, start_time, end_time, duration_s, current_setpoint_nominal_a, air_flow_nominal_m3h, solvent_flow_nominal_lmin, operator, sorbent_batch, notes, (extract(epoch FROM start_time) * 1000)::bigint AS start_ms, (extract(epoch FROM end_time) * 1000)::bigint AS end_ms FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring}) ORDER BY experiment_id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "experiment_id"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open detail",
+                    "url": "/d/dac-experiment?var-experiment=${__value.raw}&from=${__data.fields.start_ms}&to=${__data.fields.end_ms}",
+                    "targetBlank": false
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "Experiment"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "start_time"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Start"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "end_time"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "End"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "duration_s"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Duration (s)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "current_setpoint_nominal_a"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Nominal setpoint (A)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "air_flow_nominal_m3h"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Air flow (m3/h)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "solvent_flow_nominal_lmin"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Solvent flow (L/min)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "operator"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Operator"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "sorbent_batch"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Sorbent batch"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "notes"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Notes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "start_ms"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "end_ms"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+    {
+      "id": 2,
+      "type": "table",
+      "title": "Whole-run KPIs",
+      "description": "Whole-run metrics per experiment from Postgres experiment_metrics (metrics version ${metrics_version}). Status: complete green, partial amber, none red.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${pg}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT experiment_id, metric, value, unit, coverage, status FROM ${pg_schema}.experiment_metrics WHERE metrics_version = '${metrics_version}' AND experiment_id IN (${experiment:sqlstring}) ORDER BY experiment_id, metric"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "complete": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "complete"
+                      },
+                      "partial": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "partial"
+                      },
+                      "none": {
+                        "color": "red",
+                        "index": 2,
+                        "text": "none"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Steady-state KPIs (95 % interval)",
+      "description": "Steady-window KPIs per experiment from Postgres comparison_kpi (compare version ${compare_version}), with the 95 % interval and coverage. Status: complete green, partial amber, none red.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${pg}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT experiment_id, kpi, value, unit, interval_low, interval_high, coverage, status FROM ${pg_schema}.comparison_kpi WHERE compare_version = '${compare_version}' AND experiment_id IN (${experiment:sqlstring}) ORDER BY experiment_id, kpi"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "complete": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "complete"
+                      },
+                      "partial": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "partial"
+                      },
+                      "none": {
+                        "color": "red",
+                        "index": 2,
+                        "text": "none"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Which pairs can be compared",
+      "description": "Pairs with at least one selected end, from Postgres comparison_pair. same_conditions and supported green, confounded amber, with the differing factors.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 10,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${pg}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT a, b, conditions_status, differing FROM ${pg_schema}.comparison_pair WHERE compare_version = '${compare_version}' AND (a IN (${experiment:sqlstring}) OR b IN (${experiment:sqlstring})) ORDER BY a, b"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "conditions_status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "same_conditions": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "same_conditions"
+                      },
+                      "supported": {
+                        "color": "green",
+                        "index": 1,
+                        "text": "supported"
+                      },
+                      "confounded": {
+                        "color": "orange",
+                        "index": 2,
+                        "text": "confounded"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+    {
+      "id": 5,
+      "type": "table",
+      "title": "Steady KPI differences by pair",
+      "description": "Difference b - a with its 95 % interval per pair and KPI, from Postgres comparison_pair_kpi. Same pairs as the comparability table.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 10,
+        "y": 18,
+        "w": 14,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${pg}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT a, b, kpi, unit, difference, interval_low, interval_high, excludes_zero, coverage_status FROM ${pg_schema}.comparison_pair_kpi WHERE compare_version = '${compare_version}' AND (a IN (${experiment:sqlstring}) OR b IN (${experiment:sqlstring})) ORDER BY a, b, kpi"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "coverage_status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "both_complete": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "both_complete"
+                      },
+                      "partial_coverage": {
+                        "color": "orange",
+                        "index": 1,
+                        "text": "partial_coverage"
+                      },
+                      "not_available": {
+                        "color": "red",
+                        "index": 2,
+                        "text": "not_available"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+    {
+      "id": 6,
+      "type": "xychart",
+      "title": "Overlay: ${signal} in minutes since start",
+      "description": "Accepted readings of the chosen signal, one line per selected experiment, x = minutes since that experiment's start (from Postgres). Excluded readings are not drawn.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${influx}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH w(experiment_id, t0, t1) AS (VALUES ${windows:raw}) SELECT r.experiment_id, (CAST(r.time AS BIGINT) - w.t0) / 60000000000.0 AS experiment_time_min, r.value FROM readings_processed r JOIN w ON r.experiment_id = w.experiment_id WHERE r.signal = '${signal}' AND r.policy_version = '${policy_version}' AND r.verdict = 'accepted' AND r.time >= '${span_from}' AND r.time < '${span_to}' AND CAST(r.time AS BIGINT) >= w.t0 AND CAST(r.time AS BIGINT) < w.t1 ORDER BY r.experiment_id, r.time"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "experiment_id"
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "show": "lines",
+            "lineWidth": 1,
+            "pointSize": {
+              "fixed": 3
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "experiment_time_min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisLabel",
+                "value": "Minutes since start"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "${__field.labels.experiment_id}"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Accepted value"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "mapping": "auto",
+        "series": [],
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "xychart",
+      "title": "Overlay: ${metric} in minutes since start",
+      "description": "Derived metric series, one line per selected experiment, x = minutes since that experiment's start.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 26,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${influx}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH w(experiment_id, t0, t1) AS (VALUES ${windows:raw}) SELECT r.experiment_id, (CAST(r.time AS BIGINT) - w.t0) / 60000000000.0 AS experiment_time_min, r.value FROM metrics_series r JOIN w ON r.experiment_id = w.experiment_id WHERE r.metric = '${metric}' AND r.metrics_version = '${metrics_version}' AND r.policy_version = '${policy_version}' AND r.time >= '${span_from}' AND r.time < '${span_to}' AND CAST(r.time AS BIGINT) >= w.t0 AND CAST(r.time AS BIGINT) < w.t1 ORDER BY r.experiment_id, r.time"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "experiment_id"
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "show": "lines",
+            "lineWidth": 1,
+            "pointSize": {
+              "fixed": 3
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "experiment_time_min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisLabel",
+                "value": "Minutes since start"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "${__field.labels.experiment_id}"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Metric value"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "mapping": "auto",
+        "series": [],
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Data quality per experiment",
+      "description": "Completeness is readings present over readings expected, summed over the polled signals. Valid, bad and uncertain are shares of all readings of the experiment. Completeness and valid: green at 0.95 or more, amber at 0.5 or more, red below. Bad and uncertain: green below 0.05, amber below 0.5, red above.",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "${pg}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT experiment_id, SUM(present) FILTER (WHERE expected IS NOT NULL)::float8 / NULLIF(SUM(expected), 0) AS completeness, SUM(accepted)::float8 / NULLIF(SUM(present), 0) AS valid_fraction, SUM(bad)::float8 / NULLIF(SUM(present), 0) AS bad_fraction, SUM(uncertain)::float8 / NULLIF(SUM(present), 0) AS uncertain_fraction FROM ${pg_schema}.signal_quality WHERE metrics_version = '${metrics_version}' AND experiment_id IN (${experiment:sqlstring}) GROUP BY experiment_id ORDER BY experiment_id"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "completeness"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.95
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "valid_fraction"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.95
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bad_fraction"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.05
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "uncertain_fraction"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 0.05
+                    },
+                    {
+                      "color": "red",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true
+      }
+    },
+    {
+      "id": 9,
+      "type": "barchart",
+      "title": "Excluded readings by reason",
+      "description": "Readings the cleaning step excluded, counted per experiment and reason. An experiment with no exclusions has no bar.",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 36,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${influx}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH w(experiment_id, t0, t1) AS (VALUES ${windows:raw}) SELECT r.experiment_id, r.reason, COUNT(*) AS readings FROM readings_processed r JOIN w ON r.experiment_id = w.experiment_id WHERE r.policy_version = '${policy_version}' AND r.verdict = 'excluded' AND r.time >= '${span_from}' AND r.time < '${span_to}' AND CAST(r.time AS BIGINT) >= w.t0 AND CAST(r.time AS BIGINT) < w.t1 GROUP BY r.experiment_id, r.reason ORDER BY r.experiment_id, r.reason"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "reason",
+            "rowField": "experiment_id",
+            "valueField": "readings",
+            "emptyValue": "zero"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 80,
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "auto",
+        "stacking": "normal",
+        "showValue": "auto",
+        "barWidth": 0.8,
+        "xTickLabelRotation": 0,
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    }
+  ]
+}
