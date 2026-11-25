@@ -455,7 +455,7 @@ def pg(postgres_conn):
     schema, kwargs = _create_schema(postgres_conn)
     conn = None
     try:
-        assert run_migrations(kwargs) == ["0001", "0002", "0003"]
+        assert run_migrations(kwargs) == ["0001", "0002", "0003", "0004"]
         conn = pg_connect(migrate.connect_kwargs(migrate.load_env()), schema)
         with conn.cursor() as cur:
             for experiment_id, setpoint in ((EXP, 12.5), (OTHER_EXP, 40.0)):
@@ -630,7 +630,10 @@ def test_pg_check_accepts_a_migrated_schema_and_refuses_one_without_0003(
         assert "0003" in detail
         assert detail.startswith("missing table(s) experiment_metrics, signal_quality:")
 
-        assert run_migrations(kwargs) == ["0003"]  # the real directory adds the missing one
+        assert run_migrations(kwargs) == [
+            "0003",
+            "0004",
+        ]  # the real directory adds the missing ones
         assert pg_check(conn) is None
     finally:
         if conn is not None:

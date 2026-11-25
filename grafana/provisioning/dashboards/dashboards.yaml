@@ -1,0 +1,15 @@
+# Dashboards are committed JSON under grafana/dashboards and are the only source of them
+# (M6 decision 1): provisioned read-only, no editing in the UI, no deletion.
+apiVersion: 1
+
+providers:
+  - name: dac
+    orgId: 1
+    folder: DAC
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

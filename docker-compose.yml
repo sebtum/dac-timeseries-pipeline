@@ -55,6 +55,63 @@ services:
       retries: 10
       start_period: 5s
 
+  # Grafana (M6, ADR-0018). Starts only after the InfluxDB admin token exists in `.env`: Grafana
+  # reads the token once, at start (scripts/verify_stack.py and the README bring it up last).
+  # Dashboards are committed JSON, provisioned read-only (allowUiUpdates: false); the two bind
+  # mounts are config files, not data, so ADR-0008's concern about Windows bind mounts for data
+  # does not apply. Grafana's own state (users, preferences) lives in the named volume.
+  grafana:
+    image: grafana/grafana:13.3.2
+    container_name: ${GRAFANA_CONTAINER_NAME:-dac-grafana}
+    depends_on:
+      influxdb:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-changeme_local_only}
+      # Auth stays on locally, as for InfluxDB (ADR-0009); no anonymous viewer, no sign-up.
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      # Read by grafana/provisioning/datasources/datasources.yaml.
+      INFLUX_TOKEN: ${INFLUX_TOKEN:-}
+      DAC_INFLUX_URL: ${DAC_INFLUX_URL:-http://influxdb:8181}
+      DAC_POSTGRES_HOST: ${DAC_POSTGRES_HOST:-postgres:5432}
+      POSTGRES_DB: ${POSTGRES_DB:-dac}
+      POSTGRES_USER: ${POSTGRES_USER:-dac}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_local_only}
+      # Screenshots (compose profile `render`): used only when the renderer service runs.
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      # Grafana 13 refuses to start with a rendering server and the default token.
+      GF_RENDERING_RENDERER_TOKEN: ${GRAFANA_RENDERER_TOKEN:-changeme_local_only}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  # Image renderer for dashboard screenshots (decision 10). Off by default: `docker compose
+  # --profile render up -d renderer`.
+  renderer:
+    image: grafana/grafana-image-renderer:v5.12.11
+    container_name: ${RENDERER_CONTAINER_NAME:-dac-renderer}
+    profiles: ["render"]
+    environment:
+      ENABLE_METRICS: "false"
+      AUTH_TOKEN: ${GRAFANA_RENDERER_TOKEN:-changeme_local_only}
+
 volumes:
   # Named volume, not a bind mount — Windows bind-mount path semantics are avoided per
   # ADR-0008. The name matches the `influxdb-data/` path already reserved in .gitignore
@@ -63,3 +120,4 @@ volumes:
   # root, so nothing here actually touches the working tree.
   influxdb-data:
   postgres-data:
+  grafana-data:

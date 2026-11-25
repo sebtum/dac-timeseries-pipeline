@@ -1,4 +1,4 @@
-"""Fixtures for the end-to-end ingest tests (helpers live in `tests/e2e/helpers.py`).
+"""Fixtures for the end-to-end tests (helpers: `tests/e2e/helpers.py`, `grafana_helpers.py`).
 
 Each fixture creates one empty throwaway database and drops it afterwards, so a test never
 touches `dac_raw`. Both depend on the session `influx_client` fixture, which skips when no
@@ -11,7 +11,18 @@ import uuid
 
 import pytest
 
+from tests.e2e.grafana_helpers import require_grafana
 from tests.e2e.helpers import create_database, drop_database
+
+
+@pytest.fixture(scope="session")
+def grafana():
+    """A `GrafanaClient` for the Grafana of `.env`; skips (never fails) when it is unreachable.
+
+    Tests that need it carry the `grafana` marker (pyproject.toml). Bring Grafana up with
+    `python scripts/verify_stack.py up` (private stack) or `docker compose up -d grafana`.
+    """
+    return require_grafana()
 
 
 @pytest.fixture

@@ -22,7 +22,7 @@ live in `decisions/`, written only after Sebastian has made the call.
 | M3 | Quality & cleaning pipeline | C, D | Verify | [0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md) |
 | M4 | Derived metrics | E | Verify (built 2026-11-24, judge not run) | [0016](decisions/ADR-0016-derived-metrics.md) |
 | M5 | Comparison & findings | F | Verify (built 2026-11-24, judge not run) | [0017](decisions/ADR-0017-comparison-and-findings.md) |
-| M6 | Grafana dashboard | G | Not started | — |
+| M6 | Grafana dashboard | G | Verify (built 2026-11-25, judge not run) | [0018](decisions/ADR-0018-grafana-dashboards.md) |
 | M7 | Edge, cloud, presentation | H, I, J | Not started | — |
 | — | Retrospective (terminal) | — | Locked until session declared over | — |
 
@@ -40,7 +40,7 @@ Every letter in the brief must appear here with a live state. Nothing gets dropp
 | D | Cleaning and processing | M3 | **Built, awaiting the judge** (2026-11-23). Per-signal policy table, 25 rows, checked against the code by a test: [`cleaning_policy.md`](cleaning_policy.md). All nine defect kinds covered. Real data: 29 gaps, 5 stuck-sensor runs, 4 impossible values, 4 spikes, 100 BAD and 230 UNCERTAIN readings excluded; rollup rebuilt over the verdict (16,256 buckets). Report: [`reports/M3.md`](../reports/M3.md). Decisions: [ADR-0015](decisions/ADR-0015-cleaning-and-quality-pipeline.md). |
 | E | Derived metrics | M4 | **Built, awaiting the judge** (2026-11-24). Real data: 13 metrics and 4 derived series for each of the 6 experiments, each metric with a coverage and a label (complete, partial or none); the formulas were recomputed independently in plain Python with 0 differences; energy from voltage times current agrees with the logged power to within 0.67 % in every experiment. These are numbers, not findings. Report: [`reports/M4.md`](../reports/M4.md). Decisions: [ADR-0016](decisions/ADR-0016-derived-metrics.md). Formulas: [`metrics.md`](metrics.md). Schema: [`schema.md`](schema.md). |
 | F | Experiment comparison | M5 | **Built, awaiting the judge** (2026-11-24). Real data: all 6 experiments put on one experiment clock, 28 voltage fits (hydrolyzer and absorber, steady and whole run, each experiment and pooled), 8 evidence rows, 15 pair comparisons, the pressure-drop check and the EXP_004 air-flow check; an independent plain-Python recompute found 0 differences. The headline answer on flow and pressure against cell voltage is **not resolved in this run**: all 8 evidence rows are `not_resolved`, which is not evidence of no effect. Only one pair (EXP_001 against EXP_002, differing in current setpoint) is a supported comparison; the other 14 are confounded. Report: [`reports/M5.md`](../reports/M5.md). Draft findings: [`reports/findings.md`](../reports/findings.md); **the findings are a draft until Sebastian approves them.** Decisions: [ADR-0017](decisions/ADR-0017-comparison-and-findings.md). Method: [`comparison.md`](comparison.md). |
-| G | Grafana dashboard | M6 | Not started |
+| G | Grafana dashboard | M6 | **Built, awaiting the judge** (2026-11-25). Two dashboards, provisioned read-only from committed JSON: compare experiments (9 panels, overlay on minutes since start) and experiment detail (10 panels, excluded readings drawn as red points beside the accepted line, gaps and stuck stretches marked). The checker ran every panel query for each experiment and each numeric signal: 299 runs, 3,105 panel queries, 3,082 with rows, 23 empty and allowed (all the gaps table of EXP_005, which has none), 0 errors. The wide time picker returned the same rows as the experiment window (U-05, closed for this data set). Four screenshots committed. Not run: GitHub Actions, the click-through by hand (Sebastian's, in review). No panel states a finding. Report: [`reports/M6.md`](../reports/M6.md). Decisions: [ADR-0018](decisions/ADR-0018-grafana-dashboards.md). Panels and conventions: [`dashboard.md`](dashboard.md). Schema: [`schema.md`](schema.md). |
 | H | Edge ingestion & resilience (design) | M7 | Not started |
 | I | Cloud scaling narrative (verbal) | M7 | Not started |
 | J | Presentation walkthrough (verbal) | M7 | Not started |
@@ -117,7 +117,7 @@ code is fresh. A milestone is not `Done` until its CI increment is green.
 | M3 | Unit tests for each per-signal handling rule; the "nothing silently dropped" reconciliation runs as a test. |
 | M4 | Metric correctness tests, including the power cross-check against the logged `power` signal. |
 | M5 | Regression test pinning the headline findings, so later pipeline changes can't silently move them. |
-| M6 | Dashboard JSON lint/validation; datasource references resolve. |
+| M6 | Dashboard JSON lint/validation; datasource references resolve. **Added (2026-11-25):** the lint runs over every file in `grafana/dashboards` in the unit suite (`tests/unit/test_dashboards_lint.py`); the dashboard document is checked against the JSON (`tests/unit/test_dashboard_doc.py`); the lint job validates the contract example of the check output; the integration job starts Grafana (`docker run --network host`) so the `grafana`-marked tests run, and a skip there is a failure. Not run on GitHub yet. |
 | M7 | Docs build/link check only — H, I, J produce no runnable code. |
 
 **CD** here is not deployment — there is no environment to ship to. It means the stack as
@@ -569,6 +569,34 @@ reaches the dashboard through a template variable rather than a join
 ([ADR-0005](decisions/ADR-0005-postgres-experiment-metadata.md)).
 
 **Execute** — build it; export the JSON model into the repo.
+
+**Execute-phase status (2026-11-25).** Built on branch `m6-dashboard` (cut from `master`). The
+dashboards are committed JSON provisioned read-only from the start, which replaces the "build in the
+UI, export at the end" exception of ADR-0009 (addendum there). The milestone record is
+`.workflow/dac.md` (scenarios S6.1-S6.26), the decisions are in
+[ADR-0018](decisions/ADR-0018-grafana-dashboards.md), the panels and colour conventions are in
+[`dashboard.md`](dashboard.md), and the report for review is [`reports/M6.md`](../reports/M6.md).
+Merge to `master` waits for approval. Results:
+
+- Stack: Grafana `13.3.2` and the image renderer `v5.12.11` (tags and digests in ADR-0018), both
+  datasources provisioned, started last because Grafana reads the InfluxDB token once, at start.
+- Real data, `python -m scripts.check_dashboards --sweep signal --allow-empty "Gaps and stuck
+  stretches"`: exit 0, 299 runs, 3,105 panel queries, 3,082 with rows, 23 empty and allowed (all the
+  gaps table of EXP_005, where a plain count is 0), 0 errors. Committed as
+  `reports/dashboard_check.json`.
+- Wide time picker: the detail dashboard from the earliest start to the latest end returned the same
+  rows as the experiment window (1,794 entries, 0 differences). U-05 is closed for this data set,
+  with a plant-scale caveat.
+- Independent recompute of the overlay from plain pulls: 160,648 rows, 0 differences. The EXP_004
+  air-flow hour: 3,600 excluded readings, equal to a plain count.
+- A fresh private stack gave a check result equal to the committed one except timing.
+- Four screenshots in `docs/screenshots/m6/`.
+- Added: migration `0004` and `python -m scripts.load_comparison` (three Postgres tables for the
+  steady KPIs and pair comparability), a checker with a contract, the Grafana CI steps.
+- Deviations: one annotation colour (Grafana 13 has no colour per annotation row); a database with no
+  gap at all has no `quality_intervals` table, so two queries error there; mirrored bad and
+  uncertain thresholds; the first compare table is taller. All in ADR-0018.
+- Not run: GitHub Actions, the judge, the click-through by hand (Sebastian's).
 
 **Verify**
 - Clicked through end to end; every panel returns data for every experiment.

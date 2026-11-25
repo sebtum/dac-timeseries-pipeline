@@ -1,0 +1,1088 @@
+{
+  "uid": "dac-experiment",
+  "title": "Experiment detail",
+  "description": "One experiment in detail: phases, one signal with its excluded readings and gaps, electrical and capture series, and data quality.",
+  "tags": [
+    "dac"
+  ],
+  "schemaVersion": 41,
+  "editable": false,
+  "graphTooltip": 1,
+  "liveNow": false,
+  "refresh": "",
+  "timezone": "utc",
+  "time": {
+    "from": "2026-05-04T08:00:00.000Z",
+    "to": "2026-05-04T10:00:00.000Z"
+  },
+  "timepicker": {},
+  "weekStart": "",
+  "fiscalYearStartMonth": 0,
+  "links": [
+    {
+      "title": "Jump to this experiment's window",
+      "type": "link",
+      "url": "/d/dac-experiment?var-experiment=${experiment}&from=${from_ms}&to=${to_ms}",
+      "icon": "external link",
+      "tooltip": "Reset the time range to the whole selected experiment",
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "name": "Gaps and stuck stretches",
+        "enable": true,
+        "hide": false,
+        "iconColor": "orange",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${influx}"
+        },
+        "filter": {
+          "exclude": false,
+          "ids": [
+            3
+          ]
+        },
+        "target": {
+          "refId": "Anno",
+          "format": "table",
+          "rawSql": "SELECT time, to_timestamp_nanos(end_ns) AS timeend, CONCAT(kind, ' ', CAST(seconds AS VARCHAR), ' s') AS text, kind AS tags FROM quality_intervals WHERE experiment_id = '${experiment}' AND policy_version = '${policy_version}' AND signal = '${signal}' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time"
+        }
+      }
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "influx",
+        "type": "datasource",
+        "query": "influxdb",
+        "hide": 2,
+        "skipUrlSync": true,
+        "current": {
+          "text": "influx-dac",
+          "value": "influx-dac"
+        }
+      },
+      {
+        "name": "pg",
+        "type": "datasource",
+        "query": "grafana-postgresql-datasource",
+        "hide": 2,
+        "skipUrlSync": true,
+        "current": {
+          "text": "pg-dac",
+          "value": "pg-dac"
+        }
+      },
+      {
+        "name": "pg_schema",
+        "type": "constant",
+        "hide": 2,
+        "query": "public",
+        "skipUrlSync": true,
+        "current": {
+          "text": "public",
+          "value": "public"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "public",
+            "value": "public"
+          }
+        ]
+      },
+      {
+        "name": "policy_version",
+        "type": "constant",
+        "hide": 2,
+        "query": "m3-v1",
+        "skipUrlSync": true,
+        "current": {
+          "text": "m3-v1",
+          "value": "m3-v1"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "m3-v1",
+            "value": "m3-v1"
+          }
+        ]
+      },
+      {
+        "name": "metrics_version",
+        "type": "constant",
+        "hide": 2,
+        "query": "m4-v1",
+        "skipUrlSync": true,
+        "current": {
+          "text": "m4-v1",
+          "value": "m4-v1"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "m4-v1",
+            "value": "m4-v1"
+          }
+        ]
+      },
+      {
+        "name": "compare_version",
+        "type": "constant",
+        "hide": 2,
+        "query": "m5-v1",
+        "skipUrlSync": true,
+        "current": {
+          "text": "m5-v1",
+          "value": "m5-v1"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "m5-v1",
+            "value": "m5-v1"
+          }
+        ]
+      },
+      {
+        "name": "experiment",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "hide": 0,
+        "query": "SELECT experiment_id FROM ${pg_schema}.experiment ORDER BY 1",
+        "refresh": 1,
+        "sort": 0,
+        "includeAll": false,
+        "multi": false,
+        "label": "Experiment",
+        "current": {
+          "text": "EXP_001",
+          "value": "EXP_001"
+        }
+      },
+      {
+        "name": "windows",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "hide": 2,
+        "query": "SELECT string_agg('(''' || experiment_id || ''', ' || (extract(epoch FROM start_time)::bigint * 1000000000)::text || ', ' || (extract(epoch FROM end_time)::bigint * 1000000000)::text || ')', ', ' ORDER BY experiment_id) AS windows FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "refresh": 1,
+        "sort": 0,
+        "includeAll": false,
+        "multi": false,
+        "skipUrlSync": true
+      },
+      {
+        "name": "span_from",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "hide": 2,
+        "query": "SELECT to_char(MIN(start_time) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS span_from FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "refresh": 1,
+        "sort": 0,
+        "includeAll": false,
+        "multi": false,
+        "skipUrlSync": true
+      },
+      {
+        "name": "span_to",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "hide": 2,
+        "query": "SELECT to_char(MAX(end_time) AT TIME ZONE 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"') AS span_to FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})",
+        "refresh": 1,
+        "sort": 0,
+        "includeAll": false,
+        "multi": false,
+        "skipUrlSync": true
+      },
+      {
+        "name": "signal",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "hide": 0,
+        "query": "SELECT DISTINCT signal FROM ${pg_schema}.signal_quality WHERE nominal_interval_s IS NOT NULL AND metrics_version = '${metrics_version}' ORDER BY 1",
+        "refresh": 1,
+        "sort": 0,
+        "includeAll": false,
+        "multi": false,
+        "label": "Signal",
+        "current": {
+          "text": "voltage",
+          "value": "voltage"
+        }
+      },
+      {
+        "name": "from_ms",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "hide": 2,
+        "query": "SELECT (extract(epoch FROM start_time) * 1000)::bigint AS from_ms FROM ${pg_schema}.experiment WHERE experiment_id = '${experiment}'",
+        "refresh": 1,
+        "sort": 0,
+        "includeAll": false,
+        "multi": false,
+        "skipUrlSync": true
+      },
+      {
+        "name": "to_ms",
+        "type": "query",
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "${pg}"
+        },
+        "hide": 2,
+        "query": "SELECT (extract(epoch FROM end_time) * 1000)::bigint AS to_ms FROM ${pg_schema}.experiment WHERE experiment_id = '${experiment}'",
+        "refresh": 1,
+        "sort": 0,
+        "includeAll": false,
+        "multi": false,
+        "skipUrlSync": true
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "table",
+      "title": "Experiment",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT experiment_id, start_time AS \"start\", end_time AS \"end\", duration_s, current_setpoint_nominal_a, air_flow_nominal_m3h, solvent_flow_nominal_lmin, operator, sorbent_batch, notes FROM ${pg_schema}.experiment WHERE experiment_id = '${experiment}'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "experiment_id"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Jump to this experiment's window",
+                    "url": "/d/dac-experiment?var-experiment=${experiment}&from=${from_ms}&to=${to_ms}",
+                    "targetBlank": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "duration_s"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "description": "The selected experiment's metadata. The experiment id links to this dashboard over the experiment's own window."
+    },
+    {
+      "id": 2,
+      "type": "state-timeline",
+      "title": "Process phases",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, CASE WHEN signal = 'process_state' THEN value_raw END AS process_state, CASE WHEN signal = 'valve_state' THEN value_raw END AS valve_state FROM state_intervals WHERE experiment_id = '${experiment}' AND policy_version = '${policy_version}' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) AND signal IN ('process_state', 'valve_state') ORDER BY time, signal"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 70,
+            "lineWidth": 0,
+            "spanNulls": true
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "STARTUP": {
+                  "color": "blue",
+                  "index": 0
+                },
+                "STEADY_STATE": {
+                  "color": "green",
+                  "index": 1
+                },
+                "LOAD_CHANGE": {
+                  "color": "orange",
+                  "index": 2
+                },
+                "SHUTDOWN": {
+                  "color": "#9AA0A6",
+                  "index": 3
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "alignValue": "left",
+        "rowHeight": 0.8,
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "description": "Every state event of the experiment with its raw value, as logged. The last state lasts to the end of the experiment."
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "${signal}: accepted and excluded",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, CASE WHEN verdict = 'accepted' THEN value END AS \"accepted\", CASE WHEN verdict = 'excluded' THEN value_raw END AS \"excluded (raw value)\" FROM readings_processed WHERE experiment_id = '${experiment}' AND policy_version = '${policy_version}' AND signal = '${signal}' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "accepted"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "excluded (raw value)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "points"
+              },
+              {
+                "id": "custom.showPoints",
+                "value": "always"
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 8
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Accepted readings as a line; every excluded reading as a red point at the value the sensor reported. Orange regions mark gaps and stuck stretches."
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Electrical: voltage, current, power",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, MAX(CASE WHEN signal = 'voltage' THEN value END) AS \"voltage\", MAX(CASE WHEN signal = 'current' THEN value END) AS \"current\", MAX(CASE WHEN signal = 'power' THEN value END) AS \"power (logged)\" FROM readings_processed WHERE experiment_id = '${experiment}' AND policy_version = '${policy_version}' AND verdict = 'accepted' AND signal IN ('voltage', 'current', 'power') AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) GROUP BY time ORDER BY time"
+        },
+        {
+          "refId": "B",
+          "format": "table",
+          "rawSql": "SELECT time, value AS \"power_computed\" FROM metrics_series WHERE experiment_id = '${experiment}' AND metrics_version = '${metrics_version}' AND policy_version = '${policy_version}' AND metric = 'power_computed' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "voltage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "volt"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "current"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "amp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "power (logged)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "watt"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "power_computed"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "watt"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Accepted readings only. Power is on the right axis; power_computed is voltage times current at the same instant."
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Power residual (logged − computed)",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 19,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, value AS \"power_residual\" FROM metrics_series WHERE experiment_id = '${experiment}' AND metrics_version = '${metrics_version}' AND policy_version = '${policy_version}' AND metric = 'power_residual' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Logged power minus voltage times current, in watts, where all three readings were accepted."
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Capture: CO2 in and out",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 28,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, MAX(CASE WHEN signal = 'co2_in_ppm' THEN value END) AS \"co2_in_ppm\", MAX(CASE WHEN signal = 'co2_out_ppm' THEN value END) AS \"co2_out_ppm\" FROM readings_processed WHERE experiment_id = '${experiment}' AND policy_version = '${policy_version}' AND verdict = 'accepted' AND signal IN ('co2_in_ppm', 'co2_out_ppm') AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) GROUP BY time ORDER BY time"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ppm"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Accepted CO2 readings at the absorber inlet and outlet."
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Capture efficiency and rate",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 28,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, value AS \"capture_efficiency\" FROM metrics_series WHERE experiment_id = '${experiment}' AND metrics_version = '${metrics_version}' AND policy_version = '${policy_version}' AND metric = 'capture_efficiency' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time"
+        },
+        {
+          "refId": "B",
+          "format": "table",
+          "rawSql": "SELECT time, value AS \"capture_rate\" FROM metrics_series WHERE experiment_id = '${experiment}' AND metrics_version = '${metrics_version}' AND policy_version = '${policy_version}' AND metric = 'capture_rate' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "capture_efficiency"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "capture_rate"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "kg/h"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "description": "Derived metrics (version ${metrics_version}). Capture rate is on the right axis, in kg per hour."
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Signal quality",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "${pg}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 24,
+        "h": 13
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT signal, source, nominal_interval_s, present, expected, accepted, bad, uncertain, completeness, valid_fraction, bad_fraction, uncertain_fraction FROM ${pg_schema}.signal_quality WHERE experiment_id = '${experiment}' AND metrics_version = '${metrics_version}' AND policy_version = '${policy_version}' ORDER BY signal"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "completeness"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.95
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "valid_fraction"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "#EAB839",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.95
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "bad_fraction"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "uncertain_fraction"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "description": "One row per signal of the experiment. Completeness and valid fraction: green at 0.95 or more, amber at 0.5 or more, red below."
+    },
+    {
+      "id": 9,
+      "type": "table",
+      "title": "Gaps and stuck stretches",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 50,
+        "w": 10,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT signal, kind, time AS start, seconds, points FROM quality_intervals WHERE experiment_id = '${experiment}' AND policy_version = '${policy_version}' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time, signal"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "kind"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "gap": {
+                        "color": "#9AA0A6",
+                        "index": 0
+                      },
+                      "flatline": {
+                        "color": "orange",
+                        "index": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "seconds"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "description": "Every gap and stuck stretch of every signal of the experiment. An empty table means the cleaning run found none."
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Excluded readings",
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${influx}"
+      },
+      "gridPos": {
+        "x": 10,
+        "y": 50,
+        "w": 14,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, signal, value_raw, quality, reason, flags FROM (SELECT time, signal, value_raw, quality, reason, flags FROM readings_processed WHERE experiment_id = '${experiment}' AND policy_version = '${policy_version}' AND verdict = 'excluded' AND time >= '${span_from}' AND time < '${span_to}' AND $__timeFilter(time) ORDER BY time DESC, signal DESC LIMIT 1000) AS newest ORDER BY time, signal"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      },
+      "description": "Every excluded reading, with the reason and the value as reported (at most 1,000, the newest last)."
+    }
+  ]
+}

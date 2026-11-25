@@ -479,7 +479,7 @@ def pg(postgres_conn, tmp_path):
     schema, kwargs = _create_schema(postgres_conn)
     conn = None
     try:
-        assert run_migrations(kwargs) == ["0001", "0002", "0003"]
+        assert run_migrations(kwargs) == ["0001", "0002", "0003", "0004"]
         experiments = json.loads(EXPERIMENTS_FIXTURE.read_text(encoding="utf-8"))
         path = tmp_path / "experiments.json"
         path.write_text(json.dumps([*experiments, SECOND_EXPERIMENT]), encoding="utf-8")

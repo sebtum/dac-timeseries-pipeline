@@ -1,0 +1,116 @@
+{
+  "uid": "dac-test",
+  "title": "Checker test",
+  "schemaVersion": 41,
+  "annotations": {
+    "list": [
+      {
+        "name": "Gaps",
+        "enable": true,
+        "iconColor": "orange",
+        "datasource": { "type": "influxdb", "uid": "${influx}" },
+        "target": {
+          "refId": "Anno",
+          "format": "table",
+          "rawSql": "SELECT time, to_timestamp_nanos(end_ns) AS timeend, CONCAT(kind, ' ', CAST(seconds AS VARCHAR), ' s') AS text FROM quality_intervals WHERE experiment_id IN (${experiment:sqlstring}) AND signal = '${signal}' AND policy_version = '${policy_version}' AND $__timeFilter(time) ORDER BY time"
+        }
+      }
+    ]
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "influx",
+        "type": "datasource",
+        "query": "influxdb",
+        "hide": 2,
+        "current": { "text": "influx-dac", "value": "influx-dac" }
+      },
+      {
+        "name": "pg",
+        "type": "datasource",
+        "query": "grafana-postgresql-datasource",
+        "hide": 2,
+        "current": { "text": "pg-dac", "value": "pg-dac" }
+      },
+      { "name": "pg_schema", "type": "constant", "query": "public", "hide": 2 },
+      { "name": "policy_version", "type": "constant", "query": "m3-v1", "hide": 2 },
+      {
+        "name": "experiment",
+        "type": "query",
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "${pg}" },
+        "query": "SELECT experiment_id FROM ${pg_schema}.experiment ORDER BY 1",
+        "multi": true,
+        "includeAll": true,
+        "current": { "text": "All", "value": ["$__all"] }
+      },
+      {
+        "name": "windows",
+        "type": "query",
+        "hide": 2,
+        "datasource": { "type": "grafana-postgresql-datasource", "uid": "${pg}" },
+        "query": "SELECT string_agg('(''' || experiment_id || ''', ' || (extract(epoch FROM start_time)::bigint * 1000000000)::text || ', ' || (extract(epoch FROM end_time)::bigint * 1000000000)::text || ')', ', ' ORDER BY experiment_id) AS windows FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring})"
+      },
+      {
+        "name": "signal",
+        "type": "custom",
+        "query": "voltage,current",
+        "current": { "text": "voltage", "value": "voltage" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "table",
+      "title": "Experiments",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "${pg}" },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT experiment_id, start_time, end_time FROM ${pg_schema}.experiment WHERE experiment_id IN (${experiment:sqlstring}) ORDER BY 1"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Readings: ${signal}",
+      "datasource": { "type": "influxdb", "uid": "${influx}" },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT time, value, value_raw FROM readings_processed WHERE experiment_id IN (${experiment:sqlstring}) AND signal = '${signal}' AND policy_version = '${policy_version}' AND $__timeFilter(time) ORDER BY time"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "xychart",
+      "title": "Overlay: ${signal}",
+      "datasource": { "type": "influxdb", "uid": "${influx}" },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "WITH w(experiment_id, t0, t1) AS (VALUES ${windows:raw}) SELECT r.experiment_id, (CAST(r.time AS BIGINT) - w.t0) / 60000000000.0 AS experiment_time_min, r.value FROM readings_processed r JOIN w ON r.experiment_id = w.experiment_id WHERE r.signal = '${signal}' AND r.policy_version = '${policy_version}' AND r.verdict = 'accepted' AND CAST(r.time AS BIGINT) >= w.t0 AND CAST(r.time AS BIGINT) < w.t1 ORDER BY r.experiment_id, r.time"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Gaps and stuck stretches",
+      "datasource": { "type": "influxdb", "uid": "${influx}" },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "rawSql": "SELECT experiment_id, signal, kind, time AS start, seconds, points FROM quality_intervals WHERE experiment_id IN (${experiment:sqlstring}) AND policy_version = '${policy_version}' AND $__timeFilter(time) ORDER BY time"
+        }
+      ]
+    }
+  ]
+}

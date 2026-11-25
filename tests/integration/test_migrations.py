@@ -63,11 +63,14 @@ def _table_exists(pg_schema, table_name: str) -> bool:
 def test_real_migrations_apply_clean_and_rerun_is_noop(pg_schema):
     """V10: the project's actual migrations/ directory, run against an empty schema."""
     first = run_migrations(pg_schema)
-    assert first == ["0001", "0002", "0003"]
+    assert first == ["0001", "0002", "0003", "0004"]
     assert _table_exists(pg_schema, "experiment")
     assert _table_exists(pg_schema, "experiment_field_source")
     assert _table_exists(pg_schema, "experiment_metrics")
     assert _table_exists(pg_schema, "signal_quality")
+    assert _table_exists(pg_schema, "comparison_kpi")
+    assert _table_exists(pg_schema, "comparison_pair")
+    assert _table_exists(pg_schema, "comparison_pair_kpi")
 
     second = run_migrations(pg_schema)
     assert second == []
@@ -224,3 +227,94 @@ def test_migration_0003_pins_the_keys_foreign_keys_and_status_check(pg_schema):
             "INSERT INTO experiment_metrics (experiment_id, metrics_version, policy_version, "
             "metric, unit) VALUES ('E1', 'v', 'p', 'm', 'kg')"
         )
+
+
+def test_migration_0004_pins_the_keys_checks_and_foreign_keys(pg_schema):
+    """M6 (S6.8): the three comparison tables have the pinned primary keys, the experiment
+    references, the pair-to-KPI cascade, and refuse a bad status, an unordered pair and an
+    unknown experiment."""
+    run_migrations(pg_schema)
+
+    assert _primary_key(pg_schema, "comparison_kpi") == ["experiment_id", "compare_version", "kpi"]
+    assert _primary_key(pg_schema, "comparison_pair") == ["a", "b", "compare_version"]
+    assert _primary_key(pg_schema, "comparison_pair_kpi") == ["a", "b", "compare_version", "kpi"]
+
+    with psycopg.connect(**pg_schema, autocommit=True) as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT conrelid::regclass::text, confrelid::regclass::text, pg_get_constraintdef(oid) "
+            "FROM pg_constraint WHERE contype = 'f' AND conrelid IN "
+            "(to_regclass('comparison_kpi'), to_regclass('comparison_pair'), "
+            "to_regclass('comparison_pair_kpi')) ORDER BY 1, 3"
+        )
+        foreign_keys = [
+            (child.rpartition(".")[2], parent.rpartition(".")[2], definition)
+            for child, parent, definition in cur.fetchall()
+        ]
+        assert foreign_keys == [
+            (
+                "comparison_kpi",
+                "experiment",
+                "FOREIGN KEY (experiment_id) REFERENCES experiment(experiment_id)",
+            ),
+            (
+                "comparison_pair",
+                "experiment",
+                "FOREIGN KEY (a) REFERENCES experiment(experiment_id)",
+            ),
+            (
+                "comparison_pair",
+                "experiment",
+                "FOREIGN KEY (b) REFERENCES experiment(experiment_id)",
+            ),
+            (
+                "comparison_pair_kpi",
+                "comparison_pair",
+                "FOREIGN KEY (a, b, compare_version) REFERENCES comparison_pair(a, b, "
+                "compare_version) ON DELETE CASCADE",
+            ),
+        ]
+
+        cur.execute(
+            "INSERT INTO experiment (experiment_id, start_time, end_time, duration_s) "
+            "VALUES ('E1', now(), now(), 1), ('E2', now(), now(), 1)"
+        )
+        kpi = (
+            "INSERT INTO comparison_kpi (experiment_id, compare_version, kpi, policy_version, "
+            "metrics_version, unit, status) VALUES (%s, 'c', 'k', 'p', 'm', 'V', %s)"
+        )
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute(kpi, ("E1", "bogus"))
+        with pytest.raises(psycopg.errors.ForeignKeyViolation):
+            cur.execute(kpi, ("NOPE", "complete"))
+        # A null value, coverage and interval is allowed (status 'none').
+        cur.execute(kpi, ("E1", "none"))
+        with pytest.raises(psycopg.errors.UniqueViolation):
+            cur.execute(kpi, ("E1", "none"))
+
+        pair = (
+            "INSERT INTO comparison_pair (a, b, compare_version, conditions_status, differing) "
+            "VALUES (%s, %s, 'c', %s, '')"
+        )
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute(pair, ("E1", "E2", "bogus"))
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute(pair, ("E2", "E1", "supported"))  # a < b
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute(pair, ("E1", "E1", "supported"))
+        with pytest.raises(psycopg.errors.ForeignKeyViolation):
+            cur.execute(pair, ("E1", "NOPE", "supported"))
+        cur.execute(pair, ("E1", "E2", "same_conditions"))
+
+        pair_kpi = (
+            "INSERT INTO comparison_pair_kpi (a, b, compare_version, kpi, unit, coverage_status) "
+            "VALUES (%s, %s, 'c', 'k', 'V', %s)"
+        )
+        with pytest.raises(psycopg.errors.CheckViolation):
+            cur.execute(pair_kpi, ("E1", "E2", "bogus"))
+        with pytest.raises(psycopg.errors.ForeignKeyViolation):
+            cur.execute(pair_kpi, ("E1", "E3", "both_complete"))  # no such pair
+        cur.execute(pair_kpi, ("E1", "E2", "not_available"))
+
+        cur.execute("DELETE FROM comparison_pair WHERE a = 'E1' AND b = 'E2'")
+        cur.execute("SELECT count(*) FROM comparison_pair_kpi")
+        assert cur.fetchone() == (0,)

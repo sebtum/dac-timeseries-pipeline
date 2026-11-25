@@ -51,6 +51,14 @@ jobs:
           check-jsonschema
           --schemafile contracts/comparison_summary.schema.json
           contracts/examples/comparison_summary.example.json
+      # Same for the dashboard check (M6); the checker's own output is validated in
+      # tests/integration/test_grafana_stack.py. The lint of grafana/dashboards runs in the unit
+      # suite (tests/unit/test_dashboards_lint.py), so it needs no service here.
+      - name: Validate the dashboard check contract example
+        run: >-
+          check-jsonschema
+          --schemafile contracts/dashboard_check.schema.json
+          contracts/examples/dashboard_check.example.json
 
   integration:
     runs-on: ubuntu-latest
@@ -110,6 +118,48 @@ jobs:
       - name: Initialize InfluxDB databases
         run: python scripts/init_influx.py
 
+      # Grafana (M6), last of the services: it reads the token once, at start, so it comes after
+      # the bootstrap, and its datasource on dac_raw is healthy only after the init above. Plain
+      # `docker run --network host` with the same provisioning directory the compose file mounts
+      # (decision 17): the stores are then at localhost, which is what .env.example's
+      # GRAFANA_URL and the checker expect. The image tag is read from docker-compose.yml so the
+      # pin lives in one place. grafana/dashboards may not exist yet, hence the mkdir.
+      - name: Start Grafana
+        run: |
+          mkdir -p grafana/dashboards
+          env_value() { grep -E "^$1=" .env | head -n1 | cut -d= -f2-; }
+          image=$(grep -oE 'grafana/grafana:[0-9][0-9.]*' docker-compose.yml | head -n1)
+          args=(-d --name dac-grafana --network host)
+          args+=(-v "$PWD/grafana/provisioning:/etc/grafana/provisioning:ro")
+          args+=(-v "$PWD/grafana/dashboards:/var/lib/grafana/dashboards:ro")
+          args+=(-e GF_SECURITY_ADMIN_USER="$(env_value GRAFANA_ADMIN_USER)")
+          args+=(-e GF_SECURITY_ADMIN_PASSWORD="$(env_value GRAFANA_ADMIN_PASSWORD)")
+          args+=(-e GF_AUTH_ANONYMOUS_ENABLED=false -e GF_USERS_ALLOW_SIGN_UP=false)
+          args+=(-e GF_ANALYTICS_REPORTING_ENABLED=false -e GF_ANALYTICS_CHECK_FOR_UPDATES=false)
+          args+=(-e DAC_INFLUX_URL=http://localhost:8181 -e DAC_POSTGRES_HOST=localhost:5432)
+          args+=(-e INFLUX_TOKEN="$(env_value INFLUX_TOKEN)")
+          args+=(-e POSTGRES_DB="$(env_value POSTGRES_DB)")
+          args+=(-e POSTGRES_USER="$(env_value POSTGRES_USER)")
+          args+=(-e POSTGRES_PASSWORD="$(env_value POSTGRES_PASSWORD)")
+          docker run "${args[@]}" "$image"
+
+      - name: Wait for Grafana and both datasources
+        run: |
+          user=$(grep -E '^GRAFANA_ADMIN_USER=' .env | cut -d= -f2-)
+          password=$(grep -E '^GRAFANA_ADMIN_PASSWORD=' .env | cut -d= -f2-)
+          base=http://localhost:3000
+          wait_for() {
+            for _ in $(seq 1 60); do
+              if "$@" >/dev/null 2>&1; then return 0; fi
+              sleep 2
+            done
+            return 1
+          }
+          wait_for curl -sf "$base/api/health"
+          for uid in influx-dac pg-dac; do
+            wait_for bash -c "curl -sf -u '$user:$password' $base/api/datasources/uid/$uid/health | grep -q OK"
+          done
+
       # `pytest` from the repo root also runs tests/e2e: the real ingest, profile, clean and
       # metrics CLIs (and the rollup) against this InfluxDB and Postgres, on the committed fixtures
       # (tests/fixtures/ingest, profile, clean, metrics), into throwaway databases and a throwaway
@@ -128,10 +178,12 @@ jobs:
             exit 1
           fi
 
-      - name: Dump InfluxDB logs on failure
+      - name: Dump InfluxDB and Grafana logs on failure
         if: failure()
-        run: docker logs dac-influxdb
+        run: |
+          docker logs dac-influxdb
+          docker logs dac-grafana
 
-      - name: Stop InfluxDB
+      - name: Stop InfluxDB and Grafana
         if: always()
-        run: docker rm -f dac-influxdb
+        run: docker rm -f dac-influxdb dac-grafana
